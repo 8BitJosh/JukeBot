@@ -104,7 +104,14 @@ def fixPlaylist():
             info = ydl.extract_info(things, download=False)
         except Exception as e:
             while things in playlist: playlist.remove(things)
-
+            
+def length(path):
+    length = subprocess.check_output(['ffprobe', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', '-sexagesimal', path])   
+    length = length.decode("utf-8")
+    millisStart = length.find('.')
+    length = length[ :millisStart]
+    return length
+    
 #itterate through playlist get the title from youtube url search and print to screen
 def getPlaylist():
     endmsg = ''
