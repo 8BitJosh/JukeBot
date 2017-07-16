@@ -11,9 +11,10 @@ used to take music suggestions which are then searched for and played from youtu
 
 	'shuffle'			shuffle the order of the song queue
     
-#####################  these dont work yet  #######################
-
 	'skip'				skip the current song and move to the next in the queue
+                            sometimes is unable to remove file because it is in use
+
+#####################  these dont work yet  #######################
 
 	'pause'				pause the current playing song
 

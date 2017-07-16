@@ -13,7 +13,7 @@ savedir = "playlist"
 if not os.path.exists(savedir):
     os.makedirs(savedir)
     
-option = 'butts'
+option = 'none'
 isPlaying = False
 
 playlist = []
@@ -176,7 +176,7 @@ def download_song(unfixedsongURL):
         savepath = os.path.join(savedir, "%s.mp3" % (title))
     except Exception as e:
         print("Can't access song! %s\n" % traceback.format_exc())
-        return 'butts!'
+        return 'bad_path'
 
     try:
         os.stat(savepath)
@@ -188,7 +188,7 @@ def download_song(unfixedsongURL):
             return savepath
         except Exception as e:
             print ("Can't download audio! %s\n" % traceback.format_exc())
-            return 'butts!'
+            return 'bad_path'
 
 #Thread constantly looping to playsong / process the current command
 #update this to use a vector for the commands so that multiple people can do things
@@ -206,7 +206,7 @@ def playlist_update():
                 thing = playlist[0]
                 try:
                     path = download_song(thing)
-                    if path != 'butts!':
+                    if path != 'bad_path':
                         player = Player(path)
                         isPlaying = True
                         while thing in playlist: playlist.remove(thing)
@@ -225,6 +225,7 @@ def playlist_update():
                 else:
                     time.sleep(1)
             player.stop()
+            option = 'none'
             currentlyPlaying = ''
             isPlaying = False
         elif option == 'pause':
