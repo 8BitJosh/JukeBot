@@ -6,10 +6,12 @@ import sys
 import time
 import traceback
 import threading
+import datetime
 from random import shuffle
 from player import Player
 
 savedir = "playlist"
+
 if not os.path.exists(savedir):
     os.makedirs(savedir)
     
@@ -104,14 +106,8 @@ def fixPlaylist():
             info = ydl.extract_info(things, download=False)
         except Exception as e:
             while things in playlist: playlist.remove(things)
-            
-def length(path):
-    length = subprocess.check_output(['ffprobe', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', '-sexagesimal', path])   
-    length = length.decode("utf-8")
-    millisStart = length.find('.')
-    length = length[ :millisStart]
-    return length
-    
+           
+           
 #itterate through playlist get the title from youtube url search and print to screen
 def getPlaylist():
     endmsg = ''
@@ -171,7 +167,7 @@ def download_song(unfixedsongURL):
 
     try:
         title = info['title']
-        currentlyPlaying = 'Now: ' + title + '\n'
+        currentlyPlaying = 'Now: ['+ str(datetime.timedelta(seconds=info['duration'])) + ']  ' + title + '\n'
         title = do_format(title)
         savepath = os.path.join(savedir, "%s.mp3" % (title))
     except Exception as e:
