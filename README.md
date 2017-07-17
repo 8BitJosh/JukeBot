@@ -3,9 +3,15 @@
 Based on another project called MusicBot for discord ( https://github.com/Just-Some-Bots/MusicBot )
 used to take music suggestions which are then searched for and played from youtube using youtube-dl
 
+## Dependencys
+
+use "pip install" to add these
+
+youtube_dl
+
 ## What are its commands?
 
-	'play [songname]'	searches youtube for the songname and adds it to a play queue
+	'play [songname]'	        searches youtube for the songname and adds it to a play queue
 
 	'playlist'			print out all the songs in the queue
 

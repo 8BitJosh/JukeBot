@@ -1,14 +1,15 @@
 import subprocess
-import re
 import youtube_dl
-import os
-import sys
+
+import os, sys
 import time
 import traceback
 import threading
 import datetime
+
 import re
 import unicodedata
+
 import queue
 from random import shuffle
 from player import Player
