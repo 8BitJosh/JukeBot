@@ -9,6 +9,7 @@ import threading
 import datetime
 import re
 import unicodedata
+import queue
 from random import shuffle
 from player import Player
 
@@ -17,9 +18,9 @@ savedir = "playlist"
 if not os.path.exists(savedir):
     os.makedirs(savedir)
     
-option = 'none'
-isPlaying = False
+volume = 0.15
 
+commands = queue.Queue()
 playlist = []
 currentlyPlaying = ''
 
@@ -38,7 +39,7 @@ options = {
 
 #called when user enters a command and processes it acordingly
 def on_message(message):
-    global option
+    global commands
     global volume
     
     msg = message
@@ -51,19 +52,21 @@ def on_message(message):
         else:
             print(endmsg)
     elif msg.lower() == 'skip':
-        option = 'skip'
+        commands.put('skip')
+    elif msg.lower() == 'pause':
+        commands.put('pause')
+    elif msg.lower() == 'resume':
+        commands.put('resume')
+    elif msg.lower() == 'exit':
+        commands.put('exit')
     elif msg.lower() == 'shuffle':
         shuffle(playlist)
-    elif msg.lower() == 'pause':
-        option = 'pause'
-    elif msg.lower() == 'resume':
-        option = 'resume'
     elif 'volume' in msg.lower():
         substrStart = msg.find('volume') + 7
         msg = msg[substrStart: ]
         msg.strip()
         try:
-            volume = msg
+            volume = int(msg)
         except:
             print("thats not a number please use a number")
     elif 'play' in msg.lower():
@@ -180,17 +183,21 @@ def download_song(unfixedsongURL):
             return 'bad_path'
 
 #Thread constantly looping to playsong / process the current command
-#update this to use a vector for the commands so that multiple people can do things
-#    and commands get queued
 def playlist_update():
-    global isPlaying
-    global option
+    isPlaying = False
     global volume
     global currentlyPlaying
     
+    option = 'none'
     count = 0
+    
     while count != -1:
-        if isPlaying is False and option != 'pause':
+        if commands.empty():
+            option = 'none'
+        else:
+            option = commands.get()
+        
+        if isPlaying is False:
             if playlist:
                 thing = playlist[0]
                 try:
@@ -198,32 +205,18 @@ def playlist_update():
                     if path != 'bad_path':
                         player = Player(path)
                         isPlaying = True
-                        while thing in playlist: playlist.remove(thing)
-                        option = 'sleep'
-                    else:
-                        while thing in playlist: playlist.remove(thing)
+                    while thing in playlist: playlist.remove(thing)
                 except:
                     while thing in playlist: playlist.remove(thing)
-        if option == 'sleep' or option == 'skip':
-            while option != 'skip' and player.running():
-                if option == 'pause':
-                    player.pause()
-                elif option == 'resume':
-                    player.resume()
-                    option = 'sleep'
-                else:
-                    time.sleep(1)
+        if option == 'skip':
             player.stop()
-            option = 'none'
             currentlyPlaying = ''
             isPlaying = False
-        elif option == 'pause':
-            player.pause()
-            while option != 'resume':
-                time.sleep(1)
-            player.resume()
+        elif option == 'exit':
+            player.stop()
+            count = -1
         else:
-           time.sleep(1)
+            time.sleep(0.25)
 
 #create threads for other things
 try:
@@ -231,6 +224,11 @@ try:
 except Exception:
     print("fail to start loop")
 finally:
-    while True:
+    run = 1
+    while run == 1:
         message = input("Input Command - ")
         on_message(message)
+        if message == 'exit':
+            while not commands.empty():
+                time.sleep(1)
+            run = 0
