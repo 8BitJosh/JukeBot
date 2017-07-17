@@ -20,22 +20,20 @@ class Player:
         if self.p.poll() is None:
             return True
         else:
-            print("Finished")
             return False      
     
 #stop current song and cancel playback
     def stop(self):
         self.p.kill()
-        print("stop")
         self.delete_file()
 
 #pause the current song could pipe stdin to ffmpeg 'p' pauses/resumes
     def pause(self):
-        print("pause")
+        pass
     
 #resume the current song if it has been resumed
     def resume(self):
-        print("resume")
+        pass
 
 #delete the file in the current path
     def delete_file(self):

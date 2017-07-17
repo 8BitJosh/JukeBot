@@ -1,7 +1,7 @@
 # JukeBot
 
 Based on another project called MusicBot for discord ( https://github.com/Just-Some-Bots/MusicBot )
-used to take music suggestions which are then searched for and played from youtube
+used to take music suggestions which are then searched for and played from youtube using youtube-dl
 
 ## What are its commands?
 
