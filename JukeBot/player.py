@@ -3,7 +3,7 @@ import os
 import time
 
 class Player:
-#play song located at path kill current song first if running
+#play song located at path
 #might add pipe stuff? for stdin commands idk if this will work - have to give it a try
     def __init__(self, _path):
         self.path = _path
@@ -13,7 +13,7 @@ class Player:
                             stdout=subprocess.DEVNULL, 
                             stdin=subprocess.PIPE, 
                             stderr=subprocess.STDOUT
-                            )             
+                            )
 
 #check if the song is still running
     def running(self):
@@ -36,7 +36,8 @@ class Player:
 #resume the current song if it has been resumed
     def resume(self):
         print("resume")
-        
+
+#delete the file in the current path
     def delete_file(self):
         for x in range(30):
             try:

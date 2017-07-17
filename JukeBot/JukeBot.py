@@ -7,6 +7,8 @@ import time
 import traceback
 import threading
 import datetime
+import re
+import unicodedata
 from random import shuffle
 from player import Player
 
@@ -75,18 +77,9 @@ def on_message(message):
 
 #reformat the titles so the titles are suitable for windows file names
 def do_format(message):
-    replacements = ( ('4','a'), ('3','e'), ('1','l'), ('0','o'), ('7','t') )
-    endMsg = re.sub('À|à|Á|á|Â|â|Ã|ã|Ä|ä', 'a', message)
-    endMsg = re.sub('È|è|É|é|Ê|ê|Ë|ë', 'e', endMsg)
-    endMsg = re.sub('Ì|ì|Í|í|Î|î|Ï|ï', 'i', endMsg)
-    endMsg = re.sub('Ò|ò|Ó|ó|Ô|ô|Õ|õ|Ö', 'o', endMsg)
-    endMsg = re.sub('Ù|ù|Ú|ú|Û|û|Ü|ü', 'u', endMsg)
-    endMsg = re.sub('Ý|ý|Ÿ|ÿ', 'y', endMsg)
-    endMsg = re.sub('Ñ|ñ', 'n', endMsg)
-    for old, new in replacements:
-        endMsg = endMsg.replace(old, new)
-    endMsg = re.sub('[^0-9a-zA-Z]+', '', endMsg)
-    endMsg = re.sub(r'([a-z])\1+', r'\1', endMsg)
+    endMsg = unicodedata.normalize('NFKD', message).encode('ascii', 'ignore').decode('ascii')
+    endMsg = re.sub('[^\w\s-]', '', endMsg).strip().lower()
+    endMsg = re.sub('[-\s]+', '-', endMsg)
     return endMsg
 
 #fix the urls / remove bad items from the playlist that cant be found on yt
