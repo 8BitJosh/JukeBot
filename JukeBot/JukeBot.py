@@ -7,10 +7,6 @@ import traceback
 import threading
 import datetime
 
-#import logging
-#log = logging.getLogger('werkzeug')
-#log.setLevel(logging.ERROR)
-
 import re
 import unicodedata
 
@@ -26,8 +22,6 @@ savedir = "playlist"
 if not os.path.exists(savedir):
     os.makedirs(savedir)
     
-volume = 0.15
-
 web_inputs = queue.Queue()
 playlist = []
 currentlyPlaying = ''
@@ -62,11 +56,23 @@ def hello():
     if request.method == 'POST':
         title=request.form['title']
  
-        if form.validate():
-            web_inputs.put(title)
-            flash('Added Song - ' + title)
-        else:
-            flash('Error: All the form fields are required. ')
+        if 'submit' in request.form:
+            if form.validate():
+                playlist.append(title)
+                flash('Added Song - ' + title)
+            else:
+                flash('Error: All the form fields are required. ')
+        elif 'skip' in request.form:
+            web_inputs.put('skip')
+        elif 'shuffle' in request.form:
+            web_inputs.put('shuffle')
+        elif 'playlist' in request.form:
+            endmsg = currentlyPlaying
+            endmsg = endmsg + getPlaylist()
+            if(endmsg == ''):
+                flash("There is currently nothing left in the playlist")
+            else:
+                flash(endmsg)
  
     return render_template('index.html', form=form)
 
@@ -188,29 +194,12 @@ def playlist_update():
         option = 'none'
         if not web_inputs.empty():
             msg = web_inputs.get()
-            msg.strip()
             print(msg)
-            if msg.lower() == 'playlist':
-                endmsg = currentlyPlaying
-                endmsg = endmsg + getPlaylist()
-                if(endmsg == ''):
-                    print("There is currently nothing left in the playlist")
-                else:
-                    print(endmsg)
-            elif msg.lower() == 'skip':
+            if msg == 'skip':
                 option = 'skip'
-            elif msg.lower() == 'shuffle':
+            elif msg == 'shuffle':
                 shuffle(playlist)
-            elif 'volume' in msg.lower():
-                substrStart = msg.find('volume') + 7
-                msg = msg[substrStart: ]
-                msg.strip()
-                try:
-                    volume = int(msg)
-                except:
-                    print("thats not a number please use a number")
             else:
-                playlist.append(msg)
                 fixPlaylist()
         
         if isPlaying is False:

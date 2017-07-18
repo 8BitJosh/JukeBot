@@ -18,7 +18,10 @@
       <label for="title">Song Title:</label>
       <input type="text" class="form-control" id="title" name="title" placeholder="Song?">
     </div>
-    <button type="submit" class="btn btn-success">Submit</button>
+    <button type="submit" name="submit" class="btn btn-success"> Submit </button>
+    <button type="submit" name="skip" class="btn btn-success">  Skip  </button>
+    <button type="submit" name="shuffle" class="btn btn-success"> Shuffle </button>
+    <button type="submit" name="playlist" class="btn btn-success"> Playlist </button>
   </form>
  
   <br>
@@ -27,8 +30,8 @@
  
         {% for message in messages %}
             {% if "Error" not in message[1]: %}
-                <div class="alert alert-info">
-                <strong>Success! </strong> {{ message[1] }}
+                <div class="alert alert-info" style="white-space: pre">
+                    {{ message[1] }}
                 </div>
             {% endif %}
  

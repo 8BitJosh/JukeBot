@@ -1,6 +1,7 @@
 import subprocess
 import os
 import time
+import traceback
 
 class Player:
 #play song located at path
@@ -48,8 +49,8 @@ class Player:
 
             except Exception as e:
                 traceback.print_exc()
-                print("Error trying to delete " + path)
+                print("Error trying to delete " + self.path)
                 break
         else:
             print("[Config:SaveVideos] Could not delete file {}, giving up and moving on".format(
-                os.path.relpath(path)))
+                os.path.relpath(self.path)))
