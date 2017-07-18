@@ -21,7 +21,7 @@ class ReusableForm(Form):
     title = TextField('Title:', validators=[validators.required()])
  
 @app.route("/", methods=['GET', 'POST'])
-def hello():
+def index():
     form = ReusableForm(request.form)
     global web_inputs
     global playlist
@@ -74,15 +74,14 @@ def player_update():
         
         if isPlaying is False:
             if not playlist.empty():
-                thing = playlist.get_next()
                 try:
-                    path = playlist.download_song(thing)
+                    path = playlist.get_next()
                     if path != '':
                         player = Player(path)
                         isPlaying = True
-                    playlist.remove(thing)
+                    playlist.remove()
                 except:
-                    playlist.remove(thing)
+                    playlist.remove()
         if option == 'skip':
             player.stop()
             isPlaying = False

@@ -44,9 +44,9 @@ class Playlist:
             return True
     
     def get_next(self):
-        return self.songqueue[0].url
+        return self.songqueue[0].dir
         
-    def remove(self, thing):
+    def remove(self):
         self.currently_play = "Now : [" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title + " \n"
         print("remove")
         #while thing in self.songqueue: self.songqueue.remove(thing)
@@ -78,7 +78,7 @@ class Playlist:
 
             try:
                 entry = PlaylistEntry(
-                    things,
+                    song_url,
                     info['title'],
                     info['duration']
                 )
@@ -87,6 +87,13 @@ class Playlist:
                 
             self.songqueue.append(entry)
             while things in self.songlist: self.songlist.remove(things)
+            
+        for things in self.songqueue:
+            if things.downloaded == False:
+                things.dir = self.download_song(things)
+                things.downloaded = True
+                break
+           
 
     #itterate through playlist get the title from youtube url search and print to screen
     def getPlaylist(self):
@@ -99,31 +106,12 @@ class Playlist:
     
     
     #download song from url or search term and return the save path of the file
-    def download_song(self, unfixedsongURL):
-        print("download")
-        song_url = unfixedsongURL.strip()
+    def download_song(self, to_down):
+        song_url = to_down.url.strip()
         ydl = youtube_dl.YoutubeDL(options)
+        
         try:
-            info = ydl.extract_info(song_url, download = False, process = False)
-        except Exception:
-            print("error")
-            pass
-        if not info:
-            print("Ths video cannot be played")
-            return
-            
-        if info.get('url', '').startswith('ytsearch'):
-            info = ydl.extract_info(song_url, download = False, process = True)
-            
-            if not all(info.get('entries', [])):
-                return
-                
-            song_url = info['entries'][0]['webpage_url']
-            info = ydl.extract_info(song_url, download = False, process = False)
-
-        try:
-            title = info['title']
-            title = do_format(title)
+            title = do_format(to_down.title)
             savepath = os.path.join(self.savedir, "%s.mp3" % (title))
         except Exception as e:
             print("Can't access song! %s\n" % traceback.format_exc())
