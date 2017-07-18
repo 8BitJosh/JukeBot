@@ -15,15 +15,12 @@ wtforms
 
 ## What are its commands?
 
-    '[songname]'            searches youtube for the songname and adds it to a play queue
-
-    'playlist'              print out all the songs in the queue
-
-    'shuffle'               shuffle the order of the song queue
-
-    'skip'                  skip the current song and move to the next in the queue
+    Entering a song title on the webpage and selecting submit will queue the song
+    
+    The other buttons skip, shuffle, playlist will perform there respective function
 
 ## TODO
 
-The skip and shuffle command will be moved to a seperate webpage for admin only
-The playlist will be constantly on the webpage instead of having to be called atm it prints to console
+-move the playlist to a class
+-store the playlist title/duration/url in structs instead of redownloading each time more efficient for webpage
+-predownload to stop the delay between the songs
