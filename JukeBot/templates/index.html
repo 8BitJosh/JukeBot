@@ -16,7 +16,7 @@
     {{ form.csrf }}
     <div class="form-group">
       <label for="title">Song Title:</label>
-      <input type="text" class="form-control" id="title" name="title" placeholder="Song?">
+      <input type="text" class="form-control" id="title" name="title" placeholder="Song?" autofocus>
     </div>
     <button type="submit" name="submit" class="btn btn-success"> Submit </button>
     <button type="submit" name="skip" class="btn btn-success">  Skip  </button>
@@ -30,7 +30,7 @@
  
         {% for message in messages %}
             {% if "Error" not in message[1]: %}
-                <div class="alert alert-info" style="white-space: pre">
+                <div class="alert alert-info" style="white-space: pre-wrap">
                     {{ message[1] }}
                 </div>
             {% endif %}
