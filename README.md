@@ -3,27 +3,27 @@
 Based on another project called MusicBot for discord ( https://github.com/Just-Some-Bots/MusicBot )
 used to take music suggestions which are then searched for and played from youtube using youtube-dl
 
+Song suggestions are added through a web interface
+
 ## Dependencys
 
 use "pip install" to add these
 
 youtube_dl
+flask
+wtforms
 
 ## What are its commands?
 
-	'play [songname]'	        searches youtube for the songname and adds it to a play queue
+    '[songname]'            searches youtube for the songname and adds it to a play queue
 
-	'playlist'			print out all the songs in the queue
+    'playlist'              print out all the songs in the queue
 
-	'shuffle'			shuffle the order of the song queue
-    
-	'skip'				skip the current song and move to the next in the queue
+    'shuffle'               shuffle the order of the song queue
 
-#####################  these dont work yet  #######################
+    'skip'                  skip the current song and move to the next in the queue
 
-	'pause'				pause the current playing song
+## TODO
 
-	'resume'			resume the currently paused song
-
-	'volume'			set the volume of playback between 0.0-1.0
-
+The skip and shuffle command will be moved to a seperate webpage for admin only
+The playlist will be constantly on the webpage instead of having to be called atm it prints to console

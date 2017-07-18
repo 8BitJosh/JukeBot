@@ -7,12 +7,19 @@ import traceback
 import threading
 import datetime
 
+#import logging
+#log = logging.getLogger('werkzeug')
+#log.setLevel(logging.ERROR)
+
 import re
 import unicodedata
 
 import queue
 from random import shuffle
 from player import Player
+
+from flask import Flask, render_template, flash, request
+from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 
 savedir = "playlist"
 
@@ -21,7 +28,7 @@ if not os.path.exists(savedir):
     
 volume = 0.15
 
-commands = queue.Queue()
+web_inputs = queue.Queue()
 playlist = []
 currentlyPlaying = ''
 
@@ -38,46 +45,30 @@ options = {
     'default_search': 'ytsearch',
     }
 
-#called when user enters a command and processes it acordingly
-def on_message(message):
-    global commands
-    global volume
-    
-    msg = message
-    msg.strip()
-    if msg.lower() == 'playlist':
-        endmsg = currentlyPlaying
-        endmsg = endmsg + getPlaylist()
-        if(endmsg == ''):
-            print("There is currently nothing left in the playlist")
+app = Flask(__name__)
+app.config.from_object(__name__)
+app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+ 
+class ReusableForm(Form):
+    title = TextField('Title:', validators=[validators.required()])
+ 
+ 
+@app.route("/", methods=['GET', 'POST'])
+def hello():
+    form = ReusableForm(request.form)
+    global web_inputs
+ 
+    print(form.errors)
+    if request.method == 'POST':
+        title=request.form['title']
+ 
+        if form.validate():
+            web_inputs.put(title)
+            flash('Added Song - ' + title)
         else:
-            print(endmsg)
-    elif msg.lower() == 'skip':
-        commands.put('skip')
-    elif msg.lower() == 'pause':
-        commands.put('pause')
-    elif msg.lower() == 'resume':
-        commands.put('resume')
-    elif msg.lower() == 'exit':
-        commands.put('exit')
-    elif msg.lower() == 'shuffle':
-        shuffle(playlist)
-    elif 'volume' in msg.lower():
-        substrStart = msg.find('volume') + 7
-        msg = msg[substrStart: ]
-        msg.strip()
-        try:
-            volume = int(msg)
-        except:
-            print("thats not a number please use a number")
-    elif 'play' in msg.lower():
-        substrStart = msg.find('play') + 5
-        msg = msg[substrStart: ]
-        msg.strip()
-        playlist.append(msg)
-        fixPlaylist()
-    else:
-        print("Invalid Command")
+            flash('Error: All the form fields are required. ')
+ 
+    return render_template('index.html', form=form)
 
 #reformat the titles so the titles are suitable for windows file names
 def do_format(message):
@@ -188,15 +179,39 @@ def playlist_update():
     isPlaying = False
     global volume
     global currentlyPlaying
+    global web_inputs
     
     option = 'none'
     count = 0
     
     while count != -1:
-        if commands.empty():
-            option = 'none'
-        else:
-            option = commands.get()
+        option = 'none'
+        if not web_inputs.empty():
+            msg = web_inputs.get()
+            msg.strip()
+            print(msg)
+            if msg.lower() == 'playlist':
+                endmsg = currentlyPlaying
+                endmsg = endmsg + getPlaylist()
+                if(endmsg == ''):
+                    print("There is currently nothing left in the playlist")
+                else:
+                    print(endmsg)
+            elif msg.lower() == 'skip':
+                option = 'skip'
+            elif msg.lower() == 'shuffle':
+                shuffle(playlist)
+            elif 'volume' in msg.lower():
+                substrStart = msg.find('volume') + 7
+                msg = msg[substrStart: ]
+                msg.strip()
+                try:
+                    volume = int(msg)
+                except:
+                    print("thats not a number please use a number")
+            else:
+                playlist.append(msg)
+                fixPlaylist()
         
         if isPlaying is False:
             if playlist:
@@ -217,19 +232,11 @@ def playlist_update():
             player.stop()
             count = -1
         else:
-            time.sleep(0.25)
+            time.sleep(0.1)
 
+def start_web():
+    app.run(host = '0.0.0.0', port=80, debug = False, threaded = True, use_reloader = False)
+    
 #create threads for other things
-try:
-    t = threading.Thread(target = playlist_update).start()
-except Exception:
-    print("fail to start loop")
-finally:
-    run = 1
-    while run == 1:
-        message = input("Input Command - ")
-        on_message(message)
-        if message == 'exit':
-            while not commands.empty():
-                time.sleep(1)
-            run = 0
+t = threading.Thread(target = playlist_update).start()
+p = threading.Thread(target = start_web).start()
