@@ -74,14 +74,10 @@ def player_update():
         
         if isPlaying is False:
             if not playlist.empty():
-                try:
-                    path = playlist.get_next()
-                    if path != '':
-                        player = Player(path)
-                        isPlaying = True
-                    playlist.remove()
-                except:
-                    playlist.remove()
+                path = playlist.get_next()
+                if path != '':
+                    player = Player(path)
+                    isPlaying = True
         if option == 'skip':
             player.stop()
             isPlaying = False

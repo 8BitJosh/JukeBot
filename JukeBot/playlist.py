@@ -44,14 +44,12 @@ class Playlist:
             return True
     
     def get_next(self):
-        return self.songqueue[0].dir
-        
-    def remove(self):
         self.currently_play = "Now : [" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title + " \n"
+        path = self.songqueue[0].dir
         print("remove")
-        #while thing in self.songqueue: self.songqueue.remove(thing)
         del self.songqueue[0]
-    
+        return path
+        
     def add(self, title):
         self.songlist.append(title)
 
