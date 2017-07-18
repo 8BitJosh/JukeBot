@@ -67,10 +67,8 @@ def player_update():
                 option = 'skip'
             elif msg == 'shuffle':
                 playlist.shuff()
-            else:
-                print("unknown command")
-                
-        playlist.process()
+        else:
+            playlist.process()
         
         if isPlaying is False:
             if not playlist.empty():
