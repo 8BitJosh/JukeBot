@@ -1,4 +1,3 @@
-import os, sys
 import time
 import threading
 
@@ -29,23 +28,23 @@ def index():
     print(form.errors)
     if request.method == 'POST':
         title=request.form['title']
- 
+        
         if 'submit' in request.form:
             if form.validate():
                 playlist.add(title)
                 flash('Added Song - ' + title)
-            else:
-                flash('Error: All the form fields are required. ')
         elif 'skip' in request.form:
             web_inputs.put('skip')
         elif 'shuffle' in request.form:
             web_inputs.put('shuffle')
         elif 'playlist' in request.form:
-            endmsg = playlist.getPlaylist()
-            if(endmsg == ''):
-                flash("There is currently nothing left in the playlist")
-            else:
-                flash(endmsg)
+            pass
+
+    endmsg = playlist.getPlaylist()
+    if(endmsg == ''):
+        flash("There is currently nothing left in the playlist")
+    else:
+        flash(endmsg)
 
     return render_template('index.html', form=form)
 
@@ -55,10 +54,7 @@ def player_update():
     global web_inputs
     global playlist
     
-    option = 'none'
-    count = 0
-    
-    while count != -1:
+    while True:
         option = 'none'
         if not web_inputs.empty():
             msg = web_inputs.get()

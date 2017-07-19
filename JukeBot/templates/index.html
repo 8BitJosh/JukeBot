@@ -29,15 +29,15 @@
             {% if messages %}
  
         {% for message in messages %}
-            {% if "Error" not in message[1]: %}
-                <div class="alert alert-info" style="white-space: pre-wrap">
+            {% if "Added" in message[1]: %}
+                <div class="alert alert-info">
                     {{ message[1] }}
                 </div>
             {% endif %}
- 
-            {% if "Error" in message[1]: %}
-                <div class="alert alert-warning">
-                {{ message[1] }}
+            
+            {% if "Added" not in message[1]: %}
+                <div class="alert alert-info" style="white-space: pre-wrap">
+                    {{ message[1] }}
                 </div>
             {% endif %}
         {% endfor %}
