@@ -38,7 +38,7 @@ class Player:
             self.delete_file()
             self.path = ''
         else:
-            print("Unable to skip no song playing")
+            print("Unable to skip - no song playing")
             
 #delete the file in the current path
     def delete_file(self):

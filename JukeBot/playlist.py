@@ -36,6 +36,7 @@ class Playlist:
         
     def shuff(self):
         shuffle(self.songlist)
+        print("Playlist Shuffled")
     
     def empty(self):
         if self.songqueue:
@@ -46,7 +47,7 @@ class Playlist:
     def get_next(self):
         self.currently_play = "Now : [" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title + " \n"
         path = self.songqueue[0].dir
-        print("remove")
+        print("Removed from  to play queue - " + self.songqueue[0].title)
         del self.songqueue[0]
         return path
         
@@ -55,7 +56,7 @@ class Playlist:
 
     def process(self):
         for things in self.songlist:
-            print("processed")
+            print("process called")
             song_url = things.strip()
             ydl = youtube_dl.YoutubeDL(options)
 
@@ -84,6 +85,7 @@ class Playlist:
                 print("oh no url YT error again")
                 
             self.songqueue.append(entry)
+            print("user input processed - " + things)
             while things in self.songlist: self.songlist.remove(things)
             
         for things in self.songqueue:
@@ -122,7 +124,7 @@ class Playlist:
             try:
                 result = ydl.extract_info(song_url, download=True)
                 os.rename(result['id'], savepath)
-                print("Downloaded")
+                print("Downloaded - " + savepath)
                 return savepath
             except Exception as e:
                 print ("Can't download audio! %s\n" % traceback.format_exc())

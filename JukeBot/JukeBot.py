@@ -58,7 +58,7 @@ def player_update():
         option = 'none'
         if not web_inputs.empty():
             msg = web_inputs.get()
-            print(msg)
+            print("command called - " + msg)
             if msg == 'skip':
                 option = 'skip'
             elif msg == 'shuffle':
