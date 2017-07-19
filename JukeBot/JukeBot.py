@@ -50,9 +50,9 @@ def index():
 
 #Thread constantly looping to playsong / process the current command
 def player_update():
-    isPlaying = False
     global web_inputs
     global playlist
+    player = Player()
     
     while True:
         option = 'none'
@@ -66,15 +66,14 @@ def player_update():
         else:
             playlist.process()
         
-        if isPlaying is False:
+        if not player.running():
             if not playlist.empty():
                 path = playlist.get_next()
                 if path != '':
-                    player = Player(path)
-                    isPlaying = True
+                    player.play(path)
+
         if option == 'skip':
             player.stop()
-            isPlaying = False
         else:
             time.sleep(0.1)
 

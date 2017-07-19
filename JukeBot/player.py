@@ -6,7 +6,11 @@ import traceback
 class Player:
 #play song located at path
 #might add pipe stuff? for stdin commands idk if this will work - have to give it a try
-    def __init__(self, _path):
+    def __init__(self):
+        pass
+
+# start playing song at path
+    def play(self, _path):
         self.path = _path
         self.p = subprocess.Popen(
                             ['ffplay', '-nodisp', '-autoexit', self.path],
@@ -15,27 +19,27 @@ class Player:
                             stdin=subprocess.PIPE, 
                             stderr=subprocess.STDOUT
                             )
-
+    
 #check if the song is still running
     def running(self):
-        if self.p.poll() is None:
-            return True
-        else:
-            return False      
+        try:
+            if self.p.poll() is None:
+                return True
+            else:
+                self.path = ''
+                return False
+        except:
+            return False
     
 #stop current song and cancel playback
     def stop(self):
-        self.p.kill()
-        self.delete_file()
-
-#pause the current song could pipe stdin to ffmpeg 'p' pauses/resumes
-    def pause(self):
-        pass
-    
-#resume the current song if it has been resumed
-    def resume(self):
-        pass
-
+        if self.running():
+            self.p.kill()
+            self.delete_file()
+            self.path = ''
+        else:
+            print("Unable to skip no song playing")
+            
 #delete the file in the current path
     def delete_file(self):
         for x in range(30):
