@@ -13,7 +13,7 @@
     $(window).load(function($) {
         get_playlist();
     });
-    setInterval('get_playlist()', 5000);
+    setInterval('get_playlist()', 10000);
 </script>
     
 <head>
@@ -39,9 +39,9 @@
   </form>
  
   <br>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
- 
                 {% for message in messages %}
                     <div class="alert alert-info">
                         {{ message[1] }}

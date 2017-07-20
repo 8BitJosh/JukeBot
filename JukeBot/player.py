@@ -28,7 +28,7 @@ class Player:
             else:
                 self.path = ''
                 return False
-        except:
+        except: # causes error before first song as no process is playing
             return False
     
 #stop current song and cancel playback

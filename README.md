@@ -8,6 +8,7 @@ playlist or skip the current song
 
 ## Dependencys
 
+run update_dep to install dependencies or
 use "pip install" to add these
 
 youtube_dl
