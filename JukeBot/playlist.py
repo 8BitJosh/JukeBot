@@ -68,7 +68,9 @@ class Playlist:
           
             if info.get('url', '').startswith('ytsearch'):
                 info = ydl.extract_info(song_url, download = False, process = True)
-            
+                if not info:
+                    self.songlist.remove(things)
+                    return
                 if not all(info.get('entries', [])):
                     return
                 
