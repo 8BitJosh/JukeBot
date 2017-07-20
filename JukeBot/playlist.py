@@ -41,6 +41,7 @@ class Playlist:
         if self.songqueue:
             return False
         else:
+            self.currently_play = ''
             return True
     
     def get_next(self):
@@ -62,9 +63,9 @@ class Playlist:
             try:
                 info = ydl.extract_info(song_url, download = False, process = False)
             except Exception:
-                print("error")
+                print("info extraction error")
                 pass
-            
+          
             if info.get('url', '').startswith('ytsearch'):
                 info = ydl.extract_info(song_url, download = False, process = True)
             
@@ -72,6 +73,7 @@ class Playlist:
                     return
                 
                 song_url = info['entries'][0]['webpage_url']
+                   
                 info = ydl.extract_info(song_url, download = False, process = False)
 
             try:

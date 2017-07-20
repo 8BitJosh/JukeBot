@@ -19,3 +19,4 @@ wtforms
 
 - come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
 the way some of the functions work
+- change the playlist class to allow the user to add songs by a playlist

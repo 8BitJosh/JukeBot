@@ -19,6 +19,7 @@ class Player:
                             stdin=subprocess.PIPE, 
                             stderr=subprocess.STDOUT
                             )
+        print("playing - " + self.path)
     
 #check if the song is still running
     def running(self):
@@ -45,6 +46,7 @@ class Player:
         for x in range(30):
             try:
                 os.unlink(self.path)
+                print("file deleted - " + self.path)
                 break
 
             except PermissionError as e:
@@ -53,7 +55,7 @@ class Player:
 
             except Exception as e:
                 traceback.print_exc()
-                print("Error trying to delete " + self.path)
+                print("Error trying to delete - " + self.path)
                 break
         else:
             print("[Config:SaveVideos] Could not delete file {}, giving up and moving on".format(

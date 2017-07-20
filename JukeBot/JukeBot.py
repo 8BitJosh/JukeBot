@@ -32,11 +32,13 @@ def index():
         if 'submit' in request.form:
             if form.validate():
                 playlist.add(title)
-                flash('Added Song - ' + title)
+                flash('Queued Song - ' + title)
                 print("user entered song - " + title)
         elif 'skip' in request.form:
+            flash('Song Skipped')
             web_inputs.put('skip')
         elif 'shuffle' in request.form:
+            flash('Playlist Shuffled')
             web_inputs.put('shuffle')
 
     return render_template('index.html', form=form)
@@ -46,7 +48,7 @@ def index():
 def data():
     endmsg = playlist.getPlaylist()
     if(endmsg == ''):
-        return jsonify("There is currently nothing left in the playlist")
+        return jsonify("There is currently nothing in the playlist")
     else:
         return jsonify(endmsg)
 
