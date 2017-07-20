@@ -28,7 +28,7 @@ class Playlist:
         self.songqueue = []
         self.currently_play = ''
         
-        self.savedir = "playlist"
+        self.savedir = "cache"
         if os.path.exists(self.savedir):
             shutil.rmtree(self.savedir)
         os.makedirs(self.savedir)
