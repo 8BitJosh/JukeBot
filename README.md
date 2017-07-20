@@ -18,4 +18,3 @@ wtforms
 
 - come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
 the way some of the functions work
--use jquery and AJAX to make the webpage update the playlist without having to update the page

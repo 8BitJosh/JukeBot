@@ -1,14 +1,29 @@
 <html>
-    <head>
-        <title>JukeBot</title>
-       <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
-       <link rel="stylesheet" href="static/bootstrap-theme.min.css">
-       <meta name="viewport" content = "width=device-width, initial-scale=1.0">
- 
-    </head>
-    <body>
- 
- 
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type=text/javascript>
+    function get_playlist() {
+        $.getJSON(
+            "data",
+            function(data) {
+                $('#playlist').text(data);
+            }
+        );
+    }
+    $(window).load(function($) {
+        get_playlist();
+    });
+    setInterval('get_playlist()', 5000);
+</script>
+    
+<head>
+    <title>JukeBot</title>
+    <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
+    <link rel="stylesheet" href="static/bootstrap-theme.min.css">
+    <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+</head>
+
+<body>
 <div class="container">
  
   <h2>JukeBot Song Request</h2>
@@ -21,29 +36,21 @@
     <button type="submit" name="submit" class="btn btn-success"> Submit </button>
     <button type="submit" name="skip" class="btn btn-success">  Skip  </button>
     <button type="submit" name="shuffle" class="btn btn-success"> Shuffle </button>
-    <button type="submit" name="playlist" class="btn btn-success"> Playlist </button>
   </form>
  
   <br>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
  
-        {% for message in messages %}
-            {% if "Added" in message[1]: %}
-                <div class="alert alert-info">
-                    {{ message[1] }}
-                </div>
-            {% endif %}
-            
-            {% if "Added" not in message[1]: %}
-                <div class="alert alert-info" style="white-space: pre-wrap">
-                    {{ message[1] }}
-                </div>
-            {% endif %}
-        {% endfor %}
+                {% for message in messages %}
+                    <div class="alert alert-info">
+                        {{ message[1] }}
+                    </div>
+                {% endfor %}
             {% endif %}
         {% endwith %}
- 
+        
+    <div class="alert alert-info" id="playlist" style="white-space: pre-wrap"></div>
 </div>
 <br>      
 </div>

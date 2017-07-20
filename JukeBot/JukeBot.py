@@ -6,7 +6,7 @@ import queue
 from player import Player
 from playlist import Playlist
 
-from flask import Flask, render_template, flash, request
+from flask import Flask, render_template, flash, request, jsonify
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
    
 web_inputs = queue.Queue()
@@ -33,20 +33,21 @@ def index():
             if form.validate():
                 playlist.add(title)
                 flash('Added Song - ' + title)
+                print("user entered song - " + title)
         elif 'skip' in request.form:
             web_inputs.put('skip')
         elif 'shuffle' in request.form:
             web_inputs.put('shuffle')
-        elif 'playlist' in request.form:
-            pass
-
-    endmsg = playlist.getPlaylist()
-    if(endmsg == ''):
-        flash("There is currently nothing left in the playlist")
-    else:
-        flash(endmsg)
 
     return render_template('index.html', form=form)
+    
+@app.route('/data')
+def data():
+    endmsg = playlist.getPlaylist()
+    if(endmsg == ''):
+        return jsonify("There is currently nothing left in the playlist")
+    else:
+        return jsonify(endmsg)
 
 #Thread constantly looping to playsong / process the current command
 def player_update():

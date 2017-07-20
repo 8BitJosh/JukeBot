@@ -23,7 +23,6 @@ options = {
 
 class Playlist:
     
-
     def __init__(self):
         self.songlist = []
         self.songqueue = []
@@ -47,7 +46,7 @@ class Playlist:
     def get_next(self):
         self.currently_play = "Now : [" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title + " \n"
         path = self.songqueue[0].dir
-        print("Removed from  to play queue - " + self.songqueue[0].title)
+        print("Removed from to play queue - " + self.songqueue[0].title)
         del self.songqueue[0]
         return path
         
