@@ -92,7 +92,7 @@ class Playlist:
                     print("oh no url YT error again")
 
 ####if song is playlist
-            if 'entries' in info:
+            elif 'entries' in info:
                 try:
                     info = ydl.extract_info(song_url, download=False, process=False)
                 except Exception as e:

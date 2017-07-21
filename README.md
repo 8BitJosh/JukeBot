@@ -23,3 +23,4 @@ wtforms
 - add more cases to the process function to accept and handle all types of possible user input
 - come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
 the way some of the functions work, could use mplayer ?
+-find a better way to exit without having to terminate the process
