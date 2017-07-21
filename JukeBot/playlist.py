@@ -81,16 +81,55 @@ class Playlist:
                    
                 info = ydl.extract_info(song_url, download = False, process = False)
 
-            try:
-                entry = PlaylistEntry(
-                    song_url,
-                    info['title'],
-                    info['duration']
-                )
-                self.songqueue.append(entry)
-            except:
-                print("oh no url YT error again")
+                try:
+                    entry = PlaylistEntry(
+                        song_url,
+                        info['title'],
+                        info['duration']
+                    )
+                    self.songqueue.append(entry)
+                except:
+                    print("oh no url YT error again")
 
+####if song is playlist
+            if 'entries' in info:
+                try:
+                    info = ydl.extract_info(song_url, download=False, process=False)
+                except Exception as e:
+                    print('Could not extract information from {}\n\n{}'.format(playlist_url, e))
+                    return
+
+                if not info:
+                    print('Could not extract information from %s' % playlist_url)
+                    return
+                    
+                items = 0
+                baditems = 0
+                for entry_data in info['entries']:
+                    items += 1
+                    if entry_data:
+                        baseurl = info['webpage_url'].split('playlist?list=')[0]
+                        song_url = baseurl + 'watch?v=%s' % entry_data['id']
+                        try:
+                            playlist_info = ydl.extract_info(song_url, download=False, process=True)
+                            entry = PlaylistEntry(
+                                song_url,
+                                playlist_info['title'],
+                                playlist_info['duration']
+                            )
+                            print(playlist_info['title'] + " added from playlist")
+                            self.songqueue.append(entry)
+                        except Exception as e:
+                            baditems += 1
+                            print("There was an error adding the song from playlist")
+                            print(e)
+                    else:
+                        baditems += 1
+
+                if baditems:
+                    print("Skipped %s bad entries" % baditems)
+        
+                print('Added {}/{} songs from playlist'.format(items - baditems, items))
 
             print("user input processed - " + things)
             while things in self.songlist: self.songlist.remove(things)
