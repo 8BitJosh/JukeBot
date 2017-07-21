@@ -111,13 +111,13 @@ class Playlist:
                         baseurl = info['webpage_url'].split('playlist?list=')[0]
                         song_url = baseurl + 'watch?v=%s' % entry_data['id']
                         try:
-                            playlist_info = ydl.extract_info(song_url, download=False, process=False)
+                            playlist_info = ydl.extract_info(song_url, download=False, process=True)
                             entry = PlaylistEntry(
-                                info.get('url', ''),
-                                info['title'],
-                                0
+                                song_url,
+                                playlist_info['title'],
+                                playlist_info['duration']
                             )
-                            print(info['title'] + " added from playlist")
+                            print(playlist_info['title'] + " added from playlist")
                             self.songqueue.append(entry)
                         except Exception as e:
                             baditems += 1
