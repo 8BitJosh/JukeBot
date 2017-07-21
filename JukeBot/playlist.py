@@ -13,7 +13,7 @@ options = {
     'extractaudio' : True,
     'audioformat' : "mp3",
     'outtmpl': '%(id)s',
-    'noplaylist' : True,
+    'noplaylist' : False,   ################
     'nocheckcertificate' : True,
     'ignoreerrors' : True,
     'quiet' : True,
@@ -59,13 +59,16 @@ class Playlist:
             print("process called")
             song_url = things.strip()
             ydl = youtube_dl.YoutubeDL(options)
-
+            
+####get info for song
             try:
                 info = ydl.extract_info(song_url, download = False, process = False)
             except Exception:
                 print("info extraction error")
                 pass
-          
+                
+####if song is search term
+            
             if info.get('url', '').startswith('ytsearch'):
                 info = ydl.extract_info(song_url, download = False, process = True)
                 if not info:
@@ -84,13 +87,15 @@ class Playlist:
                     info['title'],
                     info['duration']
                 )
+                self.songqueue.append(entry)
             except:
                 print("oh no url YT error again")
-                
-            self.songqueue.append(entry)
+
+
             print("user input processed - " + things)
             while things in self.songlist: self.songlist.remove(things)
             
+####download next non downloaded song
         for things in self.songqueue:
             if things.downloaded == False:
                 things.dir = self.download_song(things)
