@@ -113,7 +113,8 @@ class Playlist:
                         try:
                             playlist_info = ydl.extract_info(song_url, download=False, process=True)
                             entry = PlaylistEntry(
-                                song_url,
+                                #song_url,
+                                playlist_info['url'],
                                 playlist_info['title'],
                                 playlist_info['duration']
                             )
@@ -131,10 +132,24 @@ class Playlist:
         
                 print('Added {}/{} songs from playlist'.format(items - baditems, items))
 
+####else if song is a url or other thing
+            else:
+                info = ydl.extract_info(song_url, download = False, process = True)
+                try:
+                    entry = PlaylistEntry(
+                        song_url,
+                        info['title'],
+                        info['duration']
+                    )
+                    self.songqueue.append(entry)
+                except:
+                    print("Error with other option")
+
             print("user input processed - " + things)
             while things in self.songlist: self.songlist.remove(things)
-            
-####download next non downloaded song
+
+    #download next non downloaded song
+    def download_next(self):
         for things in self.songqueue:
             if things.downloaded == False:
                 things.dir = self.download_song(things)

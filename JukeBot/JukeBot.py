@@ -31,7 +31,13 @@ def index():
         
         if 'submit' in request.form:
             if form.validate():
-                playlist.add(title)
+                if '&' in title:
+                    flash("If you wanted to add a playlist use the full playlist page that has 'playlist' in the url")
+                    start_pos = title.find('&')
+                    msg = title[:start_pos]
+                    playlist.add(msg)
+                else:
+                    playlist.add(title)
                 flash('Queued Song - ' + title)
                 print("user entered song - " + title)
         elif 'skip' in request.form:
@@ -69,6 +75,7 @@ def player_update():
                 playlist.shuff()
         else:
             playlist.process()
+            playlist.download_next()
         
         if not player.running():
             if not playlist.empty():
