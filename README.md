@@ -9,6 +9,8 @@ where the user can also see the playlist, shuffle the playlist or skip the curre
 The song suggestions can be added via the song title which will be found through a YT search
 or a direct link to the youtube song or youtube playlist. playlist url must say playlist in it
 
+tested and runs on a raspberry pi
+
 ## Dependencys
 
 run update_dep to install dependencies or
@@ -17,6 +19,8 @@ use "pip install" to add these
 youtube_dl
 flask
 wtforms
+
+avlib also needs to be installed on the system the bot is running on 
 
 ## TODO
 
