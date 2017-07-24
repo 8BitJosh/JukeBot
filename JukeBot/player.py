@@ -27,6 +27,8 @@ class Player:
             if self.p.poll() is None:
                 return True
             else:
+                if self.path != '' and os.path.exists(self.path):
+                    self.delete_file()
                 self.path = ''
                 return False
         except: # causes error before first song as no process is playing
@@ -58,5 +60,5 @@ class Player:
                 print("Error trying to delete - " + self.path)
                 break
         else:
-            print("[Config:SaveVideos] Could not delete file {}, giving up and moving on".format(
-                os.path.relpath(self.path)))
+            print("Could not delete file {}, giving up and moving on".format(self.path))
+
