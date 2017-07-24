@@ -7,14 +7,17 @@ from playlist import Playlist
 
 from flask import Flask, render_template, flash, request, jsonify
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
-   
+from flask_socketio import SocketIO, emit
+import eventlet
+
 web_inputs = queue.Queue()
 playlist = Playlist()
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
- 
+socketio = SocketIO(app, async_mode='eventlet')
+
 class ReusableForm(Form):
     title = TextField('Title:', validators=[validators.required()])
 
@@ -89,9 +92,11 @@ def player_update():
             time.sleep(0.1)
 
 #function to run for webpage thread
-def start_web():
-    app.run(host = '0.0.0.0', port=80, debug = False, threaded = True, use_reloader = False)
+#def start_web():
+    #app.run(host = '0.0.0.0', port=80, debug = False, threaded = True, use_reloader = False)
+#    socketio.run(app, debug = True)
     
 #create threads for other things
 t = threading.Thread(target = player_update).start()
-p = threading.Thread(target = start_web).start()
+#p = threading.Thread(target = start_web).start()
+socketio.run(app, debug = True, host = '0.0.0.0', port=80)
