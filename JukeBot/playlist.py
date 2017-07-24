@@ -113,8 +113,8 @@ class Playlist:
                         try:
                             playlist_info = ydl.extract_info(song_url, download=False, process=True)
                             entry = PlaylistEntry(
-                                #song_url,
-                                playlist_info['url'],
+                                song_url,
+                                #playlist_info['url'],
                                 playlist_info['title'],
                                 playlist_info['duration']
                             )
