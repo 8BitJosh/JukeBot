@@ -39,7 +39,7 @@ avlib also needs to be installed on the system the bot is running on as the bot 
 ## Web Interface
 - screenshot of the web interface
 
-![jukebot webpage screenshot](https://s12.postimg.org/vb228kkq5/jukebot_snap.png)][![jukebot snap.png](https://s12.postimg.org/vb228kkq5/jukebot_snap.png)
+![jukebot webpage screenshot](https://s12.postimg.org/vb228kkq5/jukebot_snap.png)
 
 ## TODO
 
