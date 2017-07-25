@@ -34,7 +34,7 @@ class Playlist:
         os.makedirs(self.savedir)
         
     def shuff(self):
-        shuffle(self.songlist)
+        shuffle(self.songqueue)
         print("Playlist Shuffled")
     
     def empty(self):
