@@ -36,6 +36,11 @@ avlib also needs to be installed on the system the bot is running on as the bot 
 - songs can be added through: song title, youtube/soundcloud url or youtube playlist url.
 - other websites supported by youtube-dl may work through adding urls but this is untested
 
+## Web Interface
+- screenshot of the web interface
+
+![jukebot webpage screenshot](https://s12.postimg.org/vb228kkq5/jukebot_snap.png)][![jukebot snap.png](https://s12.postimg.org/vb228kkq5/jukebot_snap.png)
+
 ## TODO
 
 This project is still in development with more features to come
