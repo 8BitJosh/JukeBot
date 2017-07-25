@@ -1,20 +1,30 @@
 <html>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type=text/javascript>
-    function get_playlist() {
-        $.getJSON(
-            "data",
-            function(data) {
-                $('#playlist').text(data);
-            }
-        );
-    }
-    $(window).load(function($) {
-        get_playlist();
-    });
-    setInterval('get_playlist()', 10000);
-</script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            namespace = '/test';
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+            socket.on('connect', function() {
+                socket.emit('my_event', {data: 'I\'m connected!'});
+            });
+
+            socket.on('my_response', function(msg) {
+                $('#playlist').html(msg.data);
+            });
+
+//            $('form#emit').submit(function(event) {
+//                socket.emit('my_event', {data: $('#emit_data').val()});
+//                return false;
+//            });
+//            $('form#disconnect').submit(function(event) {
+//                socket.emit('disconnect_request');
+//                return false;
+//            });
+        });
+    </script>
     
 <head>
     <title>JukeBot</title>

@@ -52,14 +52,11 @@ def index():
 
     return render_template('index.html', form=form)
 
-#ajax call to return playlist in json format
-@app.route('/data')
-def data():
+def send_playlist():
     endmsg = playlist.getPlaylist()
     if(endmsg == ''):
-        return jsonify("There is currently nothing in the playlist")
-    else:
-        return jsonify(endmsg)
+        endmsg = "There is currently nothing in the playlist"
+    socketio.emit('my_response', {'data': endmsg}, namespace = '/test', broadcast=True)
 
 #Thread constantly looping to playsong / process the current command
 def player_update():
@@ -79,6 +76,8 @@ def player_update():
         else:
             playlist.process()
             playlist.download_next()
+        
+        send_playlist()
         
         if not player.running():
             if not playlist.empty():
