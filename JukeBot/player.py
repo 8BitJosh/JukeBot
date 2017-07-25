@@ -13,7 +13,7 @@ class Player:
     def play(self, _path):
         self.path = _path
         self.p = subprocess.Popen(
-                            ['avplay', '-nodisp', '-autoexit', self.path],
+                            ['ffplay', '-nodisp', '-autoexit', self.path],
                             #shell = True
                             stdout=subprocess.DEVNULL, 
                             stdin=subprocess.PIPE, 

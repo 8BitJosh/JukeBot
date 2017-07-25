@@ -8,6 +8,10 @@
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
             socket.on('connect', function() {
+                socket.emit('my_event', {data: 'human music'});
+            });
+            
+            socket.on('connect', function() {
                 socket.emit('my_event', {data: 'I\'m connected!'});
             });
 
@@ -15,14 +19,20 @@
                 $('#playlist').html(msg.data);
             });
 
-//            $('form#emit').submit(function(event) {
-//                socket.emit('my_event', {data: $('#emit_data').val()});
-//                return false;
-//            });
-//            $('form#disconnect').submit(function(event) {
-//                socket.emit('disconnect_request');
-//                return false;
-//            });
+            $('form#submit').submit(function(event) {
+                socket.emit('my_event', {data: $('#submit_data').val()});
+                return false;
+            });
+            
+            function skip(){
+                socket.emit('skip_request');
+                return false;
+            });
+            
+            function shuffle(){
+                socket.emit('shuffle_request');
+                return false;
+            });
         });
     </script>
     
@@ -37,15 +47,16 @@
 <div class="container">
  
   <h2>JukeBot Song Request</h2>
+  
+  
   <form  action="" method="post" role="form">
-    {{ form.csrf }}
     <div class="form-group">
       <label for="title">Song Title:</label>
       <input type="text" class="form-control" id="title" name="title" placeholder="Song?" autofocus>
     </div>
-    <button type="submit" name="submit" class="btn btn-success"> Submit </button>
-    <button type="submit" name="skip" class="btn btn-success">  Skip  </button>
-    <button type="submit" name="shuffle" class="btn btn-success"> Shuffle </button>
+    <button type="button" name="submit" class="btn btn-success" onclick="submit();"> Submit </button>
+    <button type="button" name="skip" class="btn btn-success" onclick="skip();">  Skip  </button>
+    <button type="button" name="shuffle" class="btn btn-success" onclick="shuffle();"> Shuffle </button>
   </form>
  
   <br>

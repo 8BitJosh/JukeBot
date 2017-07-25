@@ -6,7 +6,6 @@ from player import Player
 from playlist import Playlist
 
 from flask import Flask, render_template, flash, request, jsonify
-from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 from flask_socketio import SocketIO, emit
 import eventlet
 
@@ -18,46 +17,46 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
 socketio = SocketIO(app, async_mode='eventlet')
 
-class ReusableForm(Form):
-    title = TextField('Title:', validators=[validators.required()])
-
 #main webpage and form handler
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/")
 def index():
-    form = ReusableForm(request.form)
-    global web_inputs
+    return render_template('index.html', async_mode=socketio.async_mode)
+    
+@socketio.on('my_event', namespace='/test')
+def test_message(message):
     global playlist
- 
-    print(form.errors)
-    if request.method == 'POST':
-        title=request.form['title']
-        
-        if 'submit' in request.form:
-            if form.validate():
-                if '&' in title:
-                    flash("If you wanted to add a playlist use the full playlist page that has 'playlist' in the url")
-                    start_pos = title.find('&')
-                    msg = title[:start_pos]
-                    playlist.add(msg)
-                else:
-                    playlist.add(title)
-                flash('Queued Song - ' + title)
-                print("user entered song - " + title)
-        elif 'skip' in request.form:
-            flash('Song Skipped')
-            web_inputs.put('skip')
-        elif 'shuffle' in request.form:
-            flash('Playlist Shuffled')
-            web_inputs.put('shuffle')
+    title = message['data']
+    print('receaved message submit - ' + title)
+    if '&' in title:
+        flash("If you wanted to add a playlist use the full playlist page that has 'playlist' in the url")
+        start_pos = title.find('&')
+        msg = title[:start_pos]
+        playlist.add(msg)
+    else:
+        playlist.add(title)
+        flash('Queued Song - ' + title)
+    print("user entered song - " + title)
 
-    return render_template('index.html', form=form)
-
+@socketio.on('skip_request', namespace='/test')
+def skip_request():
+    global web_inputs
+    flash('Song Skipped')
+    web_inputs.put('skip')
+    
+@socketio.on('shuffle_request', namespace='/test')
+def shuffle_request():
+    print("shuffled ?")
+    global web_inputs
+    flash('Playlist Shuffled')
+    web_inputs.put('shuffle')
+    
 def send_playlist():
+    global playlist
     endmsg = playlist.getPlaylist()
     if(endmsg == ''):
         endmsg = "There is currently nothing in the playlist"
-    socketio.emit('my_response', {'data': endmsg}, namespace = '/test', broadcast=True)
-
+    socketio.emit('my_response', {'data': endmsg}, namespace = '/test')
+    
 #Thread constantly looping to playsong / process the current command
 def player_update():
     global web_inputs
