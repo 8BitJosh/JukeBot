@@ -7,7 +7,7 @@ from playlist import Playlist
 
 from flask import Flask, render_template, flash, session, request
 from flask_socketio import SocketIO, emit
-#import eventlet
+import eventlet
 
 web_inputs = queue.Queue()
 playlist = Playlist()
@@ -15,7 +15,7 @@ playlist = Playlist()
 app = Flask(__name__)
 #app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
-socketio = SocketIO(app) #async_mode='eventlet')
+socketio = SocketIO(app, async_mode='eventlet')
 
 #main webpage and form handler
 @app.route("/")
