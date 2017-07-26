@@ -11,7 +11,11 @@
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
             socket.on('response', function(msg) {
-                $('#playlist').append('<br>' + $('<div/>').text('Received #' + msg.data).html());
+                $('#user_alerts').text(msg.data);
+            });
+            
+            socket.on('sent_playlist', function(msg) {
+                $('#playlist').text(msg.data);
             });
 
             var ping_pong_times = [];

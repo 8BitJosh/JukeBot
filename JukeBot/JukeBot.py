@@ -24,26 +24,26 @@ def index():
     
 @socketio.on('sent_song', namespace='/test')
 def test_message(message):
-    emit('response', {'data': message['data']})
-    
     global playlist
     title = message['data']
+    str = 'Queued Song - ' + title 
+    
     print('receaved message submit - ' + title)
     if '&' in title:
-        flash("If you wanted to add a playlist use the full playlist page that has 'playlist' in the url")
+        str = str + "\nIf you wanted to add a playlist use the full playlist page that has 'playlist' in the url"
         start_pos = title.find('&')
         msg = title[:start_pos]
         playlist.add(msg)
     else:
         playlist.add(title)
-        flash('Queued Song - ' + title)
+    
     print("user entered song - " + title)
+    emit('response', {'data': str})
 
 @socketio.on('song_skip', namespace='/test')
 def skip_request():
     emit('response', {'data': 'Song Skipped'})
     global web_inputs
-    flash('Song Skipped')
     web_inputs.put('skip')
     
 @socketio.on('song_shuffle', namespace='/test')
@@ -51,20 +51,17 @@ def shuffle_request():
     emit('response', {'data': 'Songs Shuffled'})
     print("shuffled ?")
     global web_inputs
-    flash('Playlist Shuffled')
     web_inputs.put('shuffle')
 
 @socketio.on('my_ping', namespace='/test')
 def ping_pong():
+    global playlist
+    endmsg = playlist.getPlaylist()
+    if(endmsg == ''):
+        endmsg = "There is currently nothing in the playlist"
+    emit('sent_playlist', {'data': endmsg}, namespace = '/test')
     emit('my_pong')
 
-#def send_playlist():
-#    global playlist
-#    endmsg = playlist.getPlaylist()
-#    if(endmsg == ''):
-#        endmsg = "There is currently nothing in the playlist"
-#    socketio.emit('my_response', {'data': endmsg}, namespace = '/test')
-    
 #Thread constantly looping to playsong / process the current command
 def player_update():
     global web_inputs
@@ -83,9 +80,7 @@ def player_update():
         else:
             playlist.process()
             playlist.download_next()
-        
-        #send_playlist()
-        
+               
         if not player.running():
             if not playlist.empty():
                 path = playlist.get_next()
