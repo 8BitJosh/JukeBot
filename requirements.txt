@@ -1,3 +1,4 @@
 youtube_dl
 flask
-wtforms
+flask_socketio
+eventlet
