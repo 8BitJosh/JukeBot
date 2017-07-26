@@ -13,7 +13,6 @@ web_inputs = queue.Queue()
 playlist = Playlist()
 
 app = Flask(__name__)
-#app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
 socketio = SocketIO(app, async_mode='eventlet')
 
