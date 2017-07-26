@@ -5,25 +5,27 @@ import queue
 from player import Player
 from playlist import Playlist
 
-from flask import Flask, render_template, flash, request, jsonify
+from flask import Flask, render_template, flash, session, request
 from flask_socketio import SocketIO, emit
-import eventlet
+#import eventlet
 
 web_inputs = queue.Queue()
 playlist = Playlist()
 
 app = Flask(__name__)
-app.config.from_object(__name__)
+#app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app) #async_mode='eventlet')
 
 #main webpage and form handler
 @app.route("/")
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
     
-@socketio.on('my_event', namespace='/test')
+@socketio.on('sent_song', namespace='/test')
 def test_message(message):
+    emit('response', {'data': message['data']})
+    
     global playlist
     title = message['data']
     print('receaved message submit - ' + title)
@@ -37,25 +39,31 @@ def test_message(message):
         flash('Queued Song - ' + title)
     print("user entered song - " + title)
 
-@socketio.on('skip_request', namespace='/test')
+@socketio.on('song_skip', namespace='/test')
 def skip_request():
+    emit('response', {'data': 'Song Skipped'})
     global web_inputs
     flash('Song Skipped')
     web_inputs.put('skip')
     
-@socketio.on('shuffle_request', namespace='/test')
+@socketio.on('song_shuffle', namespace='/test')
 def shuffle_request():
+    emit('response', {'data': 'Songs Shuffled'})
     print("shuffled ?")
     global web_inputs
     flash('Playlist Shuffled')
     web_inputs.put('shuffle')
-    
-def send_playlist():
-    global playlist
-    endmsg = playlist.getPlaylist()
-    if(endmsg == ''):
-        endmsg = "There is currently nothing in the playlist"
-    socketio.emit('my_response', {'data': endmsg}, namespace = '/test')
+
+@socketio.on('my_ping', namespace='/test')
+def ping_pong():
+    emit('my_pong')
+
+#def send_playlist():
+#    global playlist
+#    endmsg = playlist.getPlaylist()
+#    if(endmsg == ''):
+#        endmsg = "There is currently nothing in the playlist"
+#    socketio.emit('my_response', {'data': endmsg}, namespace = '/test')
     
 #Thread constantly looping to playsong / process the current command
 def player_update():
@@ -76,7 +84,7 @@ def player_update():
             playlist.process()
             playlist.download_next()
         
-        send_playlist()
+        #send_playlist()
         
         if not player.running():
             if not playlist.empty():
