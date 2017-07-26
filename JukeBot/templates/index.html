@@ -31,6 +31,7 @@
                     sum += ping_pong_times[i];
                 $('#ping-pong').text(Math.round(10 * sum / ping_pong_times.length) / 10);
             });
+            
 
             $('form#send').submit(function(event) {
                 socket.emit('sent_song', {data: $('#title_sent').val()});
@@ -61,36 +62,28 @@
   <h2>JukeBot Song Request</h2>
   
     <form id="send" method="POST" action='#'>
-        <input type="text" name="title_sent" id="title_sent" placeholder="Song Title" autofocus>
-        <input type="submit" value="Submit">
+        <div class="form-group">
+            <label for="title_sent">Song Title:</label>
+            <input type="text" class="form-control" name="title_sent" id="title_sent" placeholder="Song?" autofocus>
+        </div>
+        <input type="submit" class="btn btn-success" value="Submit">
     </form>
     
     <form id="skip_song" method="POST" action="#">
-        <input type="submit" value="Skip">
+        <input type="submit" class="btn btn-success" value="Skip">
     </form>
     
     <form id="shuffle_song" method="POST" action="#">
-        <input type="submit" value="Shuffle">
+        <input type="submit" class="btn btn-success" value="Shuffle">
     </form>
   
- <!-- <form  action="" method="post" role="form">
-    <div class="form-group">
-      <label for="title">Song Title:</label>
-      <input type="text" class="form-control" id="title" name="title" placeholder="Song?" autofocus>
-    </div>
-    <button type="button" name="submit" class="btn btn-success" onclick="submit();"> Submit </button>
-    <button type="button" name="skip" class="btn btn-success" onclick="skip();">  Skip  </button>
-    <button type="button" name="shuffle" class="btn btn-success" onclick="shuffle();"> Shuffle </button>
-  </form>
- -->
- 
   <br>
-        
-    <div class="alert alert-info" id="playlist" style="white-space: pre-wrap"></div>
+    <!-- style="white-space: pre-wrap" -->
+    <div class="alert alert-info" id="user_alerts"></div>
+    <div class="alert alert-info" id="playlist"></div>
     
-    <div class="alert alert-info" id="ex-info" style="white-space: pre-wrap">
-        <p>Async mode is: <b>{{ async_mode }}</b></p>
-        <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
+    <div class="alert alert-info" id="ex-info">
+        <p>Average Latency: <b><span id="ping-pong"></span>ms</b></p>
     </div>
 </div>
 <br>      
