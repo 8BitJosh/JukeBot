@@ -91,12 +91,6 @@ def player_update():
         else:
             time.sleep(0.1)
 
-#function to run for webpage thread
-#def start_web():
-    #app.run(host = '0.0.0.0', port=80, debug = False, threaded = True, use_reloader = False)
-#    socketio.run(app, debug = True)
-    
 #create threads for other things
 t = threading.Thread(target = player_update).start()
-#p = threading.Thread(target = start_web).start()
 socketio.run(app, debug = True, host = '0.0.0.0', port=80)

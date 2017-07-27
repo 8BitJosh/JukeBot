@@ -45,8 +45,6 @@ avlib also needs to be installed on the system the bot is running on as the bot 
 
 This project is still in development with more features to come
 
-- replace the AJAX request system to retreve the playlist info with socketio so the server can push data when its ready
-instead of constantly polling the server
 - add playlist page so users can create playlists that are stored on the server and can be queued up. need to work
 out how to do this user interface wise
 - add more cases to the process function to accept and handle all types of possible user input from more sources
