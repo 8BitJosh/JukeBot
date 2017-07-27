@@ -22,7 +22,8 @@ use "pip install" to add these
 
 youtube_dl
 flask
-wtforms
+flask_socketio
+eventlet
 
 avlib also needs to be installed on the system the bot is running on as the bot uses avplay to play the audio
 
