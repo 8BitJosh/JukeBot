@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
 socketio = SocketIO(app, async_mode='eventlet')
 
-#main webpage and form handler
+#### handlers for main suggestion page
 @app.route("/")
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
@@ -25,18 +25,21 @@ def index():
 def song_received(message):
     global playlist
     title = message['data']
-    str = 'Queued Song - ' + title 
-    
     print('receaved message submit - ' + title)
-    if '&' in title:
-        str = str + "\nIf you wanted to add a playlist use the full playlist page that has 'playlist' in the url"
-        start_pos = title.find('&')
-        msg = title[:start_pos]
-        playlist.add(msg)
-    else:
-        playlist.add(title)
     
-    print("user entered song - " + title)
+    if title != '':
+        str = 'Queued Song - ' + title 
+        if '&' in title:
+            str = str + "\nIf you wanted to add a playlist use the full playlist page that has 'playlist' in the url"
+            start_pos = title.find('&')
+            msg = title[:start_pos]
+            playlist.add(msg)
+        else:
+            playlist.add(title)
+    
+        print("user entered song - " + title)
+    else:
+        str = 'Enter a Song Name'
     emit('response', {'data': str})
 
 @socketio.on('song_skip', namespace='/main')
@@ -60,7 +63,7 @@ def return_playlist():
         endmsg = "There is currently nothing in the playlist"
     emit('sent_playlist', {'data': endmsg})
 
-#Thread constantly looping to playsong / process the current command
+#### Thread constantly looping to playsong / process the current command
 def player_update():
     global web_inputs
     global playlist
@@ -90,6 +93,6 @@ def player_update():
         else:
             time.sleep(0.1)
 
-#create threads for other things
+####create threads and start webserver
 t = threading.Thread(target = player_update).start()
 socketio.run(app, debug = True, host = '0.0.0.0', port=80)
