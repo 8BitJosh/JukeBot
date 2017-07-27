@@ -52,9 +52,8 @@ def shuffle_request():
     global web_inputs
     web_inputs.put('shuffle')
 
-@socketio.on('my_ping', namespace='/main')
-def ping_pong():
-    emit('my_pong')
+@socketio.on('ping', namespace='/main')
+def return_playlist():
     global playlist
     endmsg = playlist.getPlaylist()
     if(endmsg == ''):
