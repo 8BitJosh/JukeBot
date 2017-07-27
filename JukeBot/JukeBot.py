@@ -21,8 +21,8 @@ socketio = SocketIO(app, async_mode='eventlet')
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
     
-@socketio.on('sent_song', namespace='/test')
-def test_message(message):
+@socketio.on('sent_song', namespace='/main')
+def song_received(message):
     global playlist
     title = message['data']
     str = 'Queued Song - ' + title 
@@ -39,27 +39,27 @@ def test_message(message):
     print("user entered song - " + title)
     emit('response', {'data': str})
 
-@socketio.on('song_skip', namespace='/test')
+@socketio.on('song_skip', namespace='/main')
 def skip_request():
     emit('response', {'data': 'Song Skipped'})
     global web_inputs
     web_inputs.put('skip')
     
-@socketio.on('song_shuffle', namespace='/test')
+@socketio.on('song_shuffle', namespace='/main')
 def shuffle_request():
     emit('response', {'data': 'Songs Shuffled'})
     print("shuffled ?")
     global web_inputs
     web_inputs.put('shuffle')
 
-@socketio.on('my_ping', namespace='/test')
+@socketio.on('my_ping', namespace='/main')
 def ping_pong():
+    emit('my_pong')
     global playlist
     endmsg = playlist.getPlaylist()
     if(endmsg == ''):
         endmsg = "There is currently nothing in the playlist"
-    emit('sent_playlist', {'data': endmsg}, namespace = '/test')
-    emit('my_pong')
+    emit('sent_playlist', {'data': endmsg})
 
 #Thread constantly looping to playsong / process the current command
 def player_update():

@@ -6,7 +6,7 @@
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
 
-            namespace = '/test';
+            namespace = '/main';
 
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
@@ -42,12 +42,12 @@
                 return false;
             });
 
-            $('form#skip_song').submit(function(event) {
+            $('button#skip').click(function(event) {
                 socket.emit('song_skip');
                 return false;
             });
             
-            $('form#shuffle_song').submit(function(event) {
+            $('button#shuffle').click(function(event) {
                 socket.emit('song_shuffle');
                 return false;
             });
@@ -73,22 +73,19 @@
         <input type="submit" class="btn btn-success" value="Submit">
     </form>
     
-    <form id="skip_song" method="POST" action="#">
-        <input type="submit" class="btn btn-success" value="Skip">
-    </form>
+    <div class="form-group">
+        <button type="submit" name="skip" id="skip" class="btn btn-success">  Skip  </button>
+        <button type="submit" name="shuffle" id="shuffle" class="btn btn-success"> Shuffle </button>
+    </div>
     
-    <form id="shuffle_song" method="POST" action="#">
-        <input type="submit" class="btn btn-success" value="Shuffle">
-    </form>
-  
   <br>
-    <!-- style="white-space: pre-wrap" -->
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
     <div class="alert alert-info" id="playlist" style="white-space: pre-wrap"></div>
     
     <div class="alert alert-info" id="ex-info">
         <p>Average Latency: <b><span id="ping-pong"></span>ms</b></p>
     </div>
+    
 </div>
 <br>      
 </div>
