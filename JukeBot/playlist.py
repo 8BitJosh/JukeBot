@@ -156,16 +156,17 @@ class Playlist:
                 things.downloaded = True
                 break
            
-
     #itterate through playlist get the title from youtube url search and print to screen
     def getPlaylist(self):
         endmsg = self.currently_play
+        if endmsg == '':
+            return "There is currently nothing in the playlist"
+            
         count = 0
         for things in self.songqueue:
             count += 1
             endmsg = endmsg + str(count) + ": [" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title + " \n"
         return endmsg
-    
     
     #download song from url or search term and return the save path of the file
     def download_song(self, to_down):

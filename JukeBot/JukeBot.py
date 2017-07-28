@@ -58,10 +58,7 @@ def shuffle_request():
 @socketio.on('ping', namespace='/main')
 def return_playlist():
     global playlist
-    endmsg = playlist.getPlaylist()
-    if(endmsg == ''):
-        endmsg = "There is currently nothing in the playlist"
-    emit('sent_playlist', {'data': endmsg})
+    emit('sent_playlist', {'data': playlist.getPlaylist()})
 
 #### Thread constantly looping to playsong / process the current command
 def player_update():
