@@ -58,8 +58,12 @@ class Playlist:
     def getPlaylist(self):
         endmsg = {}
         count = 0
+        
+        if self.currently_play == '':
+            endmsg['-'] = 'There is currently nothing in the playlist'
+            return endmsg
+        
         endmsg[str(count)] = self.currently_play
-
         for things in self.songqueue:
             count += 1
             endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
