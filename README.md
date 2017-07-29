@@ -20,10 +20,10 @@ tested and runs on a raspberry pi
 run update_dep to install dependencies or
 use "pip install" to add these
 
-youtube_dl
-flask
-flask_socketio
-eventlet
+-youtube_dl
+-flask
+-flask_socketio
+-eventlet
 
 avlib also needs to be installed on the system the bot is running on as the bot uses avplay to play the audio
 
@@ -46,9 +46,10 @@ avlib also needs to be installed on the system the bot is running on as the bot 
 
 This project is still in development with more features to come
 
+-add more buttons and control, delete a song in playlist, clear playlist, etc...
+- come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
+the way some of the functions work, could use mplayer ?
 - add playlist page so users can create playlists that are stored on the server and can be queued up. need to work
 out how to do this user interface wise
 - add more cases to the process function to accept and handle all types of possible user input from more sources
-- come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
-the way some of the functions work, could use mplayer ?
 - find a better way to exit without having to terminate the process
