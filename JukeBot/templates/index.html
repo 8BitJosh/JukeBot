@@ -14,9 +14,12 @@
             });
             
             socket.on('sent_playlist', function(msg) {
-                $('#playlist').text(msg.data);
+                $('#playlist_table').empty()
+                $.each(msg, function(index, item) {
+                    $('<tr>').html("<td>" + index + "</td><td>" + item + "</td>").appendTo('#playlist_table');
+                });
             });
-
+            
             window.setInterval(function() {
                 socket.emit('ping');
             }, 1000);
@@ -69,7 +72,10 @@
     
   <br>
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
-    <div class="alert alert-info" id="playlist" style="white-space: pre-wrap"></div>
+    
+    <h4>Playlist:</h4>
+    <table id="playlist_table" class="table"></table>
+
     
 </div>
 <br>      
