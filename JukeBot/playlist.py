@@ -27,6 +27,7 @@ class Playlist:
         self.songlist = []
         self.songqueue = []
         self.currently_play = ''
+        self.playlist_dict = {}
         
         self.savedir = "cache"
         if os.path.exists(self.savedir):
@@ -35,6 +36,7 @@ class Playlist:
         
     def shuff(self):
         shuffle(self.songqueue)
+        self.generatePlaylist()
         print("Playlist Shuffled")
     
     def empty(self):
@@ -42,6 +44,7 @@ class Playlist:
             return False
         else:
             self.currently_play = ''
+            self.generatePlaylist()
             return True
     
     def get_next(self):
@@ -49,26 +52,31 @@ class Playlist:
         path = self.songqueue[0].dir
         print("Removed from to play queue - " + self.songqueue[0].title)
         del self.songqueue[0]
+        self.generatePlaylist()
         return path
         
     def add(self, title):
         self.songlist.append(title)
 
     #itterate through playlist get the title from youtube url search and print to screen
-    def getPlaylist(self):
+    def generatePlaylist(self):
         endmsg = {}
         count = 0
         
         if self.currently_play == '':
             endmsg['-'] = 'There is currently nothing in the playlist'
-            return endmsg
+            self.playlist_dict = endmsg
+            return
         
         endmsg[str(count)] = self.currently_play
         for things in self.songqueue:
             count += 1
             endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
-        return endmsg
-
+        self.playlist_dict = endmsg
+        return
+        
+    def getPlaylist(self):
+        return self.playlist_dict
 
     #called by main loop (process user entered songs)
     def process(self):
@@ -131,7 +139,6 @@ class Playlist:
                             playlist_info = ydl.extract_info(song_url, download=False, process=True)
                             entry = PlaylistEntry(
                                 song_url,
-                                #playlist_info['url'],
                                 playlist_info['title'],
                                 playlist_info['duration']
                             )
@@ -164,6 +171,7 @@ class Playlist:
 
             print("user input processed - " + things)
             while things in self.songlist: self.songlist.remove(things)
+            self.generatePlaylist()
 
     #download next non downloaded song
     def download_next(self):
