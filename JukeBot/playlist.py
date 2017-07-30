@@ -28,6 +28,7 @@ class Playlist:
         self.songqueue = []
         self.currently_play = ''
         self.playlist_dict = {}
+        self.playlist_updated = True
         
         self.savedir = "cache"
         if os.path.exists(self.savedir):
@@ -61,23 +62,30 @@ class Playlist:
     #itterate through playlist get the title from youtube url search and print to screen
     def generatePlaylist(self):
         endmsg = {}
-        count = 0
         
         if self.currently_play == '':
             endmsg['-'] = 'There is currently nothing in the playlist'
-            self.playlist_dict = endmsg
-            return
+        else:
+            count = 0
+            endmsg[str(count)] = self.currently_play
+            for things in self.songqueue:
+                count += 1
+                endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
         
-        endmsg[str(count)] = self.currently_play
-        for things in self.songqueue:
-            count += 1
-            endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
         self.playlist_dict = endmsg
+        self.playlist_updated = True
         return
         
     def getPlaylist(self):
         return self.playlist_dict
-
+    
+    def updated(self):
+        if self.playlist_updated:
+            self.playlist_updated = False
+            return True
+        else:
+            return False
+        
     #called by main loop (process user entered songs)
     def process(self):
         for things in self.songlist:
@@ -142,7 +150,7 @@ class Playlist:
                                 playlist_info['title'],
                                 playlist_info['duration']
                             )
-                            print(playlist_info['title'] + " added from playlist")
+                            print("added from playlist - " + playlist_info['title'])
                             self.songqueue.append(entry)
                         except Exception as e:
                             baditems += 1

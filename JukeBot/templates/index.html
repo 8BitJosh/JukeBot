@@ -8,7 +8,11 @@
             namespace = '/main';
 
             var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
+            
+            socket.on('connect', function(){
+                socket.emit('connected', {data: 'client connected'});
+            });
+            
             socket.on('response', function(msg) {
                 $('#user_alerts').text(msg.data);
             });

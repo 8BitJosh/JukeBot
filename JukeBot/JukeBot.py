@@ -55,10 +55,16 @@ def shuffle_request():
     global web_inputs
     web_inputs.put('shuffle')
 
+@socketio.on('connected', namespace='/main')
+def connect_playlist(msg):
+    global playlist
+    emit('sent_playlist', playlist.getPlaylist())
+
 @socketio.on('ping', namespace='/main')
 def return_playlist():
     global playlist
-    emit('sent_playlist', playlist.getPlaylist())
+    if playlist.updated():
+        emit('sent_playlist', playlist.getPlaylist(), broadcast=True)
 
 #### Thread constantly looping to playsong / process the current command
 def player_update():
