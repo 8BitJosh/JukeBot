@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
@@ -18,9 +18,16 @@
             });
             
             socket.on('sent_playlist', function(msg) {
-                $('#playlist_table').empty()
+                $('#playlist_table tr:gt(0)').remove();
                 $.each(msg, function(index, item) {
-                    $('<tr>').html("<td>" + index + "</td><td>" + item + "</td>").appendTo('#playlist_table');
+                    if(index == '-' || index == '0'){
+                        $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td> </td>").appendTo('#playlist_table');
+                    }
+                    else{
+                        $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
+                        "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
+                        "</td>").appendTo('#playlist_table');
+                    }
                 });
             });
             
@@ -41,6 +48,12 @@
             
             $('button#shuffle').click(function(event) {
                 socket.emit('song_shuffle');
+                return false;
+            });
+
+            $('#playlist_table').on('click', '#del', function(){
+                var index = $(this).closest('tr').index();
+                socket.emit('delete', {data: index});
                 return false;
             });
         });
@@ -78,12 +91,11 @@
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
     
     <h4>Playlist:</h4>
-    <table id="playlist_table" class="table"></table>
-
+    <table id="playlist_table" class="table">
+    <tr><td>#</td><td>Song Title</td><td>Remove</td>
+    </table>
     
-</div>
-<br>      
-</div>
+        
 </div>
 </body>
 </html>

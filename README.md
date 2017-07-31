@@ -40,13 +40,13 @@ avlib also needs to be installed on the system the bot is running on as the bot 
 ## Web Interface
 - screenshot of the web interface
 
-![jukebot webpage screenshot](https://s12.postimg.org/vb228kkq5/jukebot_snap.png)
+![jukebot webpage screenshot](https://s4.postimg.org/yvz8qebq5/jukebot.png)
 
 ## TODO
 
 This project is still in development with more features to come
 
--add more buttons and control, delete a song in playlist, clear playlist, etc...
+-add more buttons and control, pause, clear playlist, etc...
 - come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
 the way some of the functions work, could use mplayer ?
 - add playlist page so users can create playlists that are stored on the server and can be queued up. need to work
