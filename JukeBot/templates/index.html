@@ -20,8 +20,13 @@
             socket.on('sent_playlist', function(msg) {
                 $('#playlist_table').empty()
                 $.each(msg, function(index, item) {
-                    $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
-                    "<button id='del' class='btn btn-sm btn-success'>X</button>" + "</td>").appendTo('#playlist_table');
+                    if(index == '-' || index == '0'){
+                        $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td> </td>").appendTo('#playlist_table');
+                    }
+                    else{
+                        $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
+                        "<button id='del' class='btn btn-sm btn-success'>X</button>" + "</td>").appendTo('#playlist_table');
+                    }
                 });
             });
             
@@ -46,9 +51,8 @@
             });
 
             $('#playlist_table').on('click', '#del', function(){
-                var text = $(this).closest('td').val();
-                console.log(this);
-                socket.emit('delete', {data: 'text'});
+                var index = $(this).closest('tr').index();
+                socket.emit('delete', {data: index});
                 return false;
             });
         });
