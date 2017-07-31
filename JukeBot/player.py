@@ -2,6 +2,7 @@ import subprocess
 import os
 import time
 import traceback
+from utils import delete_file
 
 class Player:
 #play song located at path
@@ -28,7 +29,7 @@ class Player:
                 return True
             else:
                 if self.path != '' and os.path.exists(self.path):
-                    self.delete_file()
+                    delete_file(self.path)
                 self.path = ''
                 return False
         except: # causes error before first song as no process is playing
@@ -38,27 +39,9 @@ class Player:
     def stop(self):
         if self.running():
             self.p.kill()
-            self.delete_file()
+            delete_file(self.path)
             self.path = ''
         else:
             print("Unable to skip - no song playing")
-            
-#delete the file in the current path
-    def delete_file(self):
-        for x in range(30):
-            try:
-                os.unlink(self.path)
-                print("file deleted - " + self.path)
-                break
 
-            except PermissionError as e:
-                if e.winerror == 32:  # File is in use
-                    time.sleep(0.25)
-
-            except Exception as e:
-                traceback.print_exc()
-                print("Error trying to delete - " + self.path)
-                break
-        else:
-            print("Could not delete file {}, giving up and moving on".format(self.path))
 

@@ -5,8 +5,7 @@ import traceback
 import datetime
 import time
 from random import shuffle
-from utils import do_format
-from utils import PlaylistEntry
+from utils import do_format, PlaylistEntry, delete_file
 
 options = {
     'format': 'bestaudio/best',
@@ -91,7 +90,7 @@ class Playlist:
         del self.songqueue[index-2]
         self.generatePlaylist()
         if del_path != '':
-            self.delete_file(del_path)
+            delete_file(del_path)
         
     #called by main loop (process user entered songs)
     def process(self):
@@ -221,20 +220,3 @@ class Playlist:
                 print ("Can't download audio! %s\n" % traceback.format_exc())
                 return 'bad_path'
                 
-    def delete_file(self, dir):
-        for x in range(30):
-            try:
-                os.unlink(dir)
-                print("file deleted - " + dir)
-                break
-
-            except PermissionError as e:
-                if e.winerror == 32:  # File is in use
-                    time.sleep(0.25)
-
-            except Exception as e:
-                traceback.print_exc()
-                print("Error trying to delete - " + dir)
-                break
-        else:
-            print("Could not delete file {}, giving up and moving on".format(dir))
