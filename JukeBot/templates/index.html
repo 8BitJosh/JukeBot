@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
@@ -20,7 +20,8 @@
             socket.on('sent_playlist', function(msg) {
                 $('#playlist_table').empty()
                 $.each(msg, function(index, item) {
-                    $('<tr>').html("<td>" + index + "</td><td>" + item + "</td>").appendTo('#playlist_table');
+                    $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
+                    "<button id='del' class='btn btn-sm btn-success'>X</button>" + "</td>").appendTo('#playlist_table');
                 });
             });
             
@@ -41,6 +42,13 @@
             
             $('button#shuffle').click(function(event) {
                 socket.emit('song_shuffle');
+                return false;
+            });
+
+            $('#playlist_table').on('click', '#del', function(){
+                var text = $(this).closest('td').val();
+                console.log(this);
+                socket.emit('delete', {data: 'text'});
                 return false;
             });
         });
@@ -81,9 +89,6 @@
     <table id="playlist_table" class="table"></table>
 
     
-</div>
-<br>      
-</div>
 </div>
 </body>
 </html>
