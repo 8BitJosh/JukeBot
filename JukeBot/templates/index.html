@@ -50,6 +50,11 @@
                 socket.emit('song_shuffle');
                 return false;
             });
+            
+            $('button#clearall').click(function(event) {
+                socket.emit('clear_playlist');
+                return false;
+            });
 
             $('#playlist_table').on('click', '#del', function(){
                 var index = $(this).closest('tr').index();
@@ -87,8 +92,9 @@
         </div>
     </div>
     
-  <br>
+    <br>
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
+    <button type="submit" name="clear" id="clearall" class="btn btn-success">Clear Playlist</button>
     
     <h4>Playlist:</h4>
     <table id="playlist_table" class="table">

@@ -70,7 +70,13 @@ def return_playlist():
 def delete_song(msg):
     global playlist
     playlist.remove(msg['data'])
-    print("Removed song from playlist at position - " + str(msg['data'] - 1))
+    print("Removed song from playlist at position = " + str(msg['data'] - 1))
+    
+@socketio.on('clear_playlist', namespace='/main')
+def clear_playlist():
+    global playlist
+    playlist.clearall()
+    print('cleared all of playlist')
     
 
 #### Thread constantly looping to playsong / process the current command

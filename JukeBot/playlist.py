@@ -91,7 +91,17 @@ class Playlist:
         self.generatePlaylist()
         if del_path != '':
             delete_file(del_path)
-        
+    
+    def clearall(self):
+        self.songlist.clear()
+        while len(self.songqueue):
+            if self.songqueue[0].dir != '':
+                delete_file(self.songqueue[0].dir)
+            del self.songqueue[0]
+
+        self.songqueue.clear()
+        self.generatePlaylist()
+    
     #called by main loop (process user entered songs)
     def process(self):
         for things in self.songlist:
@@ -164,7 +174,6 @@ class Playlist:
                             print(e)
                     else:
                         baditems += 1
-
                 if baditems:
                     print("Skipped %s bad entries" % baditems)
         
