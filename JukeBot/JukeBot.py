@@ -68,7 +68,10 @@ def return_playlist():
         
 @socketio.on('delete', namespace='/main')
 def delete_song(msg):
-    print(msg['data'])
+    global playlist
+    playlist.remove(msg['data'])
+    print("Removed song from playlist at index - " + str(msg['data']))
+    
 
 #### Thread constantly looping to playsong / process the current command
 def player_update():

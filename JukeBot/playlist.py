@@ -85,6 +85,10 @@ class Playlist:
             return True
         else:
             return False
+            
+    def remove(self, index):
+        del self.songqueue[index-1]
+        self.generatePlaylist()
         
     #called by main loop (process user entered songs)
     def process(self):
