@@ -87,7 +87,7 @@ class Playlist:
             return False
             
     def remove(self, index):
-        del self.songqueue[index-1]
+        del self.songqueue[index-2]
         self.generatePlaylist()
         
     #called by main loop (process user entered songs)

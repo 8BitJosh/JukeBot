@@ -18,14 +18,15 @@
             });
             
             socket.on('sent_playlist', function(msg) {
-                $('#playlist_table').empty()
+                $('#playlist_table tr:gt(0)').remove();
                 $.each(msg, function(index, item) {
                     if(index == '-' || index == '0'){
                         $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td> </td>").appendTo('#playlist_table');
                     }
                     else{
                         $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
-                        "<button id='del' class='btn btn-sm btn-success'>X</button>" + "</td>").appendTo('#playlist_table');
+                        "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
+                        "</td>").appendTo('#playlist_table');
                     }
                 });
             });
@@ -90,7 +91,9 @@
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
     
     <h4>Playlist:</h4>
-    <table id="playlist_table" class="table"></table>
+    <table id="playlist_table" class="table">
+    <tr><td>#</td><td>Song Title</td><td>Remove</td>
+    </table>
     
         
 </div>
