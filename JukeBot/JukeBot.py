@@ -70,7 +70,7 @@ def return_playlist():
 def delete_song(msg):
     global playlist
     playlist.remove(msg['data'])
-    print("Removed song from playlist at index - " + str(msg['data']))
+    print("Removed song from playlist at position - " + str(msg['data'] - 1))
     
 
 #### Thread constantly looping to playsong / process the current command
