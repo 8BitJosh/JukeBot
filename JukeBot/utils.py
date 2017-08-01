@@ -12,7 +12,7 @@ def do_format(message):
     return endMsg
     
 def delete_file(dir):
-    if dir == 'bad_path' || dir == '':
+    if dir == 'bad_path' or dir == '':
         print('No file exists - badpath/""')
         return
     for x in range(30):
