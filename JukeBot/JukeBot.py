@@ -69,6 +69,7 @@ def return_playlist():
 @socketio.on('delete', namespace='/main')
 def delete_song(msg):
     global playlist
+    print('user sent to remove = ' + msg['title'])
     playlist.remove(msg['data'])
     print("Removed song from playlist at position = " + str(msg['data'] - 1))
     
