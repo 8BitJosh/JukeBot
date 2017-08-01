@@ -30,14 +30,14 @@ def song_received(message):
     if title != '':
         str = 'Queued Song - ' + title 
         if '&' in title:
-            str = str + "\nIf you wanted to add a playlist use the full playlist page that has 'playlist' in the url"
+            str = str + '\nIf you wanted to add a playlist use the full playlist page that has "playlist" in the url'
             start_pos = title.find('&')
             msg = title[:start_pos]
             playlist.add(msg)
         else:
             playlist.add(title)
     
-        print("user entered song - " + title)
+        print('user entered song - ' + title)
     else:
         str = 'Enter a Song Name'
     emit('response', {'data': str})
@@ -51,7 +51,7 @@ def skip_request():
 @socketio.on('song_shuffle', namespace='/main')
 def shuffle_request():
     emit('response', {'data': 'Songs Shuffled'})
-    print("shuffled ?")
+    print('shuffled')
     global web_inputs
     web_inputs.put('shuffle')
 
@@ -69,15 +69,21 @@ def return_playlist():
 @socketio.on('delete', namespace='/main')
 def delete_song(msg):
     global playlist
-    print('user sent to remove = ' + msg['title'])
-    playlist.remove(msg['data'])
-    print("Removed song from playlist at position = " + str(msg['data'] - 1))
+    title = msg['title']
+    index = msg['data']
+    print('User removed index = ' + str(index) + ' title = ' + title)
+    
+    playlist.remove(index, title)
+    
+    s = 'Removed song from playlist - ' + title 
+    emit('response', {'data': s})
     
 @socketio.on('clear_playlist', namespace='/main')
 def clear_playlist():
     global playlist
     playlist.clearall()
     print('cleared all of playlist')
+    emit('response', {'data': 'Playlist Cleared'})
     
 
 #### Thread constantly looping to playsong / process the current command
@@ -90,7 +96,7 @@ def player_update():
         option = 'none'
         if not web_inputs.empty():
             msg = web_inputs.get()
-            print("command called - " + msg)
+            print('command called - ' + msg)
             if msg == 'skip':
                 option = 'skip'
             elif msg == 'shuffle':

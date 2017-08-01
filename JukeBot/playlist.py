@@ -85,9 +85,14 @@ class Playlist:
         else:
             return False
             
-    def remove(self, index):
-        del_path = self.songqueue[index-2].dir
-        del self.songqueue[index-2]
+    def remove(self, _index, _title):
+        index = _index - 1
+        start = _title.find(']') + 2
+        title = _title[start:]
+        title.strip()
+        
+        del_path = self.songqueue[index].dir
+        del self.songqueue[index]
         self.generatePlaylist()
         if del_path != '':
             delete_file(del_path)
@@ -105,7 +110,7 @@ class Playlist:
     #called by main loop (process user entered songs)
     def process(self):
         for things in self.songlist:
-            print("process called")
+            print('process called')
             song_url = things.strip()
             ydl = youtube_dl.YoutubeDL(options)
             
@@ -113,7 +118,7 @@ class Playlist:
             try:
                 info = ydl.extract_info(song_url, download = False, process = False)
             except Exception:
-                print("info extraction error")
+                print('info extraction error')
                 pass
                 
 ####if song is search term
@@ -138,7 +143,7 @@ class Playlist:
                     )
                     self.songqueue.append(entry)
                 except:
-                    print("oh no url YT error again")
+                    print('oh no url YT error again')
 
 ####if song is playlist
             elif 'entries' in info:
@@ -166,16 +171,16 @@ class Playlist:
                                 playlist_info['title'],
                                 playlist_info['duration']
                             )
-                            print("added from playlist - " + playlist_info['title'])
+                            print('added from playlist - ' + playlist_info['title'])
                             self.songqueue.append(entry)
                         except Exception as e:
                             baditems += 1
-                            print("There was an error adding the song from playlist")
+                            print('There was an error adding the song from playlist')
                             print(e)
                     else:
                         baditems += 1
                 if baditems:
-                    print("Skipped %s bad entries" % baditems)
+                    print('Skipped %s bad entries' % baditems)
         
                 print('Added {}/{} songs from playlist'.format(items - baditems, items))
 
@@ -190,9 +195,9 @@ class Playlist:
                     )
                     self.songqueue.append(entry)
                 except:
-                    print("Error with other option")
+                    print('Error with other option')
 
-            print("user input processed - " + things)
+            print('user input processed - ' + things)
             while things in self.songlist: self.songlist.remove(things)
             self.generatePlaylist()
 
@@ -223,7 +228,7 @@ class Playlist:
             try:
                 result = ydl.extract_info(song_url, download=True)
                 os.rename(result['id'], savepath)
-                print("Downloaded - " + savepath)
+                print('Downloaded - ' + savepath)
                 return savepath
             except Exception as e:
                 print ("Can't download audio! %s\n" % traceback.format_exc())

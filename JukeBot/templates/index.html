@@ -59,7 +59,7 @@
             $('#playlist_table').on('click', '#del', function(){
                 var index = $(this).closest('tr').index();
                 var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-                socket.emit('delete', {data: index, title: val});
+                socket.emit('delete', {data: index-1, title: val});
                 return false;
             });
         });
