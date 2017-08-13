@@ -22,7 +22,7 @@
                 $('#nowplay_table tr:gt(0)').remove();
                 $.each(msg, function(index, item) {
                     if(index == '-'){
-                        $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td> </td>").appendTo('#playlist_table');
+                        $('<tr>').html("<td>" + index + "</td><td>" + "There is no song playing" + "</td>").appendTo('#nowplay_table');
                     }
                     else if(index == '0'){
                         $('<tr>').html("<td>" + "-" + "</td><td>" + item + "</td>").appendTo('#nowplay_table');

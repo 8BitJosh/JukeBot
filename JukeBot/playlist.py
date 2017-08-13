@@ -63,7 +63,7 @@ class Playlist:
         endmsg = {}
         
         if self.currently_play == '':
-            endmsg['-'] = 'There is currently nothing in the playlist'
+            endmsg['-'] = ''
         else:
             count = 0
             endmsg[str(count)] = self.currently_play
