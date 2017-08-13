@@ -19,13 +19,13 @@ socketio = SocketIO(app, async_mode='eventlet')
 #### handlers for main suggestion page
 @app.route("/")
 def index():
+    print("Client connected - " + request.remote_addr)
     return render_template('index.html', async_mode=socketio.async_mode)
     
 @socketio.on('sent_song', namespace='/main')
 def song_received(message):
     global playlist
     title = message['data']
-    print('receaved message submit - ' + title)
     
     if title != '':
         str = 'Queued Song - ' + title 
@@ -36,8 +36,8 @@ def song_received(message):
             playlist.add(msg)
         else:
             playlist.add(title)
-    
-        print('user entered song - ' + title)
+
+        print(request.remote_addr + ' submitted - ' + title)
     else:
         str = 'Enter a Song Name'
     emit('response', {'data': str})
@@ -45,13 +45,14 @@ def song_received(message):
 @socketio.on('song_skip', namespace='/main')
 def skip_request():
     emit('response', {'data': 'Song Skipped'})
+    print(request.remote_addr + 'Skipped song')
     global web_inputs
     web_inputs.put('skip')
     
 @socketio.on('song_shuffle', namespace='/main')
 def shuffle_request():
     emit('response', {'data': 'Songs Shuffled'})
-    print('shuffled')
+    print(request.remote_addr + ' shuffled playlist')
     global web_inputs
     web_inputs.put('shuffle')
 
@@ -71,7 +72,7 @@ def delete_song(msg):
     global playlist
     title = msg['title']
     index = msg['data']
-    print('User removed index = ' + str(index) + ' title = ' + title)
+    print(request.remote_addr + ' removed index ' + str(index) + ' title = ' + title)
     
     playlist.remove(index, title)
     
@@ -82,7 +83,7 @@ def delete_song(msg):
 def clear_playlist():
     global playlist
     playlist.clearall()
-    print('cleared all of playlist')
+    print(request.remote_addr + ' cleared all of playlist')
     emit('response', {'data': 'Playlist Cleared'})
     
 
@@ -118,4 +119,4 @@ def player_update():
 
 ####create threads and start webserver
 t = threading.Thread(target = player_update).start()
-socketio.run(app, debug = True, host = '0.0.0.0', port=80)
+socketio.run(app, debug = False, host = '0.0.0.0', port=80)
