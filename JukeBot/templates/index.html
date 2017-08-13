@@ -19,9 +19,13 @@
             
             socket.on('sent_playlist', function(msg) {
                 $('#playlist_table tr:gt(0)').remove();
+                $('#nowplay_table tr:gt(0)').remove();
                 $.each(msg, function(index, item) {
-                    if(index == '-' || index == '0'){
+                    if(index == '-'){
                         $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td> </td>").appendTo('#playlist_table');
+                    }
+                    else if(index == '0'){
+                        $('<tr>').html("<td>" + "-" + "</td><td>" + item + "</td>").appendTo('#nowplay_table');
                     }
                     else{
                         $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
@@ -59,7 +63,7 @@
             $('#playlist_table').on('click', '#del', function(){
                 var index = $(this).closest('tr').index();
                 var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-                socket.emit('delete', {data: index-1, title: val});
+                socket.emit('delete', {data: index, title: val});
                 return false;
             });
         });
@@ -95,6 +99,18 @@
     
     <br>
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
+    
+    <table id="nowplay_table" class="table">
+        <tr><td colspan="2"><h4>Now Playing:</h4></td> 
+    </table> 
+     
+    <div class="progress"> 
+        <div class="progress-bar" role="progressbar" id="progress" style="width:90%"> 
+        </div> 
+    </div> 
+     
+    <h4 class="text-center" id="timer">00:00/00:00</h4> 
+    
     <button type="submit" name="clear" id="clearall" class="btn btn-success">Clear Playlist</button>
     
     <h4>Playlist:</h4>
