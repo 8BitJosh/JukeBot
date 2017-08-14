@@ -17,13 +17,13 @@ class Player:
         self.p = subprocess.Popen(
                             ['avplay', '-nodisp', '-autoexit', self.path],
                             #shell = True
-                            stdout=subprocess.DEVNULL, 
-                            stdin=subprocess.PIPE, 
+                            stdout=subprocess.DEVNULL,
+                            stdin=subprocess.PIPE,
                             stderr=subprocess.STDOUT
                             )
         self.startTime = time.time()
         self.newSong = True
-        print("playing - " + self.path)
+        print("playing - " + self.path, flush=True)
 
 # has a new song started playing
     def newsong(self):
@@ -69,4 +69,4 @@ class Player:
             self.path = ''
             self.dur = 0
         else:
-            print("Unable to skip - no song playing")
+            print("Unable to skip - no song playing", flush=True)

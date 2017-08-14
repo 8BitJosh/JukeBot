@@ -20,7 +20,7 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 @app.route("/")
 def index():
-    print("Client connected - " + request.remote_addr)
+    print("Client connected - " + request.remote_addr, flush=True)
     return render_template('index.html', async_mode=socketio.async_mode)
 
 
@@ -46,7 +46,7 @@ def song_received(message):
         else:
             playlist.add(title)
 
-        print(request.remote_addr + ' submitted - ' + title)
+        print(request.remote_addr + ' submitted - ' + title, flush=True)
     else:
         str = 'Enter a Song Name'
     emit('response', {'data': str})
@@ -60,15 +60,15 @@ def button_handler(msg):
 
     if command == 'skip':
         emit('response', {'data': 'Song Skipped'})
-        print(request.remote_addr + ' Skipped song')
+        print(request.remote_addr + ' Skipped song', flush=True)
         web_inputs.put('skip')
     elif command == 'shuffle':
         emit('response', {'data': 'Songs Shuffled'})
-        print(request.remote_addr + ' shuffled playlist')
+        print(request.remote_addr + ' shuffled playlist', flush=True)
         web_inputs.put('shuffle')
     elif command == 'clear':
         playlist.clearall()
-        print(request.remote_addr + ' cleared all of playlist')
+        print(request.remote_addr + ' cleared all of playlist', flush=True)
         emit('response', {'data': 'Playlist Cleared'})
 
 
@@ -77,7 +77,7 @@ def delete_song(msg):
     global playlist
     title = msg['title']
     index = msg['data']
-    print(request.remote_addr + ' removed index ' + str(index) + ' title = ' + title)
+    print(request.remote_addr + ' removed index ' + str(index) + ' title = ' + title, flush=True)
 
     playlist.remove(index, title)
 
@@ -105,7 +105,7 @@ def player_update():
         option = 'none'
         if not web_inputs.empty():
             msg = web_inputs.get()
-            print('command called - ' + msg)
+            print('command called - ' + msg, flush=True)
             if msg == 'skip':
                 option = 'skip'
             elif msg == 'shuffle':

@@ -15,12 +15,12 @@ def do_format(message):
 
 def delete_file(dir):
     if dir == 'bad_path' or dir == '':
-        print('No file exists - badpath/""')
+        print('No file exists - badpath/""', flush=True)
         return
     for x in range(30):
         try:
             os.unlink(dir)
-            print("file deleted - " + dir)
+            print("file deleted - " + dir, flush=True)
             break
 
         except PermissionError as e:
@@ -29,10 +29,10 @@ def delete_file(dir):
 
         except Exception as e:
             traceback.print_exc()
-            print("Error trying to delete - " + dir)
+            print("Error trying to delete - " + dir, flush=True)
             break
     else:
-        print("Could not delete file {}, giving up and moving on".format(dir))
+        print("Could not delete file {}, giving up and moving on".format(dir), flush=True)
 
 
 class PlaylistEntry:
