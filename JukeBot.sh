@@ -1,6 +1,11 @@
 #! /bin/bash
 cd "${0%/*}" # replace with JukeBot directory if the script is moved
 
+if [ "$(python3 -V | sed 's/^.* \(.*\)\..*$/\1/')" \< "3.5" ]; then
+	echo "JukeBot requires python 3.5.0 or later"
+	exit -2
+fi
+
 function usage() {
 	echo "$0 [-hfbcel]"
 	echo "  -h  Display this message."
