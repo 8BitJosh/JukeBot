@@ -24,6 +24,13 @@ def index():
     return render_template('index.html', async_mode=socketio.async_mode)
 
 
+@socketio.on('connected', namespace='/main')
+def connect_playlist(msg):
+    global playlist
+    emit('sent_playlist', playlist.getPlaylist())
+    emit('duration', player.getDuration(), broadcast=True)
+
+
 @socketio.on('sent_song', namespace='/main')
 def song_received(message):
     global playlist
@@ -45,27 +52,24 @@ def song_received(message):
     emit('response', {'data': str})
 
 
-@socketio.on('song_skip', namespace='/main')
-def skip_request():
-    emit('response', {'data': 'Song Skipped'})
-    print(request.remote_addr + ' Skipped song')
+@socketio.on('button', namespace='/main')
+def button_handler(msg):
     global web_inputs
-    web_inputs.put('skip')
-
-
-@socketio.on('song_shuffle', namespace='/main')
-def shuffle_request():
-    emit('response', {'data': 'Songs Shuffled'})
-    print(request.remote_addr + ' shuffled playlist')
-    global web_inputs
-    web_inputs.put('shuffle')
-
-
-@socketio.on('connected', namespace='/main')
-def connect_playlist(msg):
     global playlist
-    emit('sent_playlist', playlist.getPlaylist())
-    emit('duration', player.getDuration(), broadcast=True)
+    command = msg['data']
+
+    if command == 'skip':
+        emit('response', {'data': 'Song Skipped'})
+        print(request.remote_addr + ' Skipped song')
+        web_inputs.put('skip')
+    elif command == 'shuffle':
+        emit('response', {'data': 'Songs Shuffled'})
+        print(request.remote_addr + ' shuffled playlist')
+        web_inputs.put('shuffle')
+    elif command == 'clear':
+        playlist.clearall()
+        print(request.remote_addr + ' cleared all of playlist')
+        emit('response', {'data': 'Playlist Cleared'})
 
 
 @socketio.on('delete', namespace='/main')
@@ -79,14 +83,6 @@ def delete_song(msg):
 
     s = 'Removed song from playlist - ' + title
     emit('response', {'data': s})
-
-
-@socketio.on('clear_playlist', namespace='/main')
-def clear_playlist():
-    global playlist
-    playlist.clearall()
-    print(request.remote_addr + ' cleared all of playlist')
-    emit('response', {'data': 'Playlist Cleared'})
 
 
 @socketio.on('ping', namespace='/main')

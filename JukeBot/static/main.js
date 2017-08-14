@@ -4,6 +4,13 @@ $(document).ready(function() {
 
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
+    function genTime(time){
+        var minutes = Math.floor(time / 60);
+        var seconds = time - minutes * 60;
+        seconds = seconds > 9 ? "" + seconds: "0" + seconds;
+        return (String(minutes) + ':' + seconds);
+    }
+
     socket.on('connect', function(){
         socket.emit('connected', {data: 'client connected'});
     });
@@ -17,7 +24,7 @@ $(document).ready(function() {
         }
         
         $('.progress-bar').css('width', pro+'%');
-        $('#timer').text(msg.pos + '/' + msg.dur);
+        $('#timer').text(genTime(msg.pos) + '/' + genTime(msg.dur));
     });
     
     socket.on('response', function(msg) {
@@ -26,13 +33,13 @@ $(document).ready(function() {
     
     socket.on('sent_playlist', function(msg) {
         $('#playlist_table tr:gt(0)').remove();
-        $('#nowplay_table tr:gt(0)').remove();
+        //$('#nowplay_table tr:gt(0)').remove();
         $.each(msg, function(index, item) {
           if(index == '-'){
-            $('<tr>').html("<td>" + index + "</td><td>" + "There is no song playing" + "</td>").appendTo('#nowplay_table');
+            $('#nowplay').text("There is no song playing");
         }
         else if(index == '0'){
-            $('<tr>').html("<td>" + "-" + "</td><td>" + item + "</td>").appendTo('#nowplay_table');
+            $('#nowplay').text(item);
         }
         else{
             $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
@@ -53,17 +60,17 @@ $(document).ready(function() {
     });
 
     $('button#skip').click(function(event) {
-        socket.emit('song_skip');
+        socket.emit('button', {data: 'skip'});
         return false;
     });
     
     $('button#shuffle').click(function(event) {
-        socket.emit('song_shuffle');
+        socket.emit('button', {data: 'shuffle'});
         return false;
     });
     
     $('button#clearall').click(function(event) {
-        socket.emit('clear_playlist');
+        socket.emit('button', {data: 'clear'});
         return false;
     });
 
