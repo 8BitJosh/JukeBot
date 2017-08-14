@@ -4,6 +4,7 @@ import queue
 
 from player import Player
 from playlist import Playlist
+from utils import PlaylistEntry
 
 from flask import Flask, render_template, flash, session, request
 from flask_socketio import SocketIO, emit
@@ -11,6 +12,7 @@ import eventlet
 
 web_inputs = queue.Queue()
 playlist = Playlist()
+player = Player()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
@@ -42,10 +44,11 @@ def song_received(message):
         str = 'Enter a Song Name'
     emit('response', {'data': str})
 
+
 @socketio.on('song_skip', namespace='/main')
 def skip_request():
     emit('response', {'data': 'Song Skipped'})
-    print(request.remote_addr + 'Skipped song')
+    print(request.remote_addr + ' Skipped song')
     global web_inputs
     web_inputs.put('skip')
     
@@ -60,12 +63,8 @@ def shuffle_request():
 def connect_playlist(msg):
     global playlist
     emit('sent_playlist', playlist.getPlaylist())
+    emit('duration', player.getDuration(), broadcast=True)
 
-@socketio.on('ping', namespace='/main')
-def return_playlist():
-    global playlist
-    if playlist.updated():
-        emit('sent_playlist', playlist.getPlaylist(), broadcast=True)
         
 @socketio.on('delete', namespace='/main')
 def delete_song(msg):
@@ -86,13 +85,21 @@ def clear_playlist():
     print(request.remote_addr + ' cleared all of playlist')
     emit('response', {'data': 'Playlist Cleared'})
     
+@socketio.on('ping', namespace='/main')
+def return_playlist():
+    global playlist
+    if playlist.updated():
+        emit('sent_playlist', playlist.getPlaylist(), broadcast=True)
+    global player
+    #if player.newsong():
+    emit('duration', player.getDuration(), broadcast=True)
 
 #### Thread constantly looping to playsong / process the current command
 def player_update():
     global web_inputs
     global playlist
-    player = Player()
-    
+    global player
+
     while True:
         option = 'none'
         if not web_inputs.empty():
@@ -108,9 +115,9 @@ def player_update():
                
         if not player.running():
             if not playlist.empty():
-                path = playlist.get_next()
-                if path != '':
-                    player.play(path)
+                song = playlist.get_next()
+                if song.dir != '':
+                    player.play(song)
 
         if option == 'skip':
             player.stop()

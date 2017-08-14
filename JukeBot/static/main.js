@@ -7,6 +7,18 @@ $(document).ready(function() {
     socket.on('connect', function(){
         socket.emit('connected', {data: 'client connected'});
     });
+
+    socket.on('duration', function(msg) {
+        if(msg.pos == 0){
+            var pro = 0;
+        }
+        else{
+            var pro = Math.round(100 * (msg.pos/msg.dur))
+        }
+        
+        $('.progress-bar').css('width', pro+'%');
+        $('#timer').text(msg.pos + '/' + msg.dur);
+    });
     
     socket.on('response', function(msg) {
         $('#user_alerts').text(msg.data);

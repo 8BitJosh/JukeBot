@@ -49,11 +49,11 @@ class Playlist:
     
     def get_next(self):
         self.currently_play = "[" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title
-        path = self.songqueue[0].dir
+        song = self.songqueue[0]
         print("Removed from to play queue - " + self.songqueue[0].title)
         del self.songqueue[0]
         self.generatePlaylist()
-        return path
+        return song
         
     def add(self, title):
         self.songlist.append(title)
