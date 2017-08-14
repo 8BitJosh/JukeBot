@@ -1,16 +1,16 @@
 import subprocess
 import os
 import time
-import traceback
-from utils import delete_file, PlaylistEntry
+from utils import delete_file
+
 
 class Player:
-#create the player member
+    # create the player member
     def __init__(self):
         self.path = ''
         self.dur = 0
 
-#start playing song at path
+# start playing song at path
     def play(self, _song):
         self.path = _song.dir
         self.dur = _song.duration
@@ -25,7 +25,7 @@ class Player:
         self.newSong = True
         print("playing - " + self.path)
 
-#has a new song started playing
+# has a new song started playing
     def newsong(self):
         if self.newSong:
             self.newSong = False
@@ -33,10 +33,10 @@ class Player:
         else:
             return False
 
-#get song duration and current position
+# get song duration and current position
     def getDuration(self):
         durData = {}
-        
+
         durData['dur'] = self.dur
 
         if self.running():
@@ -45,8 +45,8 @@ class Player:
             durData['pos'] = 0
 
         return durData
-    
-#check if the song is still running
+
+# check if the song is still running
     def running(self):
         try:
             if self.p.poll() is None:
@@ -57,10 +57,11 @@ class Player:
                 self.path = ''
                 self.dur = 0
                 return False
-        except: # causes error before first song as no process is playing
+        except Exception as e:
+            # causes error before first song as no process is playing
             return False
-    
-#stop current song and cancel playback
+
+# stop current song and cancel playback
     def stop(self):
         if self.running():
             self.p.kill()
@@ -69,5 +70,3 @@ class Player:
             self.dur = 0
         else:
             print("Unable to skip - no song playing")
-
-

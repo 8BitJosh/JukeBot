@@ -20,25 +20,25 @@ options = {
     'default_search': 'ytsearch',
     }
 
+
 class Playlist:
-    
     def __init__(self):
         self.songlist = []
         self.songqueue = []
         self.currently_play = ''
         self.playlist_dict = {}
         self.playlist_updated = True
-        
+
         self.savedir = "cache"
         if os.path.exists(self.savedir):
             shutil.rmtree(self.savedir)
         os.makedirs(self.savedir)
-        
+
     def shuff(self):
         shuffle(self.songqueue)
         self.generatePlaylist()
         print("Playlist Shuffled")
-    
+
     def empty(self):
         if self.songqueue:
             return False
@@ -46,7 +46,7 @@ class Playlist:
             self.currently_play = ''
             self.generatePlaylist()
             return True
-    
+
     def get_next(self):
         self.currently_play = "[" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title
         song = self.songqueue[0]
@@ -54,14 +54,14 @@ class Playlist:
         del self.songqueue[0]
         self.generatePlaylist()
         return song
-        
+
     def add(self, title):
         self.songlist.append(title)
 
-    #itterate through playlist get the title from youtube url search and print to screen
+    # itterate through playlist get the title from youtube url search and print to screen
     def generatePlaylist(self):
         endmsg = {}
-        
+
         if self.currently_play == '':
             endmsg['-'] = ''
         else:
@@ -70,33 +70,33 @@ class Playlist:
             for things in self.songqueue:
                 count += 1
                 endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
-        
+
         self.playlist_dict = endmsg
         self.playlist_updated = True
         return
-        
+
     def getPlaylist(self):
         return self.playlist_dict
-    
+
     def updated(self):
         if self.playlist_updated:
             self.playlist_updated = False
             return True
         else:
             return False
-            
+
     def remove(self, _index, _title):
         index = _index - 1
         start = _title.find(']') + 2
         title = _title[start:]
         title.strip()
-        
+
         del_path = self.songqueue[index].dir
         del self.songqueue[index]
         self.generatePlaylist()
         if del_path != '':
             delete_file(del_path)
-    
+
     def clearall(self):
         self.songlist.clear()
         while len(self.songqueue):
@@ -106,23 +106,23 @@ class Playlist:
 
         self.songqueue.clear()
         self.generatePlaylist()
-    
+
     #called by main loop (process user entered songs)
     def process(self):
         for things in self.songlist:
             print('process called')
             song_url = things.strip()
             ydl = youtube_dl.YoutubeDL(options)
-            
+
 ####get info for song
             try:
                 info = ydl.extract_info(song_url, download = False, process = False)
             except Exception:
                 print('info extraction error')
                 pass
-                
+
 ####if song is search term
-            
+
             if info.get('url', '').startswith('ytsearch'):
                 info = ydl.extract_info(song_url, download = False, process = True)
                 if not info:

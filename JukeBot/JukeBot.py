@@ -4,9 +4,8 @@ import queue
 
 from player import Player
 from playlist import Playlist
-from utils import PlaylistEntry
 
-from flask import Flask, render_template, flash, session, request
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import eventlet
 
@@ -18,19 +17,20 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
 socketio = SocketIO(app, async_mode='eventlet')
 
-#### handlers for main suggestion page
+
 @app.route("/")
 def index():
     print("Client connected - " + request.remote_addr)
     return render_template('index.html', async_mode=socketio.async_mode)
-    
+
+
 @socketio.on('sent_song', namespace='/main')
 def song_received(message):
     global playlist
     title = message['data']
-    
+
     if title != '':
-        str = 'Queued Song - ' + title 
+        str = 'Queued Song - ' + title
         if '&' in title:
             str = str + '\nIf you wanted to add a playlist use the full playlist page that has "playlist" in the url'
             start_pos = title.find('&')
@@ -51,7 +51,8 @@ def skip_request():
     print(request.remote_addr + ' Skipped song')
     global web_inputs
     web_inputs.put('skip')
-    
+
+
 @socketio.on('song_shuffle', namespace='/main')
 def shuffle_request():
     emit('response', {'data': 'Songs Shuffled'})
@@ -59,42 +60,46 @@ def shuffle_request():
     global web_inputs
     web_inputs.put('shuffle')
 
+
 @socketio.on('connected', namespace='/main')
 def connect_playlist(msg):
     global playlist
     emit('sent_playlist', playlist.getPlaylist())
     emit('duration', player.getDuration(), broadcast=True)
 
-        
+
 @socketio.on('delete', namespace='/main')
 def delete_song(msg):
     global playlist
     title = msg['title']
     index = msg['data']
     print(request.remote_addr + ' removed index ' + str(index) + ' title = ' + title)
-    
+
     playlist.remove(index, title)
-    
-    s = 'Removed song from playlist - ' + title 
+
+    s = 'Removed song from playlist - ' + title
     emit('response', {'data': s})
-    
+
+
 @socketio.on('clear_playlist', namespace='/main')
 def clear_playlist():
     global playlist
     playlist.clearall()
     print(request.remote_addr + ' cleared all of playlist')
     emit('response', {'data': 'Playlist Cleared'})
-    
+
+
 @socketio.on('ping', namespace='/main')
 def return_playlist():
     global playlist
     if playlist.updated():
         emit('sent_playlist', playlist.getPlaylist(), broadcast=True)
     global player
-    #if player.newsong():
+    # if player.newsong():
     emit('duration', player.getDuration(), broadcast=True)
 
-#### Thread constantly looping to playsong / process the current command
+
+# Thread constantly looping to playsong / process the current command
 def player_update():
     global web_inputs
     global playlist
@@ -112,7 +117,7 @@ def player_update():
         else:
             playlist.process()
             playlist.download_next()
-               
+
         if not player.running():
             if not playlist.empty():
                 song = playlist.get_next()
@@ -124,6 +129,6 @@ def player_update():
         else:
             time.sleep(0.1)
 
-####create threads and start webserver
+# create threads and start webserver
 t = threading.Thread(target = player_update).start()
-socketio.run(app, debug = False, host = '0.0.0.0', port=80)
+socketio.run(app, debug=False, host='0.0.0.0', port=80)

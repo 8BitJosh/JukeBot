@@ -4,13 +4,15 @@ import time
 import traceback
 import os
 
-#reformat the titles so the titles are suitable for windows file names
+
+# reformat the titles so the titles are suitable for windows file names
 def do_format(message):
     endMsg = unicodedata.normalize('NFKD', message).encode('ascii', 'ignore').decode('ascii')
     endMsg = re.sub('[^\w\s-]', '', endMsg).strip().lower()
     endMsg = re.sub('[-\s]+', '-', endMsg)
     return endMsg
-    
+
+
 def delete_file(dir):
     if dir == 'bad_path' or dir == '':
         print('No file exists - badpath/""')
@@ -31,6 +33,7 @@ def delete_file(dir):
             break
     else:
         print("Could not delete file {}, giving up and moving on".format(dir))
+
 
 class PlaylistEntry:
     def __init__(self, url, title, duration=0):
