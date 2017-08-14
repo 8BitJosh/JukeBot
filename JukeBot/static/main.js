@@ -53,17 +53,17 @@ $(document).ready(function() {
     });
 
     $('button#skip').click(function(event) {
-        socket.emit('song_skip');
+        socket.emit('button', {data: 'skip'});
         return false;
     });
     
     $('button#shuffle').click(function(event) {
-        socket.emit('song_shuffle');
+        socket.emit('button', {data: 'shuffle'});
         return false;
     });
     
     $('button#clearall').click(function(event) {
-        socket.emit('clear_playlist');
+        socket.emit('button', {data: 'clear'});
         return false;
     });
 

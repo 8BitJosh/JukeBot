@@ -48,6 +48,8 @@ class Playlist:
             return True
 
     def get_next(self):
+        while not self.songqueue[0].downloaded:
+            time.sleep(0.1)
         self.currently_play = "[" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title
         song = self.songqueue[0]
         print("Removed from to play queue - " + self.songqueue[0].title)
@@ -213,7 +215,8 @@ class Playlist:
     def download_song(self, to_down):
         song_url = to_down.url.strip()
         ydl = youtube_dl.YoutubeDL(options)
-        
+        print('Starting to download - ' + to_down.title)
+
         try:
             title = do_format(to_down.title)
             savepath = os.path.join(self.savedir, "%s.mp3" % (title))
