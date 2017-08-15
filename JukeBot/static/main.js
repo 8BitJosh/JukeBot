@@ -26,6 +26,21 @@ $(document).ready(function() {
         $('.progress-bar').css('width', pro+'%');
         $('#timer').text(genTime(msg.pos) + '/' + genTime(msg.dur));
     });
+
+    socket.on('volume_set', function(msg) {
+        var vol = msg.vol;
+        $('#volume').val(vol);
+    });
+
+    $('#volume').on('change', function(){
+        var vol = $('#volume').val();
+        console.log(vol);
+        socket.emit('volume', {'vol': vol});
+    });
+
+    socket.on('pause_button', function(msg){
+        $('button#pause').text(msg.data);
+    });
     
     socket.on('response', function(msg) {
         $('#user_alerts').text(msg.data);
@@ -33,7 +48,6 @@ $(document).ready(function() {
     
     socket.on('sent_playlist', function(msg) {
         $('#playlist_table tr:gt(0)').remove();
-        //$('#nowplay_table tr:gt(0)').remove();
         $.each(msg, function(index, item) {
           if(index == '-'){
             $('#nowplay').text("There is no song playing");
@@ -71,6 +85,11 @@ $(document).ready(function() {
     
     $('button#clearall').click(function(event) {
         socket.emit('button', {data: 'clear'});
+        return false;
+    });
+
+    $('button#pause').click(function(event) {
+        socket.emit('button', {data: 'pause'});
         return false;
     });
 

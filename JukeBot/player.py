@@ -2,6 +2,7 @@ import vlc
 import os
 from utils import delete_file
 
+defaultVol = 50
 
 class Player:
     # create the player member
@@ -11,6 +12,7 @@ class Player:
         self.instance = vlc.Instance("--no-video --aout=alsa")
         #Create a MediaPlayer with the default instance
         self.player = self.instance.media_player_new()
+        self.setVolume(defaultVol)
 
 # start playing song at path
     def play(self, _song):
@@ -81,7 +83,12 @@ class Player:
 # set the playback volume
     def setVolume(self, _volume):
         self.player.audio_set_volume(_volume)
+        self.volume = _volume
 
 # get the current playback volume
     def getVolume(self):
-        return self.player.audio_get_volume()
+        if self.player.audio_get_volume() == -1:
+            return self.volume
+        else:
+            self.volume = self.player.audio_get_volume()
+            return self.volume

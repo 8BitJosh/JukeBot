@@ -20,15 +20,18 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 @app.route("/")
 def index():
-    print("Client connected - " + request.remote_addr, flush=True)
+    print("Client loaded page", flush=True)
     return render_template('index.html', async_mode=socketio.async_mode)
 
 
 @socketio.on('connected', namespace='/main')
 def connect_playlist(msg):
     global playlist
+    global player
+    print("Client socket connected - " + request.remote_addr, flush=True)
     emit('sent_playlist', playlist.getPlaylist())
     emit('duration', player.getDuration(), broadcast=True)
+    emit('volume_set', {'vol': player.getVolume()}, broadcast = True)
 
 
 @socketio.on('sent_song', namespace='/main')
@@ -56,6 +59,7 @@ def song_received(message):
 def button_handler(msg):
     global web_inputs
     global playlist
+    global player
     command = msg['data']
 
     if command == 'skip':
@@ -70,6 +74,27 @@ def button_handler(msg):
         playlist.clearall()
         print(request.remote_addr + ' cleared all of playlist', flush=True)
         emit('response', {'data': 'Playlist Cleared'})
+    elif command == 'pause':
+        if player.isPaused():
+            print(request.remote_addr + ' Resumed the song', flush=True)
+            emit('response', {'data': 'Song Resumed'})
+            emit('pause_button', {'data': 'Pause'}, broadcast=True)
+            web_inputs.put('pause')
+        elif player.running():
+            print(request.remote_addr + ' Paused the song', flush=True)
+            emit('response', {'data': 'Song Paused'})
+            emit('pause_button', {'data': 'Resume'}, broadcast=True)
+            web_inputs.put('pause')
+
+
+@socketio.on('volume', namespace='/main')
+def set_volume(msg):
+    global player
+    vol = int(msg['vol'])
+    player.setVolume(vol)
+    print(request.remote_addr + ' set volume to ' + str(vol), flush = True)
+    print("emitting volume " + str(vol))
+    emit('volume_set', {'vol': vol}, broadcast = True)
 
 
 @socketio.on('delete', namespace='/main')
@@ -110,11 +135,13 @@ def player_update():
                 option = 'skip'
             elif msg == 'shuffle':
                 playlist.shuff()
+            elif msg == 'pause':
+                option = 'pause'
         else:
             playlist.process()
             playlist.download_next()
 
-        if not player.running():
+        if not player.running() and not player.isPaused():
             if not playlist.empty():
                 song = playlist.get_next()
                 if song.dir != '':
@@ -122,8 +149,10 @@ def player_update():
 
         if option == 'skip':
             player.stop()
-        else:
-            time.sleep(0.1)
+        elif option == 'pause':
+            player.pause()
+
+        time.sleep(0.25)
 
 # create threads and start webserver
 t = threading.Thread(target = player_update).start()
