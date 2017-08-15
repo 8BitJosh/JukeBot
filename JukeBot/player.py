@@ -1,6 +1,5 @@
-import subprocess
+import vlc
 import os
-import time
 from utils import delete_file
 
 
@@ -9,19 +8,17 @@ class Player:
     def __init__(self):
         self.path = ''
         self.dur = 0
+        self.instance = vlc.Instance("--no-video --aout=alsa")
+        #Create a MediaPlayer with the default instance
+        self.player = self.instance.media_player_new()
 
 # start playing song at path
     def play(self, _song):
         self.path = _song.dir
         self.dur = _song.duration
-        self.p = subprocess.Popen(
-                            ['avplay', '-nodisp', '-autoexit', self.path],
-                            #shell = True
-                            stdout=subprocess.DEVNULL,
-                            stdin=subprocess.PIPE,
-                            stderr=subprocess.STDOUT
-                            )
-        self.startTime = time.time()
+        media = self.instance.media_new(self.path)
+        self.player.set_media(media)
+        self.player.play()
         self.newSong = True
         print("playing - " + self.path, flush=True)
 
@@ -40,7 +37,7 @@ class Player:
         durData['dur'] = self.dur
 
         if self.running():
-            durData['pos'] = int(time.time() - self.startTime)
+            durData['pos'] = int(self.player.get_time()/1000)
         else:
             durData['pos'] = 0
 
@@ -48,25 +45,43 @@ class Player:
 
 # check if the song is still running
     def running(self):
-        try:
-            if self.p.poll() is None:
-                return True
-            else:
-                if self.path != '' and os.path.exists(self.path):
-                    delete_file(self.path)
-                self.path = ''
-                self.dur = 0
+        if ( self.player.get_state() == vlc.State.Playing ) or ( self.player.get_state() == vlc.State.Opening ):
+            return True
+        else:
+            if ( self.player.get_state() == vlc.State.Paused ) or ( self.player.get_state() == vlc.State.Stopped ):
                 return False
-        except Exception as e:
-            # causes error before first song as no process is playing
+            self.player.stop()
+            if self.path != '' and os.path.exists(self.path):
+                print("deleting", flush=True)
+                delete_file(self.path)
+            self.path = ''
+            self.dur = 0
             return False
 
 # stop current song and cancel playback
     def stop(self):
         if self.running():
-            self.p.kill()
+            self.player.stop()
             delete_file(self.path)
             self.path = ''
             self.dur = 0
         else:
             print("Unable to skip - no song playing", flush=True)
+
+# pause/resume the current song
+    def pause(self):
+        self.player.pause()
+
+# check for a paused song
+    def isPaused(self):
+        if ( self.player.get_state() == vlc.State.Paused ):
+            return True
+        return False
+
+# set the playback volume
+    def setVolume(self, _volume):
+        self.player.audio_set_volume(_volume)
+
+# get the current playback volume
+    def getVolume(self):
+        return self.player.audio_get_volume()

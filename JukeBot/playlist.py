@@ -219,7 +219,7 @@ class Playlist:
 
         try:
             title = do_format(to_down.title)
-            savepath = os.path.join(self.savedir, "%s.mp3" % (title))
+            savepath = os.path.join(self.savedir, "%s" % (title))
         except Exception as e:
             print("Can't access song! %s\n" % traceback.format_exc(), flush=True)
             return 'bad_path'
