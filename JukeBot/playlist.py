@@ -12,7 +12,7 @@ options = {
     'extractaudio' : True,
     'audioformat' : "mp3",
     'outtmpl': '%(id)s',
-    'noplaylist' : False,   ################
+    'noplaylist' : False,   
     'nocheckcertificate' : True,
     'ignoreerrors' : True,
     'quiet' : True,

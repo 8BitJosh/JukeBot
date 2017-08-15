@@ -20,15 +20,18 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 @app.route("/")
 def index():
-    print("Client connected - " + request.remote_addr, flush=True)
+    print("Client loaded page", flush=True)
     return render_template('index.html', async_mode=socketio.async_mode)
 
 
 @socketio.on('connected', namespace='/main')
 def connect_playlist(msg):
     global playlist
+    global player
+    print("Client socket connected - " + request.remote_addr, flush=True)
     emit('sent_playlist', playlist.getPlaylist())
     emit('duration', player.getDuration(), broadcast=True)
+    emit('volume_set', {'vol': player.getVolume()}, broadcast = True)
 
 
 @socketio.on('sent_song', namespace='/main')
@@ -79,6 +82,16 @@ def button_handler(msg):
         elif player.running():
             emit('response', {'data': 'Song Paused'})
             web_inputs.put('pause')
+
+
+@socketio.on('volume', namespace='/main')
+def set_volume(msg):
+    global player
+    vol = int(msg['vol'])
+    player.setVolume(vol)
+    print(request.remote_addr + ' set volume to ' + str(vol), flush = True)
+    print("emitting volume " + str(vol))
+    emit('volume_set', {'vol': vol}, broadcast = True)
 
 
 @socketio.on('delete', namespace='/main')
