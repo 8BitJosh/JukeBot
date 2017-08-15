@@ -74,6 +74,11 @@ $(document).ready(function() {
         return false;
     });
 
+    $('button#pause').click(function(event) {
+        socket.emit('button', {data: 'pause'});
+        return false;
+    });
+
     $('#playlist_table').on('click', '#del', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();

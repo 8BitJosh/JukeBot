@@ -56,6 +56,7 @@ def song_received(message):
 def button_handler(msg):
     global web_inputs
     global playlist
+    global player
     command = msg['data']
 
     if command == 'skip':
@@ -70,6 +71,17 @@ def button_handler(msg):
         playlist.clearall()
         print(request.remote_addr + ' cleared all of playlist', flush=True)
         emit('response', {'data': 'Playlist Cleared'})
+    elif command == 'pause':
+        print(request.remote_addr + ' paused the song', flush=True)
+        emit('response', {'data': 'Song Paused'})
+        web_inputs.put('pause')
+        
+        #if player.isPaused():
+        #    emit('response', {'data': 'Song Resumed'})
+        #    web_inputs.put('pause')
+        #elif player.running():
+        #    emit('response', {'data': 'Song Paused'})
+        #    web_inputs.put('pause')
 
 
 @socketio.on('delete', namespace='/main')
@@ -110,6 +122,8 @@ def player_update():
                 option = 'skip'
             elif msg == 'shuffle':
                 playlist.shuff()
+            elif msg == 'pause':
+                option = 'pause'
         else:
             playlist.process()
             playlist.download_next()
@@ -122,6 +136,8 @@ def player_update():
 
         if option == 'skip':
             player.stop()
+        elif option == 'pause':
+            player.pause()
         else:
             time.sleep(0.1)
 
