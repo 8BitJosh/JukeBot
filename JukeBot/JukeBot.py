@@ -75,12 +75,15 @@ def button_handler(msg):
         print(request.remote_addr + ' cleared all of playlist', flush=True)
         emit('response', {'data': 'Playlist Cleared'})
     elif command == 'pause':
-        print(request.remote_addr + ' paused the song', flush=True)
         if player.isPaused():
+            print(request.remote_addr + ' Resumed the song', flush=True)
             emit('response', {'data': 'Song Resumed'})
+            emit('pause_button', {'data': 'Pause'}, broadcast=True)
             web_inputs.put('pause')
         elif player.running():
+            print(request.remote_addr + ' Paused the song', flush=True)
             emit('response', {'data': 'Song Paused'})
+            emit('pause_button', {'data': 'Resume'}, broadcast=True)
             web_inputs.put('pause')
 
 

@@ -37,6 +37,10 @@ $(document).ready(function() {
         console.log(vol);
         socket.emit('volume', {'vol': vol});
     });
+
+    socket.on('pause_button', function(msg){
+        $('button#pause').text(msg.data);
+    });
     
     socket.on('response', function(msg) {
         $('#user_alerts').text(msg.data);
