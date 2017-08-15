@@ -73,15 +73,12 @@ def button_handler(msg):
         emit('response', {'data': 'Playlist Cleared'})
     elif command == 'pause':
         print(request.remote_addr + ' paused the song', flush=True)
-        emit('response', {'data': 'Song Paused'})
-        web_inputs.put('pause')
-        
-        #if player.isPaused():
-        #    emit('response', {'data': 'Song Resumed'})
-        #    web_inputs.put('pause')
-        #elif player.running():
-        #    emit('response', {'data': 'Song Paused'})
-        #    web_inputs.put('pause')
+        if player.isPaused():
+            emit('response', {'data': 'Song Resumed'})
+            web_inputs.put('pause')
+        elif player.running():
+            emit('response', {'data': 'Song Paused'})
+            web_inputs.put('pause')
 
 
 @socketio.on('delete', namespace='/main')
@@ -128,7 +125,7 @@ def player_update():
             playlist.process()
             playlist.download_next()
 
-        if not player.running():
+        if not player.running() and not player.isPaused():
             if not playlist.empty():
                 song = playlist.get_next()
                 if song.dir != '':
@@ -138,8 +135,8 @@ def player_update():
             player.stop()
         elif option == 'pause':
             player.pause()
-        else:
-            time.sleep(0.1)
+
+        time.sleep(0.25)
 
 # create threads and start webserver
 t = threading.Thread(target = player_update).start()
