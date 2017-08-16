@@ -38,7 +38,7 @@ class Player:
 
         durData['dur'] = self.dur
 
-        if self.running():
+        if self.running() or self.isPaused():
             durData['pos'] = int(self.player.get_time()/1000)
         else:
             durData['pos'] = 0
