@@ -93,7 +93,6 @@ def set_volume(msg):
     vol = int(msg['vol'])
     player.setVolume(vol)
     print(request.remote_addr + ' set volume to ' + str(vol), flush = True)
-    print("emitting volume " + str(vol))
     emit('volume_set', {'vol': vol}, broadcast = True)
 
 
