@@ -41,4 +41,5 @@ class PlaylistEntry:
         self.title = title
         self.duration = duration
         self.downloaded = False
+        self.downloading = False
         self.dir = ''

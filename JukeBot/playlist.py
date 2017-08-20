@@ -4,6 +4,7 @@ import youtube_dl
 import traceback
 import datetime
 import time
+
 from random import shuffle
 from utils import do_format, PlaylistEntry, delete_file
 
@@ -23,7 +24,6 @@ options = {
 
 class Playlist:
     def __init__(self):
-        self.songlist = []
         self.songqueue = []
         self.currently_play = ''
         self.playlist_dict = {}
@@ -56,9 +56,6 @@ class Playlist:
         del self.songqueue[0]
         self.generatePlaylist()
         return song
-
-    def add(self, title):
-        self.songlist.append(title)
 
     # itterate through playlist get the title from youtube url search and print to screen
     def generatePlaylist(self):
@@ -100,7 +97,6 @@ class Playlist:
             delete_file(del_path)
 
     def clearall(self):
-        self.songlist.clear()
         while len(self.songqueue):
             if self.songqueue[0].dir != '':
                 delete_file(self.songqueue[0].dir)
@@ -109,104 +105,104 @@ class Playlist:
         self.songqueue.clear()
         self.generatePlaylist()
 
-    #called by main loop (process user entered songs)
-    def process(self):
-        for things in self.songlist:
-            print('process called', flush=True)
-            song_url = things.strip()
-            ydl = youtube_dl.YoutubeDL(options)
+    # called when user enters song to be processed
+    def process(self, _title):
+        print('process called', flush=True)
+        song_url = _title.strip()
+        ydl = youtube_dl.YoutubeDL(options)
 
 ####get info for song
-            try:
-                info = ydl.extract_info(song_url, download = False, process = False)
-            except Exception:
-                print('info extraction error', flush=True)
-                pass
+        try:
+            info = ydl.extract_info(song_url, download = False, process = False)
+        except Exception:
+            print('info extraction error', flush=True)
+            pass
 
 ####if song is search term
 
-            if info.get('url', '').startswith('ytsearch'):
-                info = ydl.extract_info(song_url, download = False, process = True)
-                if not info:
-                    self.songlist.remove(things)
-                    return
-                if not all(info.get('entries', [])):
-                    return
+        if info.get('url', '').startswith('ytsearch'):
+            info = ydl.extract_info(song_url, download = False, process = True)
+            if not info:
+                return
+            if not all(info.get('entries', [])):
+                return
 
-                song_url = info['entries'][0]['webpage_url']
+            song_url = info['entries'][0]['webpage_url']
 
-                info = ydl.extract_info(song_url, download = False, process = False)
+            info = ydl.extract_info(song_url, download = False, process = False)
 
-                try:
-                    entry = PlaylistEntry(
-                        song_url,
-                        info['title'],
-                        info['duration']
-                    )
-                    self.songqueue.append(entry)
-                except:
-                    print('oh no url YT error again', flush=True)
+            try:
+                entry = PlaylistEntry(
+                    song_url,
+                    info['title'],
+                    info['duration']
+                )
+                self.songqueue.append(entry)
+            except:
+                print('oh no url YT error again', flush=True)
 
 ####if song is playlist
-            elif 'entries' in info:
-                try:
-                    info = ydl.extract_info(song_url, download=False, process=False)
-                except Exception as e:
-                    print('Could not extract information from {}\n\n{}'.format(playlist_url, e), flush=True)
-                    return
+        elif 'entries' in info:
+            try:
+                info = ydl.extract_info(song_url, download=False, process=False)
+            except Exception as e:
+                print('Could not extract information from {}\n\n{}'.format(playlist_url, e), flush=True)
+                return
 
-                if not info:
-                    print('Could not extract information from %s' % playlist_url, flush=True)
-                    return
+            if not info:
+                print('Could not extract information from %s' % playlist_url, flush=True)
+                return
 
-                items = 0
-                baditems = 0
-                for entry_data in info['entries']:
-                    items += 1
-                    if entry_data:
-                        baseurl = info['webpage_url'].split('playlist?list=')[0]
-                        song_url = baseurl + 'watch?v=%s' % entry_data['id']
-                        try:
-                            playlist_info = ydl.extract_info(song_url, download=False, process=True)
-                            entry = PlaylistEntry(
-                                song_url,
-                                playlist_info['title'],
-                                playlist_info['duration']
-                            )
-                            print('added from playlist - ' + playlist_info['title'], flush=True)
-                            self.songqueue.append(entry)
-                        except Exception as e:
-                            baditems += 1
-                            print('There was an error adding the song from playlist', flush=True)
-                            print(e)
-                    else:
+            items = 0
+            baditems = 0
+            for entry_data in info['entries']:
+                items += 1
+                if entry_data:
+                    baseurl = info['webpage_url'].split('playlist?list=')[0]
+                    song_url = baseurl + 'watch?v=%s' % entry_data['id']
+                    try:
+                        playlist_info = ydl.extract_info(song_url, download=False, process=True)
+                        entry = PlaylistEntry(
+                            song_url,
+                            playlist_info['title'],
+                            playlist_info['duration']
+                        )
+                        print('added from playlist - ' + playlist_info['title'], flush=True)
+                        self.songqueue.append(entry)
+                    except Exception as e:
                         baditems += 1
-                if baditems:
-                    print('Skipped %s bad entries' % baditems, flush=True)
+                        print('There was an error adding the song from playlist', flush=True)
+                        print(e)
+                else:
+                    baditems += 1
+            if baditems:
+                print('Skipped %s bad entries' % baditems, flush=True)
 
-                print('Added {}/{} songs from playlist'.format(items - baditems, items), flush=True)
+            print('Added {}/{} songs from playlist'.format(items - baditems, items), flush=True)
 
 ####else if song is a url or other thing
-            else:
-                info = ydl.extract_info(song_url, download = False, process = True)
-                try:
-                    entry = PlaylistEntry(
-                        song_url,
-                        info['title'],
-                        info['duration']
-                    )
-                    self.songqueue.append(entry)
-                except:
-                    print('Error with other option', flush=True)
+        else:
+            info = ydl.extract_info(song_url, download = False, process = True)
+            try:
+                entry = PlaylistEntry(
+                    song_url,
+                    info['title'],
+                    info['duration']
+                )
+                self.songqueue.append(entry)
+            except:
+                print('Error with other option', flush=True)
 
-            print('user input processed - ' + things, flush=True)
-            while things in self.songlist: self.songlist.remove(things)
-            self.generatePlaylist()
+        print('user input processed - ' + _title, flush=True)
+        self.generatePlaylist()
 
     #download next non downloaded song
     def download_next(self):
         for things in self.songqueue:
             if things.downloaded == False:
+                if things.downloading == True:
+                    break
+                things.downloading = True
                 things.dir = self.download_song(things)
                 things.downloaded = True
                 break

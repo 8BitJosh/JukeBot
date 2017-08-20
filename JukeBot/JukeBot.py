@@ -45,11 +45,11 @@ def song_received(message):
             str = str + '\nIf you wanted to add a playlist use the full playlist page that has "playlist" in the url'
             start_pos = title.find('&')
             msg = title[:start_pos]
-            playlist.add(msg)
         else:
-            playlist.add(title)
+            msg = title
 
         print(request.remote_addr + ' submitted - ' + title, flush=True)
+        p = threading.Thread(target = playlist.process, args = (msg,)).start()
     else:
         str = 'Enter a Song Name'
     emit('response', {'data': str})
@@ -137,8 +137,7 @@ def player_update():
             elif msg == 'pause':
                 option = 'pause'
         else:
-            playlist.process()
-            playlist.download_next()
+            p = threading.Thread(target = playlist.download_next).start()
 
         if not player.running() and not player.isPaused():
             if not playlist.empty():
