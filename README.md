@@ -8,48 +8,78 @@ where the user can also see the playlist, shuffle the playlist or skip the curre
 
 songs can be added through: 
 - song title (will return the first result in a youtube search 
-- youtube/soundcloud url 
+- youtube/soundcloud/bandcamp url  (basicly any webpage supported by youtube-dl) 
 - youtube playlist url (must be main playlist page with playlist in the url)
 
 Other websites supported by youtube-dl may work through adding page urls but this is untested
 
-tested and runs on a raspberry pi
+## Web Interface
+- screenshot of the web interface
 
-## Dependencys
+![jukebot webpage screenshot](https://s27.postimg.org/wiv44hetv/Juke_Bot.png)
 
-run update_dep to install dependencies or
-use "pip install" to add these
+## Using this bot
+
+The bot is still under development and has been running successfully on a raspberry pi 3
+
+Below is a guide on how to setup the bot on the pi 3 with a fresh raspbian install
+
+## Dependencies
+
+Install git, vlc and python3-pip
+``` 
+sudo apt-get update
+sudo apt-get install git vlc python3-pip
+```
+
+Reboot the pi
+```
+sudo reboot
+```
+
+Clone the repository and move inside the directory
+```
+git clone https://github.com/8BitJosh/JukeBot.git
+cd ./JukeBot
+```
+
+run update_dep_linux.sh to install dependencies 
+```
+sudo ./update_dep_linux.sh
+```
+or use "pip install" to add these
 
 - youtube_dl
 - flask
 - flask_socketio
 - eventlet
+- python-vlc
 
-avlib also needs to be installed on the system the bot is running on as the bot uses avplay to play the audio
+## Running the bot
 
-## Runing the bot
+To run the bot use the JukeBot script
+```
+sudo ./JukeBot.sh -h
+```
+Append this command with the letter corresponding to the function you want to perform
+```
+	-h  Display this help message.
+	-f  Open JukeBot in a foreground process and tee output to CMDlog
+	-b  Open JukeBot in a background process and redirect output to CMDlog
+	-c  View the output log (implicit if no options specified)
+	-e  End JukeBot running in a background process
+	-l  List running bots
+```
+To start the bot as a background process run the command
+```
+sudo ./JukeBot.sh -b
+```
 
-- make sure python 3.5+ is installed
-- make sure all the dependencies are installed
-- go to the main bot folder and run /JukeBot/JukeBot.py ( this is going to be replaced with a script to start it)
-- you can connect to the bot by typing the ip address of the computer running the bot into a web browser on another computer
+## Connecting to the bot
+- you can connect to the bot by typing the ip address of the computer running the bot into a web browser on another computer on the same network
 - the interface is quite simple at the moment so should be easy enough to work out
 - songs can be added through: song title, youtube/soundcloud url or youtube playlist url.
-- other websites supported by youtube-dl may work through adding urls but this is untested
-
-## Web Interface
-- screenshot of the web interface
-
-![jukebot webpage screenshot](https://s4.postimg.org/yvz8qebq5/jukebot.png)
 
 ## TODO
 
 This project is still in development with more features to come
-
--add more buttons and control, pause, volume etc...
-- come up with a better player class, the current player is quite bodged limited in commands ( no pause/resume ) and 
-the way some of the functions work, could use mplayer ?
-- add playlist page so users can create playlists that are stored on the server and can be queued up. need to work
-out how to do this user interface wise
-- add more cases to the process function to accept and handle all types of possible user input from more sources
-- find a better way to exit without having to terminate the process

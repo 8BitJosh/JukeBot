@@ -11,7 +11,7 @@ function usage() {
 	echo "  -h  Display this message."
 	echo "  -f  Open JukeBot in a foreground process and tee output to CMDlog"
 	echo "  -b  Open JukeBot in a background process and redirect output to CMDlog"
-	echo "  -c  View the output log (implict if no options specified)"
+	echo "  -c  View the output log (implicit if no options specified)"
 	echo "  -e  End JukeBot running in a background process"
 	echo "  -l  List running bots"
 }
