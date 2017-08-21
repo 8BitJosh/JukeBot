@@ -43,11 +43,11 @@ git clone https://github.com/8BitJosh/JukeBot.git
 cd ./JukeBot
 ```
 
-run update_dep_linux.sh to install dependencies 
+Install the python dependencies 
 ```
-sudo ./update_dep_linux.sh
+sudo python3 -m pip install -U -r ./requirements.txt
 ```
-or use "pip install" to add these
+This command installs the following python modules
 
 - youtube_dl
 - flask
@@ -59,7 +59,7 @@ or use "pip install" to add these
 
 To run the bot use the JukeBot script
 ```
-sudo ./JukeBot.sh -h
+./JukeBot.sh -h
 ```
 Append this command with the letter corresponding to the function you want to perform
 ```
@@ -70,9 +70,9 @@ Append this command with the letter corresponding to the function you want to pe
 	-e  End JukeBot running in a background process
 	-l  List running bots
 ```
-To start the bot as a background process run the command
+For example to start the bot as a background process run the command
 ```
-sudo ./JukeBot.sh -b
+./JukeBot.sh -b
 ```
 
 ## Connecting to the bot
