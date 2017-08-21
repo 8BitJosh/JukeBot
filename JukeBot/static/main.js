@@ -51,9 +51,12 @@ $(document).ready(function() {
         $.each(msg, function(index, item) {
           if(index == '-'){
             $('#nowplay').text("There is no song playing");
+            $('#page_title').text("JukeBot");
         }
         else if(index == '0'){
             $('#nowplay').text(item);
+            var str = item.slice(item.search("]")+ 2);
+            $('#page_title').text(str);
         }
         else{
             $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
