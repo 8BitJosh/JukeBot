@@ -26,7 +26,6 @@ class Playlist:
     def __init__(self):
         self.songqueue = []
         self.currently_play = ''
-        self.playlist_dict = {}
         self.playlist_updated = True
 
         self.savedir = "cache"
@@ -36,7 +35,7 @@ class Playlist:
 
     def shuff(self):
         shuffle(self.songqueue)
-        self.generatePlaylist()
+        self.playlist_updated = True
         print("Playlist Shuffled", flush=True)
 
     def empty(self):
@@ -44,7 +43,7 @@ class Playlist:
             return False
         else:
             self.currently_play = ''
-            self.generatePlaylist()
+            self.playlist_updated = True
             return True
 
     def get_next(self):
@@ -54,11 +53,10 @@ class Playlist:
         song = self.songqueue[0]
         print("Removed from to play queue - " + self.songqueue[0].title, flush=True)
         del self.songqueue[0]
-        self.generatePlaylist()
+        self.playlist_updated = True
         return song
 
-    # itterate through playlist get the title from youtube url search and print to screen
-    def generatePlaylist(self):
+    def getPlaylist(self):
         endmsg = {}
 
         if self.currently_play == '':
@@ -70,12 +68,7 @@ class Playlist:
                 count += 1
                 endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
 
-        self.playlist_dict = endmsg
-        self.playlist_updated = True
-        return
-
-    def getPlaylist(self):
-        return self.playlist_dict
+        return endmsg
 
     def updated(self):
         if self.playlist_updated:
@@ -92,7 +85,7 @@ class Playlist:
 
         del_path = self.songqueue[index].dir
         del self.songqueue[index]
-        self.generatePlaylist()
+        self.playlist_updated = True
         if del_path != '':
             delete_file(del_path)
 
@@ -103,7 +96,7 @@ class Playlist:
             del self.songqueue[0]
 
         self.songqueue.clear()
-        self.generatePlaylist()
+        self.playlist_updated = True
 
     # called when user enters song to be processed
     def process(self, _title):
@@ -169,6 +162,7 @@ class Playlist:
                         )
                         print('added from playlist - ' + playlist_info['title'], flush=True)
                         self.songqueue.append(entry)
+                        self.playlist_updated = True
                     except Exception as e:
                         baditems += 1
                         print('There was an error adding the song from playlist', flush=True)
@@ -194,7 +188,7 @@ class Playlist:
                 print('Error with other option', flush=True)
 
         print('user input processed - ' + _title, flush=True)
-        self.generatePlaylist()
+        self.playlist_updated = True
 
     #download next non downloaded song
     def download_next(self):
