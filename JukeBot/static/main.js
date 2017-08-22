@@ -44,8 +44,13 @@ $(document).ready(function() {
     
     socket.on('response', function(msg) {
         $('#user_alerts').text(msg.data);
+        setTimeout(clearMsg, 5000);
     });
     
+    function clearMsg(){
+        $('#user_alerts').empty();
+    }
+
     socket.on('sent_playlist', function(msg) {
         $('#playlist_table tr:gt(0)').remove();
         $.each(msg, function(index, item) {
