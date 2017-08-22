@@ -63,6 +63,9 @@ $(document).ready(function() {
             var str = item.slice(item.search("]")+ 2);
             $('#page_title').text(str);
         }
+        else if(index == 'dur'){
+            $('#totalDur').text('Total Duration - ' + item);
+        }
         else{
             $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
                 "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +

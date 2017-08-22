@@ -58,6 +58,7 @@ class Playlist:
 
     def getPlaylist(self):
         endmsg = {}
+        totalDur = 0
 
         if self.currently_play == '':
             endmsg['-'] = ''
@@ -67,6 +68,8 @@ class Playlist:
             for things in self.songqueue:
                 count += 1
                 endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
+                totalDur += things.duration
+            endmsg['dur'] = str(datetime.timedelta(seconds=totalDur))
 
         return endmsg
 
