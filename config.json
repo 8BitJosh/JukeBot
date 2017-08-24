@@ -1,0 +1,13 @@
+{ 
+	"main" : {
+			"webPort" : 80  
+		},
+
+	"player" : {
+			"defaultVol" : 75
+		},
+
+	"playlist" : {
+		
+		}
+}

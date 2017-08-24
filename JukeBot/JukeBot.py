@@ -1,16 +1,22 @@
 import time
 import threading
-import queue
+import json
 
 from player import Player
 from playlist import Playlist
+from utils import configCheck
 
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import eventlet
 
-playlist = Playlist()
-player = Player()
+with open('config.json') as file:
+    uncheckedConfig = json.load(file)
+
+config = configCheck(uncheckedConfig)
+
+playlist = Playlist(config)
+player = Player(config)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
@@ -135,4 +141,4 @@ def player_update():
 
 # create threads and start webserver
 t = threading.Thread(target = player_update).start()
-socketio.run(app, debug=False, host='0.0.0.0', port=80)
+socketio.run(app, debug=False, host='0.0.0.0', port=config['main']['webPort'])

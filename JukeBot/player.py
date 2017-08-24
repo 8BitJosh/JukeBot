@@ -2,17 +2,16 @@ import vlc
 import os
 from utils import delete_file
 
-defaultVol = 75
-
 class Player:
     # create the player member
-    def __init__(self):
+    def __init__(self, _config):
+        self.config = _config
         self.path = ''
         self.dur = 0
         self.instance = vlc.Instance("--no-video --aout=alsa")
         #Create a MediaPlayer with the default instance
         self.player = self.instance.media_player_new()
-        self.setVolume(defaultVol)
+        self.setVolume(self.config['player']['defaultVol'])
 
 # start playing song at path
     def play(self, _song):

@@ -1,5 +1,4 @@
 import os, shutil
-import subprocess
 import youtube_dl
 import traceback
 import datetime
@@ -23,7 +22,9 @@ options = {
 
 
 class Playlist:
-    def __init__(self):
+    def __init__(self, _config):
+        self.config = _config
+
         self.songqueue = []
         self.currently_play = ''
         self.playlist_updated = True

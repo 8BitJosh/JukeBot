@@ -43,3 +43,14 @@ class PlaylistEntry:
         self.downloaded = False
         self.downloading = False
         self.dir = ''
+
+
+def configCheck(_config):
+    config = _config
+    return config
+
+
+class defaults:
+    defaultVol = 75
+
+    webPort = 80
