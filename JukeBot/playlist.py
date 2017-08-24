@@ -212,6 +212,7 @@ class Playlist:
 
         try:
             title = do_format(to_down.title)
+            title = title + '-' + str(int(time.time()))
             savepath = os.path.join(self.savedir, "%s" % (title))
         except Exception as e:
             print("Can't access song! %s\n" % traceback.format_exc(), flush=True)
@@ -224,7 +225,7 @@ class Playlist:
             try:
                 result = ydl.extract_info(song_url, download=True)
                 os.rename(result['id'], savepath)
-                print('Downloaded - ' + savepath, flush=True)
+                print('Downloaded - ' + to_down.title, flush=True)
                 return savepath
             except Exception as e:
                 print ("Can't download audio! %s\n" % traceback.format_exc(), flush=True)

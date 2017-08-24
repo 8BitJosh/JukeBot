@@ -2,7 +2,7 @@ import vlc
 import os
 from utils import delete_file
 
-defaultVol = 50
+defaultVol = 75
 
 class Player:
     # create the player member
