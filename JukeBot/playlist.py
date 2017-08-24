@@ -85,13 +85,22 @@ class Playlist:
         index = _index - 1
         start = _title.find(']') + 2
         title = _title[start:]
-        title.strip()
 
-        del_path = self.songqueue[index].dir
-        del self.songqueue[index]
-        self.playlist_updated = True
-        if del_path != '':
-            delete_file(del_path)
+        try:
+            playlistTitle = self.songqueue[index].title   
+            del_path = self.songqueue[index].dir
+        except IndexError:
+            print('More than one user removed a song at the same time', flush=True)
+            return
+        
+        if title.strip() == playlistTitle.strip():    
+            del self.songqueue[index]
+            self.playlist_updated = True
+            if del_path != '':
+                delete_file(del_path)
+        else:
+            print('More than one user removed a song at the same time', flush=True)
+            return
 
     def clearall(self):
         while len(self.songqueue):
