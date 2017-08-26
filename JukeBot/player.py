@@ -10,7 +10,7 @@ class Player:
         self.config = _config
         self.socketio = _socketio
         self.loop = _loop
-        
+
         self.path = ''
         self.dur = 0
         self.instance = vlc.Instance("--no-video --aout=alsa")
@@ -19,13 +19,13 @@ class Player:
         self.setVolume(self.config['player']['defaultVol'])
 
 # start playing song at path
-    def play(self, _song):
+    async def play(self, _song):
         self.path = _song.dir
-        self.dur = _song.duration
+        self.dur = int(_song.duration)
         media = self.instance.media_new(self.path)
         self.player.set_media(media)
         self.player.play()
-        self.newSong = True
+        await self.sendDuration()
         print("playing - " + self.path, flush=True)
 
 # has a new song started playing
@@ -37,17 +37,22 @@ class Player:
             return False
 
 # get song duration and current position
-    def getDuration(self):
+    async def sendDuration(self):
         durData = {}
 
-        durData['dur'] = self.dur
+        durData['length'] = self.dur
 
         if self.running() or self.isPaused():
-            durData['pos'] = int(self.player.get_time()/1000)
+            durData['position'] = int(self.player.get_time()/1000)
         else:
-            durData['pos'] = 0
+            durData['position'] = 0
 
-        return durData
+        if self.isPaused() or not self.running():
+            durData['paused'] = 1
+        else:
+            durData['paused'] = 0
+
+        await self.socketio.emit('duration', durData, namespace='/main')
 
 # check if the song is still running
     def running(self):

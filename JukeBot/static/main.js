@@ -12,20 +12,43 @@ $(document).ready(function() {
     }
 
     socket.on('connect', function(){
-        socket.emit('connected', {data: 'client connected'});
+        socket.emit('connected');
     });
 
+    var lastSync = 0;
+    var syncInterval = 20000;
+
+    setInterval(function() {
+        var now = new Date().getTime();
+        if((now - lastSync) > syncInterval){
+            lastSync = new Date().getTime();
+            socket.emit('sendAll');
+        }
+    }, 5000);
+
     socket.on('duration', function(msg) {
-        if(msg.pos == 0){
-            var pro = 0;
-        }
-        else{
-            var pro = Math.round(100 * (msg.pos/msg.dur))
-        }
-        
-        $('.progress-bar').css('width', pro+'%');
-        $('#timer').text(genTime(msg.pos) + '/' + genTime(msg.dur));
+        position = msg.position;
+        duration = msg.length;
+        paused = (msg.paused == 1) ? true : false; 
+ 
     });
+
+    var position = 0;
+    var duration = 0;
+    var paused = true;
+
+    window.setInterval(function(){
+        if(paused != true){
+            position++;
+        }
+
+        var progress = (position == 0) ? 0 : Math.round(100 * (position/duration));
+
+        $('.progress-bar').css('width', progress + '%');
+        $('#timer').text(genTime(position) + '/' + genTime(duration));
+
+
+    }, 1000);
 
     socket.on('volume_set', function(msg) {
         var vol = msg.vol;

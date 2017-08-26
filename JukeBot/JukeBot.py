@@ -1,5 +1,3 @@
-import time
-import threading
 import json
 
 from player import Player
@@ -31,12 +29,21 @@ async def index(request):
 
 
 @socketio.on('connected', namespace='/main')
-async def connect_playlist(request, msg):
+async def connect_playlist(request):
+    print("Client socket connected ", flush=True)
+    await sendAll()
+
+
+@socketio.on('sendAll', namespace='/main')
+async def resendAll(request):
+    await sendAll()
+
+    
+async def sendAll():
     global playlist
     global player
-    print("Client socket connected ", flush=True)
     await playlist.sendPlaylist()
-    await socketio.emit('duration', player.getDuration(), namespace='/main', broadcast=True)
+    await player.sendDuration()
     await socketio.emit('volume_set', {'vol': player.getVolume()}, namespace='/main', broadcast = True)
 
 
@@ -119,15 +126,13 @@ async def player_update():
     global player
 
     while True:
-        await socketio.emit('duration', player.getDuration(), namespace='/main') 
-
         p = loop.create_task(playlist.download_next())
 
         if not player.running() and not player.isPaused():
             if not (await playlist.empty()):
                 song = await playlist.get_next()
                 if song.dir != '':
-                    player.play(song)
+                    await player.play(song)
 
         await asyncio.sleep(1)
 
