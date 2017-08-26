@@ -2,10 +2,15 @@ import vlc
 import os
 from utils import delete_file
 
+import asyncio
+
 class Player:
     # create the player member
-    def __init__(self, _config):
+    def __init__(self, _config, _socketio, _loop):
         self.config = _config
+        self.socketio = _socketio
+        self.loop = _loop
+        
         self.path = ''
         self.dur = 0
         self.instance = vlc.Instance("--no-video --aout=alsa")

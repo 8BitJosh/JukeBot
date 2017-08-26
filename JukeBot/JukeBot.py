@@ -6,41 +6,42 @@ from player import Player
 from playlist import Playlist
 from utils import configCheck
 
-from flask import Flask, render_template, request
-from flask_socketio import SocketIO, emit
-import eventlet
+from aiohttp import web
+import socketio
+import asyncio
 
 with open('config.json') as file:
     uncheckedConfig = json.load(file)
-
 config = configCheck(uncheckedConfig)
 
-playlist = Playlist(config)
-player = Player(config)
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '925c12c538c41b29bb46162ab603831bba8e34b7211fc72c'
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = socketio.AsyncServer()
+app = web.Application()
+socketio.attach(app)
+
+loop = asyncio.get_event_loop()
+
+playlist = Playlist(config, socketio, loop)
+player = Player(config, socketio, loop)
 
 
-@app.route("/")
-def index():
+async def index(request):
     print("Client loaded page", flush=True)
-    return render_template('index.html', async_mode=socketio.async_mode)
+    return web.FileResponse('./JukeBot/templates/index.html')
 
 
 @socketio.on('connected', namespace='/main')
-def connect_playlist(msg):
+async def connect_playlist(request, msg):
     global playlist
     global player
-    print("Client socket connected - " + request.remote_addr, flush=True)
-    emit('sent_playlist', playlist.getPlaylist())
-    emit('duration', player.getDuration(), broadcast=True)
-    emit('volume_set', {'vol': player.getVolume()}, broadcast = True)
+    print("Client socket connected ", flush=True)
+    await socketio.emit('sent_playlist', playlist.getPlaylist(), namespace='/main')
+    await socketio.emit('duration', player.getDuration(), namespace='/main', broadcast=True)
+    await socketio.emit('volume_set', {'vol': player.getVolume()}, namespace='/main', broadcast = True)
 
 
 @socketio.on('sent_song', namespace='/main')
-def song_received(message):
+async def song_received(request, message):
     global playlist
     title = message['data']
 
@@ -53,83 +54,83 @@ def song_received(message):
         else:
             msg = title
 
-        print(request.remote_addr + ' submitted - ' + title, flush=True)
-        p = threading.Thread(target = playlist.process, args = (msg,)).start()
+        print('submitted - ' + title, flush=True)
+        p = loop.create_task(playlist.process(_title=msg))
     else:
         str = 'Enter a Song Name'
-    emit('response', {'data': str})
+    await socketio.emit('response', {'data': str}, namespace='/main')
 
 
 @socketio.on('button', namespace='/main')
-def button_handler(msg):
+async def button_handler(request, msg):
     global playlist
     global player
     command = msg['data']
 
     if command == 'skip':
-        emit('response', {'data': 'Song Skipped'})
-        print(request.remote_addr + ' Skipped song', flush=True)
+        await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main')
+        print('Skipped song', flush=True)
         player.stop()
     elif command == 'shuffle':
-        emit('response', {'data': 'Songs Shuffled'})
-        print(request.remote_addr + ' shuffled playlist', flush=True)
+        await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
+        print(' shuffled playlist', flush=True)
         playlist.shuff()
     elif command == 'clear':
         playlist.clearall()
-        print(request.remote_addr + ' cleared all of playlist', flush=True)
-        emit('response', {'data': 'Playlist Cleared'})
+        print(' cleared all of playlist', flush=True)
+        await socketio.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
     elif command == 'pause':
         if player.isPaused():
-            print(request.remote_addr + ' Resumed the song', flush=True)
-            emit('response', {'data': 'Song Resumed'})
-            emit('pause_button', {'data': 'Pause'}, broadcast=True)
+            print(' Resumed the song', flush=True)
+            await socketio.emit('response', {'data': 'Song Resumed'}, namespace='/main')
+            await socketio.emit('pause_button', {'data': 'Pause'}, namespace='/main', broadcast=True)
             player.pause()
         elif player.running():
-            print(request.remote_addr + ' Paused the song', flush=True)
-            emit('response', {'data': 'Song Paused'})
-            emit('pause_button', {'data': 'Resume'}, broadcast=True)
+            print(' Paused the song', flush=True)
+            await socketio.emit('response', {'data': 'Song Paused'}, namespace='/main')
+            await socketio.emit('pause_button', {'data': 'Resume'}, namespace='/main', broadcast=True)
             player.pause()
 
 
 @socketio.on('volume', namespace='/main')
-def set_volume(msg):
+async def set_volume(request, msg):
     global player
     vol = int(msg['vol'])
     player.setVolume(vol)
-    print(request.remote_addr + ' set volume to ' + str(vol), flush = True)
-    emit('volume_set', {'vol': vol}, broadcast = True)
+    print(' set volume to ' + str(vol), flush = True)
+    await socketio.emit('volume_set', {'vol': vol}, namespace='/main', broadcast = True)
 
 
 @socketio.on('delete', namespace='/main')
-def delete_song(msg):
+async def delete_song(request, msg):
     global playlist
     title = msg['title']
     index = msg['data']
-    print(request.remote_addr + ' removed index ' + str(index) + ' title = ' + title, flush=True)
+    print(' removed index ' + str(index) + ' title = ' + title, flush=True)
 
     playlist.remove(index, title)
 
     s = 'Removed song from playlist - ' + title
-    emit('response', {'data': s})
+    await socketio.emit('response', {'data': s}, namespace='/main')
 
 
 @socketio.on('ping', namespace='/main')
-def return_playlist():
+async def return_playlist(request):
     global playlist
     if playlist.updated():
-        emit('sent_playlist', playlist.getPlaylist(), broadcast=True)
+        await socketio.emit('sent_playlist', playlist.getPlaylist(), namespace='/main', broadcast=True)
     global player
     # if player.newsong():
-    emit('duration', player.getDuration(), broadcast=True)
+    await socketio.emit('duration', player.getDuration(), namespace='/main', broadcast=True)
 
 
 # Thread constantly looping to playsong / process the current command
-def player_update():
+async def player_update():
     global playlist
     global player
 
     while True:
-        p = threading.Thread(target = playlist.download_next).start()
+        p = loop.create_task(playlist.download_next())
 
         if not player.running() and not player.isPaused():
             if not playlist.empty():
@@ -137,8 +138,10 @@ def player_update():
                 if song.dir != '':
                     player.play(song)
 
-        time.sleep(1)
+        await asyncio.sleep(1)
 
-# create threads and start webserver
-t = threading.Thread(target = player_update).start()
-socketio.run(app, debug=False, host='0.0.0.0', port=config['main']['webPort'])
+loop.create_task(player_update())
+
+app.router.add_get('/', index)
+app.router.add_static('/static/', path=str('./JukeBot/static'), name='static')
+web.run_app(app, port=config['main']['webPort'])

@@ -4,8 +4,12 @@ import traceback
 import datetime
 import time
 
+import asyncio
+
 from random import shuffle
 from utils import do_format, PlaylistEntry, delete_file
+from downloader import Downloader
+
 
 options = {
     'format': 'bestaudio/best',
@@ -22,8 +26,12 @@ options = {
 
 
 class Playlist:
-    def __init__(self, _config):
+    def __init__(self, _config, _socketio, loop):
         self.config = _config
+        self.socketio = _socketio
+        self.loop = loop
+
+        #self.socketio.emit('response', {'data': 'msg from const'}, namespace='/main')
 
         self.songqueue = []
         self.currently_play = ''
@@ -33,6 +41,8 @@ class Playlist:
         if os.path.exists(self.savedir):
             shutil.rmtree(self.savedir)
         os.makedirs(self.savedir)
+
+        self.downloader = Downloader(self.savedir)
 
     def shuff(self):
         shuffle(self.songqueue)
@@ -48,8 +58,13 @@ class Playlist:
             return True
 
     def get_next(self):
-        while not self.songqueue[0].downloaded:
-            time.sleep(0.1)
+        if not self.songqueue[0].downloaded:
+            asyncio.sleep(0.5)
+            return  PlaylistEntry(
+                    '',
+                    'title',
+                    0)
+
         self.currently_play = "[" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title
         song = self.songqueue[0]
         print("Removed from to play queue - " + self.songqueue[0].title, flush=True)
@@ -112,14 +127,13 @@ class Playlist:
         self.playlist_updated = True
 
     # called when user enters song to be processed
-    def process(self, _title):
+    async def process(self, _title):
         print('process called', flush=True)
         song_url = _title.strip()
-        ydl = youtube_dl.YoutubeDL(options)
 
 ####get info for song
         try:
-            info = ydl.extract_info(song_url, download = False, process = False)
+            info = await self.downloader.extract_info(self.loop, song_url, download = False, process = False)
         except Exception:
             print('info extraction error', flush=True)
             pass
@@ -127,7 +141,7 @@ class Playlist:
 ####if song is search term
 
         if info.get('url', '').startswith('ytsearch'):
-            info = ydl.extract_info(song_url, download = False, process = True)
+            info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
             if not info:
                 return
             if not all(info.get('entries', [])):
@@ -135,7 +149,7 @@ class Playlist:
 
             song_url = info['entries'][0]['webpage_url']
 
-            info = ydl.extract_info(song_url, download = False, process = False)
+            info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
 
             try:
                 entry = PlaylistEntry(
@@ -150,7 +164,7 @@ class Playlist:
 ####if song is playlist
         elif 'entries' in info:
             try:
-                info = ydl.extract_info(song_url, download=False, process=False)
+                info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
             except Exception as e:
                 print('Could not extract information from {}\n\n{}'.format(playlist_url, e), flush=True)
                 return
@@ -167,7 +181,7 @@ class Playlist:
                     baseurl = info['webpage_url'].split('playlist?list=')[0]
                     song_url = baseurl + 'watch?v=%s' % entry_data['id']
                     try:
-                        playlist_info = ydl.extract_info(song_url, download=False, process=True)
+                        playlist_info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
                         entry = PlaylistEntry(
                             song_url,
                             playlist_info['title'],
@@ -189,7 +203,7 @@ class Playlist:
 
 ####else if song is a url or other thing
         else:
-            info = ydl.extract_info(song_url, download = False, process = True)
+            info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
             try:
                 entry = PlaylistEntry(
                     song_url,
@@ -204,20 +218,19 @@ class Playlist:
         self.playlist_updated = True
 
     #download next non downloaded song
-    def download_next(self):
+    async def download_next(self):
         for things in self.songqueue:
             if things.downloaded == False:
                 if things.downloading == True:
                     break
                 things.downloading = True
-                things.dir = self.download_song(things)
+                things.dir = await self.download_song(things)
                 things.downloaded = True
                 break
 
     #download song from url or search term and return the save path of the file
-    def download_song(self, to_down):
+    async def download_song(self, to_down):
         song_url = to_down.url.strip()
-        ydl = youtube_dl.YoutubeDL(options)
         print('Starting to download - ' + to_down.title, flush=True)
 
         try:
@@ -233,7 +246,7 @@ class Playlist:
             return savepath
         except OSError:
             try:
-                result = ydl.extract_info(song_url, download=True)
+                result = await self.downloader.extract_info(self.loop, song_url, download=True, process=True)
                 os.rename(result['id'], savepath)
                 print('Downloaded - ' + to_down.title, flush=True)
                 return savepath
