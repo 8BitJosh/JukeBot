@@ -47,10 +47,25 @@ class PlaylistEntry:
 
 def configCheck(_config):
     config = _config
+    # Main
+    if type(config['main']['webPort']) != int:
+        config['main']['webPort'] = defaults.webPort
+        print('webport value needs to be an interger', flush=True)
+
+    # Player
+    vol = config['player']['defaultVol']
+    if (type(vol) != int) or (vol < 0) or (vol > 100):
+        config['player']['defaultVol'] = defaults.defaultVol
+        print('default needs to be an interger between 0-100', flush=True)
+    # Playlist
     return config
 
 
 class defaults:
+    # Main
+    webPort = 80
+
+    #player
     defaultVol = 75
 
-    webPort = 80
+    #playlist
