@@ -35,7 +35,7 @@ async def connect_playlist(request, msg):
     global playlist
     global player
     print("Client socket connected ", flush=True)
-    await socketio.emit('sent_playlist', playlist.getPlaylist(), namespace='/main')
+    await playlist.sendPlaylist()
     await socketio.emit('duration', player.getDuration(), namespace='/main', broadcast=True)
     await socketio.emit('volume_set', {'vol': player.getVolume()}, namespace='/main', broadcast = True)
 
@@ -73,20 +73,20 @@ async def button_handler(request, msg):
         player.stop()
     elif command == 'shuffle':
         await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
-        print(' shuffled playlist', flush=True)
-        playlist.shuff()
+        print('shuffled playlist', flush=True)
+        await playlist.shuff()
     elif command == 'clear':
-        playlist.clearall()
-        print(' cleared all of playlist', flush=True)
+        await playlist.clearall()
+        print('cleared all of playlist', flush=True)
         await socketio.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
     elif command == 'pause':
         if player.isPaused():
-            print(' Resumed the song', flush=True)
+            print('Resumed the song', flush=True)
             await socketio.emit('response', {'data': 'Song Resumed'}, namespace='/main')
             await socketio.emit('pause_button', {'data': 'Pause'}, namespace='/main', broadcast=True)
             player.pause()
         elif player.running():
-            print(' Paused the song', flush=True)
+            print('Paused the song', flush=True)
             await socketio.emit('response', {'data': 'Song Paused'}, namespace='/main')
             await socketio.emit('pause_button', {'data': 'Resume'}, namespace='/main', broadcast=True)
             player.pause()
@@ -97,7 +97,7 @@ async def set_volume(request, msg):
     global player
     vol = int(msg['vol'])
     player.setVolume(vol)
-    print(' set volume to ' + str(vol), flush = True)
+    print('set volume to ' + str(vol), flush = True)
     await socketio.emit('volume_set', {'vol': vol}, namespace='/main', broadcast = True)
 
 
@@ -106,23 +106,12 @@ async def delete_song(request, msg):
     global playlist
     title = msg['title']
     index = msg['data']
-    print(' removed index ' + str(index) + ' title = ' + title, flush=True)
+    print('removed index ' + str(index) + ' title = ' + title, flush=True)
 
-    playlist.remove(index, title)
+    await playlist.remove(index, title)
 
     s = 'Removed song from playlist - ' + title
     await socketio.emit('response', {'data': s}, namespace='/main')
-
-
-@socketio.on('ping', namespace='/main')
-async def return_playlist(request):
-    global playlist
-    if playlist.updated():
-        await socketio.emit('sent_playlist', playlist.getPlaylist(), namespace='/main', broadcast=True)
-    global player
-    # if player.newsong():
-    await socketio.emit('duration', player.getDuration(), namespace='/main', broadcast=True)
-
 
 # Thread constantly looping to playsong / process the current command
 async def player_update():
@@ -130,11 +119,13 @@ async def player_update():
     global player
 
     while True:
+        await socketio.emit('duration', player.getDuration(), namespace='/main') 
+
         p = loop.create_task(playlist.download_next())
 
         if not player.running() and not player.isPaused():
-            if not playlist.empty():
-                song = playlist.get_next()
+            if not (await playlist.empty()):
+                song = await playlist.get_next()
                 if song.dir != '':
                     player.play(song)
 

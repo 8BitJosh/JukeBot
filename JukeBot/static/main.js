@@ -74,10 +74,6 @@ $(document).ready(function() {
     });
     });
     
-    window.setInterval(function() {
-        socket.emit('ping');
-    }, 1000);
-
     $('form#send').submit(function(event) {
         socket.emit('sent_song', {data: $('#title_sent').val()});
         $('form#send')[0].reset();

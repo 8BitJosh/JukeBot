@@ -11,31 +11,14 @@ from utils import do_format, PlaylistEntry, delete_file
 from downloader import Downloader
 
 
-options = {
-    'format': 'bestaudio/best',
-    'extractaudio' : True,
-    'audioformat' : "mp3",
-    'outtmpl': '%(id)s',
-    'noplaylist' : False,   
-    'nocheckcertificate' : True,
-    'ignoreerrors' : True,
-    'quiet' : True,
-    'no_warnings' : True,
-    'default_search': 'ytsearch',
-    }
-
-
 class Playlist:
     def __init__(self, _config, _socketio, loop):
         self.config = _config
         self.socketio = _socketio
         self.loop = loop
 
-        #self.socketio.emit('response', {'data': 'msg from const'}, namespace='/main')
-
         self.songqueue = []
         self.currently_play = ''
-        self.playlist_updated = True
 
         self.savedir = "cache"
         if os.path.exists(self.savedir):
@@ -44,20 +27,22 @@ class Playlist:
 
         self.downloader = Downloader(self.savedir)
 
-    def shuff(self):
+    async def shuff(self):
         shuffle(self.songqueue)
-        self.playlist_updated = True
+        await self.sendPlaylist()
         print("Playlist Shuffled", flush=True)
 
-    def empty(self):
+    async def empty(self):
         if self.songqueue:
             return False
+        elif self.currently_play == '':
+            return True
         else:
             self.currently_play = ''
-            self.playlist_updated = True
+            await self.sendPlaylist()
             return True
 
-    def get_next(self):
+    async def get_next(self):
         if not self.songqueue[0].downloaded:
             asyncio.sleep(0.5)
             return  PlaylistEntry(
@@ -69,10 +54,10 @@ class Playlist:
         song = self.songqueue[0]
         print("Removed from to play queue - " + self.songqueue[0].title, flush=True)
         del self.songqueue[0]
-        self.playlist_updated = True
+        await self.sendPlaylist()
         return song
 
-    def getPlaylist(self):
+    async def sendPlaylist(self):
         endmsg = {}
         totalDur = 0
 
@@ -87,16 +72,10 @@ class Playlist:
                 totalDur += things.duration
             endmsg['dur'] = str(datetime.timedelta(seconds=totalDur))
 
-        return endmsg
+        print("sending playlist")
+        await self.socketio.emit('sent_playlist', endmsg, namespace='/main')
 
-    def updated(self):
-        if self.playlist_updated:
-            self.playlist_updated = False
-            return True
-        else:
-            return False
-
-    def remove(self, _index, _title):
+    async def remove(self, _index, _title):
         index = _index - 1
         start = _title.find(']') + 2
         title = _title[start:]
@@ -110,21 +89,21 @@ class Playlist:
         
         if title.strip() == playlistTitle.strip():    
             del self.songqueue[index]
-            self.playlist_updated = True
+            await self.sendPlaylist()
             if del_path != '':
                 delete_file(del_path)
         else:
             print('More than one user removed a song at the same time', flush=True)
             return
 
-    def clearall(self):
+    async def clearall(self):
         while len(self.songqueue):
             if self.songqueue[0].dir != '':
                 delete_file(self.songqueue[0].dir)
             del self.songqueue[0]
 
         self.songqueue.clear()
-        self.playlist_updated = True
+        await self.sendPlaylist()
 
     # called when user enters song to be processed
     async def process(self, _title):
@@ -189,7 +168,7 @@ class Playlist:
                         )
                         print('added from playlist - ' + playlist_info['title'], flush=True)
                         self.songqueue.append(entry)
-                        self.playlist_updated = True
+                        await self.sendPlaylist()
                     except Exception as e:
                         baditems += 1
                         print('There was an error adding the song from playlist', flush=True)
@@ -215,7 +194,7 @@ class Playlist:
                 print('Error with other option', flush=True)
 
         print('user input processed - ' + _title, flush=True)
-        self.playlist_updated = True
+        await self.sendPlaylist()
 
     #download next non downloaded song
     async def download_next(self):
