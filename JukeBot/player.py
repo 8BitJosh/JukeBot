@@ -12,13 +12,14 @@ class Player:
         #Create a MediaPlayer with the default instance
         self.player = self.instance.media_player_new()
         self.setVolume(self.config['player']['defaultVol'])
+        self.options = '' 
 
 # start playing song at path
     def play(self, _song):
         self.path = _song.dir
         self.dur = _song.duration
-        media = self.instance.media_new(self.path)
-        self.player.set_media(media)
+        media = self.instance.media_new(self.path, self.options) 
+        self.player.set_media(media) 
         self.player.play()
         self.newSong = True
         print("playing - " + self.path, flush=True)
@@ -91,3 +92,12 @@ class Player:
         else:
             self.volume = self.player.audio_get_volume()
             return self.volume
+
+# duplicate the player output to a multicast rtp stream 
+    def multicast(self, enabled): 
+        if enabled: 
+            self.options = 'sout=#duplicate{dst=display,dst="transcode{vcodec=none,acodec=mpga,ab=128}:rtp{dst=224.0.0.1,port=1234,mux=ts}"}"' 
+        else: 
+            self.options = '' 
+
+
