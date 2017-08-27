@@ -77,7 +77,7 @@ async def button_handler(request, msg):
     if command == 'skip':
         await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main')
         print('Skipped song', flush=True)
-        player.stop()
+        await player.stop()
     elif command == 'shuffle':
         await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
         print('shuffled playlist', flush=True)
@@ -91,12 +91,12 @@ async def button_handler(request, msg):
             print('Resumed the song', flush=True)
             await socketio.emit('response', {'data': 'Song Resumed'}, namespace='/main')
             await socketio.emit('pause_button', {'data': 'Pause'}, namespace='/main', broadcast=True)
-            player.pause()
+            await player.pause()
         elif player.running():
             print('Paused the song', flush=True)
             await socketio.emit('response', {'data': 'Song Paused'}, namespace='/main')
             await socketio.emit('pause_button', {'data': 'Resume'}, namespace='/main', broadcast=True)
-            player.pause()
+            await player.pause()
 
 
 @socketio.on('volume', namespace='/main')

@@ -27,7 +27,7 @@ class Player:
         self.player.set_media(media)
         self.player.play()
         # Needs to be time so it is blocking to allow the player to start playing
-        time.sleep(0.1)
+        time.sleep(0.01)
         await self.sendDuration()
         print("playing - " + self.path, flush=True)
 
@@ -74,18 +74,22 @@ class Player:
             return False
 
 # stop current song and cancel playback
-    def stop(self):
-        if self.running():
+    async def stop(self):
+        if self.running() or self.isPaused():
             self.player.stop()
             delete_file(self.path)
             self.path = ''
             self.dur = 0
+            time.sleep(0.01)
+            await self.sendDuration()
         else:
             print("Unable to skip - no song playing", flush=True)
 
 # pause/resume the current song
-    def pause(self):
+    async def pause(self):
         self.player.pause()
+        time.sleep(0.01)
+        await self.sendDuration()
 
 # check for a paused song
     def isPaused(self):
