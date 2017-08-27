@@ -72,7 +72,6 @@ class Playlist:
                 totalDur += things.duration
             endmsg['dur'] = str(datetime.timedelta(seconds=totalDur))
 
-        print("sending playlist")
         await self.socketio.emit('sent_playlist', endmsg, namespace='/main')
 
     async def remove(self, _index, _title):

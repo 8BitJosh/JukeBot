@@ -1,5 +1,6 @@
 import vlc
 import os
+import time
 from utils import delete_file
 
 import asyncio
@@ -14,7 +15,7 @@ class Player:
         self.path = ''
         self.dur = 0
         self.instance = vlc.Instance("--no-video --aout=alsa")
-        #Create a MediaPlayer with the default instance
+        # Create a MediaPlayer with the default instance
         self.player = self.instance.media_player_new()
         self.setVolume(self.config['player']['defaultVol'])
 
@@ -25,8 +26,11 @@ class Player:
         media = self.instance.media_new(self.path)
         self.player.set_media(media)
         self.player.play()
+        # Needs to be time so it is blocking to allow the player to start playing
+        time.sleep(0.1)
         await self.sendDuration()
         print("playing - " + self.path, flush=True)
+
 
 # has a new song started playing
     def newsong(self):
@@ -43,7 +47,7 @@ class Player:
         durData['length'] = self.dur
 
         if self.running() or self.isPaused():
-            durData['position'] = int(self.player.get_time()/1000)
+            durData['position'] = int(self.player.get_time() / 1000)
         else:
             durData['position'] = 0
 
@@ -85,7 +89,7 @@ class Player:
 
 # check for a paused song
     def isPaused(self):
-        if ( self.player.get_state() == vlc.State.Paused ):
+        if (self.player.get_state() == vlc.State.Paused):
             return True
         return False
 
