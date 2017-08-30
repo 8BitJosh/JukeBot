@@ -1,3 +1,4 @@
 youtube_dl
+aiohttp
 python-socketio
 python-vlc
