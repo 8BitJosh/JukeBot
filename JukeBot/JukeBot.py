@@ -24,7 +24,10 @@ player = Player(config, socketio, loop)
 
 
 async def index(request):
-    print("Client loaded page", flush=True)
+    peername = request.transport.get_extra_info('peername')
+    if peername is not None:
+        host, port = peername
+    print("Client loaded page - " + str(host), flush=True)
     return web.FileResponse('./JukeBot/templates/index.html')
 
 
