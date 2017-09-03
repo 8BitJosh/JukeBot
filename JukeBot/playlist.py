@@ -10,6 +10,13 @@ from random import shuffle
 from utils import do_format, PlaylistEntry, delete_file
 from downloader import Downloader
 
+class ExtractionError(Exception):
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def message(self):
+        return self._message
 
 class Playlist:
     def __init__(self, _config, _socketio, loop):
@@ -77,13 +84,13 @@ class Playlist:
         title = _title[start:]
 
         try:
-            playlistTitle = self.songqueue[index].title   
+            playlistTitle = self.songqueue[index].title
             del_path = self.songqueue[index].dir
         except IndexError:
             print('More than one user removed a song at the same time', flush=True)
             return
-        
-        if title.strip() == playlistTitle.strip():    
+
+        if title.strip() == playlistTitle.strip():
             del self.songqueue[index]
             await self.sendPlaylist()
             if del_path != '':
@@ -150,29 +157,75 @@ class Playlist:
 
             items = 0
             baditems = 0
-            for entry_data in info['entries']:
-                items += 1
-                if entry_data:
-                    baseurl = info['webpage_url'].split('playlist?list=')[0]
-                    song_url = baseurl + 'watch?v=%s' % entry_data['id']
-                    try:
-                        playlist_info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
-                        entry = PlaylistEntry(
-                            song_url,
-                            playlist_info['title'],
-                            playlist_info['duration']
-                        )
-                        print('added from playlist - ' + playlist_info['title'], flush=True)
-                        self.songqueue.append(entry)
-                        await self.sendPlaylist()
-                    except Exception as e:
-                        baditems += 1
-                        print('There was an error adding the song from playlist', flush=True)
-                        print(e)
-                else:
-                    baditems += 1
+            playlist_url = song_url
+
+            if info['extractor'].lower() == 'youtube:playlist':
+                try:
+                    for entry_data in info['entries']:
+                        items += 1
+                        if entry_data:
+                            baseurl = info['webpage_url'].split('playlist?list=')[0]
+                            song_url = baseurl + 'watch?v=%s' % entry_data['id']
+                            try:
+                                try:
+                                    playlist_info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
+                                except Exception as e:
+                                    raise ExtractionError('Could not extract information from {}\n\n{}'.format(song_url, e))
+
+                                entry = PlaylistEntry(
+                                    song_url,
+                                    playlist_info.get('title', 'Untitled'),
+                                    playlist_info.get('duration', 0) or 0
+                                )
+                                print('added from playlist - ' + playlist_info['title'], flush=True)
+                                self.songqueue.append(entry)
+                                await self.sendPlaylist()
+                            except ExtractionError:
+                                baditems += 1
+                            except Exception as e:
+                                baditems += 1
+                                print('There was an error adding the song from playlist %s' %  entry_data['id'], flush=True)
+                                print(e)
+                        else:
+                            baditems += 1
+
+                except Exception:
+                    print('Error handling playlist %s queuing.' % playlist_url, flush=True)
+
+            elif info['extractor'].lower() in ['soundcloud:set', 'soundcloud:user', 'bandcamp:album']:
+                try:
+                    for entry_data in info['entries']:
+                        items += 1
+                        if entry_data:
+                            song_url = entry_data['url']
+                            try:
+                                try:
+                                    playlist_info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
+                                except Exception as e:
+                                    raise ExtractionError('Could not extract information from {}\n\n{}'.format(song_url, e))
+
+                                entry = PlaylistEntry(
+                                    song_url,
+                                    playlist_info.get('title', 'Untitled'),
+                                    playlist_info.get('duration', 0) or 0
+                                )
+                                print('added from playlist - ' + playlist_info['title'], flush=True)
+                                self.songqueue.append(entry)
+                                await self.sendPlaylist()
+                            except ExtractionError:
+                                baditems += 1
+                            except Exception as e:
+                                baditems += 1
+                                print('There was an error adding the song from playlist %s' %  entry_data['id'], flush=True)
+                                print(e)
+                        else:
+                            baditems += 1
+
+                except Exception:
+                    print('Error handling playlist %s queuing.' % playlist_url, flush=True)
+
             if baditems:
-                print('Skipped %s bad entries' % baditems, flush=True)
+                print("Skipped %s bad entries" % baditems, flush=True)
 
             print('Added {}/{} songs from playlist'.format(items - baditems, items), flush=True)
 
