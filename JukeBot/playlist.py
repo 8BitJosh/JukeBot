@@ -54,7 +54,7 @@ class Playlist:
             asyncio.sleep(0.5)
             return  PlaylistEntry('', 'title', 0)
 
-        self.currently_play = "[" + str(datetime.timedelta(seconds=self.songqueue[0].duration)) + "] " + self.songqueue[0].title
+        self.currently_play = "[" + str(datetime.timedelta(seconds=int(self.songqueue[0].duration))) + "] " + self.songqueue[0].title
         song = self.songqueue[0]
         print("Removed from to play queue - " + self.songqueue[0].title, flush=True)
         del self.songqueue[0]
@@ -72,9 +72,9 @@ class Playlist:
             endmsg[str(count)] = self.currently_play
             for things in self.songqueue:
                 count += 1
-                endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=things.duration)) + ']  ' + things.title
+                endmsg[str(count)] =  "[" + str(datetime.timedelta(seconds=int(things.duration))) + ']  ' + things.title
                 totalDur += things.duration
-            endmsg['dur'] = str(datetime.timedelta(seconds=totalDur))
+            endmsg['dur'] = str(datetime.timedelta(seconds=int(totalDur)))
 
         await self.socketio.emit('sent_playlist', endmsg, namespace='/main')
 
@@ -158,7 +158,7 @@ class Playlist:
             items = 0
             baditems = 0
             playlist_url = song_url
-
+    # youtube playlist
             if info['extractor'].lower() == 'youtube:playlist':
                 try:
                     for entry_data in info['entries']:
@@ -191,7 +191,7 @@ class Playlist:
 
                 except Exception:
                     print('Error handling playlist %s queuing.' % playlist_url, flush=True)
-
+    # soundcloud and bandcamp
             elif info['extractor'].lower() in ['soundcloud:set', 'soundcloud:user', 'bandcamp:album']:
                 try:
                     for entry_data in info['entries']:

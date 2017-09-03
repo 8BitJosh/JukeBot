@@ -1,6 +1,7 @@
 import re
 import unicodedata
-import time
+import asyncio
+from datetime import datetime
 import traceback
 import os
 
@@ -25,7 +26,7 @@ def delete_file(dir):
 
         except PermissionError as e:
             if e.winerror == 32:  # File is in use
-                time.sleep(0.25)
+                asyncio.sleep(0.25)
 
         except Exception as e:
             traceback.print_exc()
