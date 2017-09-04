@@ -1,7 +1,7 @@
 import vlc
 import os
 import time
-from utils import delete_file
+from utils import delete_file, logcsv
 
 import asyncio
 
@@ -28,6 +28,7 @@ class Player:
         self.player.play()
         # Needs to be time so it is blocking to allow the player to start playing
         time.sleep(0.01)
+        await logcsv(_song)
         await self.sendDuration()
         print("playing - " + self.path, flush=True)
 

@@ -109,7 +109,7 @@ class Playlist:
         await self.sendPlaylist()
 
     # called when user enters song to be processed
-    async def process(self, _title):
+    async def process(self, _title, _requester):
         print('process called', flush=True)
         song_url = _title.strip()
 
@@ -137,7 +137,8 @@ class Playlist:
                 entry = PlaylistEntry(
                     song_url,
                     info['title'],
-                    info['duration']
+                    info['duration'],
+                    _requester
                 )
                 self.songqueue.append(entry)
             except:
@@ -175,7 +176,8 @@ class Playlist:
                                 entry = PlaylistEntry(
                                     song_url,
                                     playlist_info.get('title', 'Untitled'),
-                                    playlist_info.get('duration', 0) or 0
+                                    playlist_info.get('duration', 0) or 0,
+                                    _requester
                                 )
                                 print('added from playlist - ' + playlist_info['title'], flush=True)
                                 self.songqueue.append(entry)
@@ -207,7 +209,8 @@ class Playlist:
                                 entry = PlaylistEntry(
                                     song_url,
                                     playlist_info.get('title', 'Untitled'),
-                                    playlist_info.get('duration', 0) or 0
+                                    playlist_info.get('duration', 0) or 0,
+                                    _requester
                                 )
                                 print('added from playlist - ' + playlist_info['title'], flush=True)
                                 self.songqueue.append(entry)
@@ -236,7 +239,8 @@ class Playlist:
                 entry = PlaylistEntry(
                     song_url,
                     info['title'],
-                    info['duration']
+                    info['duration'],
+                    _requester
                 )
                 self.songqueue.append(entry)
             except:

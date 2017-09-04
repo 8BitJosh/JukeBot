@@ -54,6 +54,7 @@ async def sendAll():
 async def song_received(request, message):
     global playlist
     title = message['data']
+    requester = ''  # todo set requester to the user that queued the song
 
     if title != '':
         str = 'Queued Song - ' + title
@@ -65,7 +66,7 @@ async def song_received(request, message):
             msg = title
 
         print('submitted - ' + title, flush=True)
-        p = loop.create_task(playlist.process(_title=msg))
+        p = loop.create_task(playlist.process(_title=msg, _requester=requester))
     else:
         str = 'Enter a Song Name'
     await socketio.emit('response', {'data': str}, namespace='/main')
