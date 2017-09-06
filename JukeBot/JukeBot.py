@@ -1,17 +1,12 @@
-import json
-
 from player import Player
 from playlist import Playlist
-from utils import configCheck
+from utils import importConfig
 
 from aiohttp import web
 import socketio
 import asyncio
 
-with open('config.json') as file:
-    uncheckedConfig = json.load(file)
-config = configCheck(uncheckedConfig)
-
+config = importConfig()
 
 socketio = socketio.AsyncServer()
 app = web.Application()
@@ -32,13 +27,13 @@ async def index(request):
 
 
 @socketio.on('connected', namespace='/main')
-async def connect_playlist(request):
+async def connect_playlist(sid):
     print("Client socket connected ", flush=True)
     await sendAll()
 
 
 @socketio.on('sendAll', namespace='/main')
-async def resendAll(request):
+async def resendAll(sid):
     await sendAll()
 
     
@@ -51,7 +46,7 @@ async def sendAll():
 
 
 @socketio.on('sent_song', namespace='/main')
-async def song_received(request, message):
+async def song_received(sid, message):
     global playlist
     title = message['data']
     requester = ''  # todo set requester to the user that queued the song
@@ -69,17 +64,17 @@ async def song_received(request, message):
         p = loop.create_task(playlist.process(_title=msg, _requester=requester))
     else:
         str = 'Enter a Song Name'
-    await socketio.emit('response', {'data': str}, namespace='/main')
+    await socketio.emit('response', {'data': str}, namespace='/main', room=sid)
 
 
 @socketio.on('button', namespace='/main')
-async def button_handler(request, msg):
+async def button_handler(sid, msg):
     global playlist
     global player
     command = msg['data']
 
     if command == 'skip':
-        await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main')
+        await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
         print('Skipped song', flush=True)
         await player.stop()
     elif command == 'shuffle':
@@ -104,7 +99,7 @@ async def button_handler(request, msg):
 
 
 @socketio.on('volume', namespace='/main')
-async def set_volume(request, msg):
+async def set_volume(sid, msg):
     global player
     vol = int(msg['vol'])
     player.setVolume(vol)
@@ -113,7 +108,7 @@ async def set_volume(request, msg):
 
 
 @socketio.on('delete', namespace='/main')
-async def delete_song(request, msg):
+async def delete_song(sid, msg):
     global playlist
     title = msg['title']
     index = msg['data']
@@ -122,7 +117,7 @@ async def delete_song(request, msg):
     await playlist.remove(index, title)
 
     s = 'Removed song from playlist - ' + title
-    await socketio.emit('response', {'data': s}, namespace='/main')
+    await socketio.emit('response', {'data': s}, namespace='/main', room=sid)
 
 # Thread constantly looping to playsong / process the current command
 async def player_update():

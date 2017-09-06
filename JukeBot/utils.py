@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import traceback
 import os
 import csv
+import json
 
 
 # reformat the titles so the titles are suitable for windows file names
@@ -52,8 +53,10 @@ class PlaylistEntry:
         self.dir = ''
 
 
-def configCheck(_config):
-    config = _config
+def importConfig():
+    with open('config.json') as file:
+        config = json.load(file)
+
     # Main
     if type(config['main']['webPort']) != int:
         config['main']['webPort'] = defaults.webPort
@@ -61,9 +64,9 @@ def configCheck(_config):
 
     # Player
     vol = config['player']['defaultVol']
-    if (type(vol) != int) or (vol < 0) or (vol > 100):
+    if (type(vol) != int) or (vol < 0) or (vol > 150):
         config['player']['defaultVol'] = defaults.defaultVol
-        print('default needs to be an interger between 0-100', flush=True)
+        print('default needs to be an interger between 0-150', flush=True)
     # Playlist
     return config
 
@@ -73,6 +76,6 @@ class defaults:
     webPort = 80
 
     #player
-    defaultVol = 75
+    defaultVol = 100
 
     #playlist
