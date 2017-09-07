@@ -37,7 +37,6 @@ class Playlist:
     async def shuff(self):
         shuffle(self.songqueue)
         await self.sendPlaylist()
-        print("Playlist Shuffled", flush=True)
 
     async def empty(self):
         if self.songqueue:
