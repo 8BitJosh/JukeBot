@@ -139,11 +139,24 @@ async def delete_song(sid, msg):
 async def aPlaylist(sid, msg):
     global playlist
     global playlistlist
-    songs = playlistlist.getsongs(str(msg['index']), msg['title'])
+    songs = playlistlist.getsongs(msg['title'])
     if songs == {}:
         return
     await socketio.emit('response', {'data': 'added playlist - ' + msg['title']}, namespace='/main', room=sid)
     await playlist.addPlaylist(songs, connectedDevices[sid]['ip'])
+
+
+@socketio.on('savequeue', namespace='/main')
+async def savequeue(sid, msg):
+    global playlist
+    global playlistlist
+    await socketio.emit('response', {'data': 'Saving Current queue as playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
+    print(connectedDevices[sid]['ip'] + ' - Saved queue as - ' + str(msg['name']), flush=True)
+    
+    songs = await playlist.getQueue()
+    songs['data']['name'] = str(msg['name'])
+    await playlistlist.addqueue(songs)
+
 
 
 # Thread constantly looping to playsong / process the current command

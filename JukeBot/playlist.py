@@ -34,9 +34,11 @@ class Playlist:
 
         self.downloader = Downloader(self.savedir)
 
+
     async def shuff(self):
         shuffle(self.songqueue)
         await self.sendPlaylist()
+
 
     async def empty(self):
         if self.songqueue:
@@ -47,6 +49,7 @@ class Playlist:
             self.currently_play = ''
             await self.sendPlaylist()
             return True
+
 
     async def get_next(self):
         if not self.songqueue[0].downloaded:
@@ -59,6 +62,7 @@ class Playlist:
         del self.songqueue[0]
         await self.sendPlaylist()
         return song
+
 
     async def sendPlaylist(self):
         endmsg = {}
@@ -76,6 +80,20 @@ class Playlist:
             endmsg['dur'] = str(datetime.timedelta(seconds=int(totalDur)))
 
         await self.socketio.emit('sent_playlist', endmsg, namespace='/main')
+
+
+    async def getQueue(self):
+        queue = {}
+        x = 0
+        length = 0
+        for song in self.songqueue:
+            s = {'url': song.url, 'title': song.title, 'dur': song.duration}
+            length += song.duration
+            queue[x] = s
+            x += 1
+        queue['data'] = {'name': '', 'dur': length}
+        return queue
+
 
     async def remove(self, _index, _title):
         index = _index - 1
@@ -107,8 +125,9 @@ class Playlist:
         self.songqueue.clear()
         await self.sendPlaylist()
 
+
     async def addPlaylist(self, songs, requester):
-        for song in songs
+        for song in songs:
             if 'data' not in song:
                 try:
                     info = await self.downloader.extract_info(self.loop, songs[song]['url'], download = False, process = False)

@@ -153,13 +153,29 @@ $(document).ready(function() {
     });
 
 // Playlist creator buttons
+    $('button#NewQueuePlaylist').click(function(event) {
+        var savename = $('#QueuePlaylistName').val();
+        $('form#sendNameQueue')[0].reset();
+        $('#SaveQueueDialog').modal('hide');
+        socket.emit('savequeue', {name: savename})
+    });
+
+    $('button#NewQueueClose').click(function(event) {
+        $('form#sendNameQueue')[0].reset();
+        $('#SaveQueueDialog').modal('hide');
+    });
+
 });
 
 function genTime(time){
-    var minutes = Math.floor(time / 60);
-    var seconds = time - minutes * 60;
-    seconds = seconds > 9 ? "" + seconds: "0" + seconds;
-    return (String(minutes) + ':' + seconds);
+    var h = Math.floor(time / 3600);
+    var m = Math.floor(time % 3600 / 60);
+    var s = Math.floor(time % 3600 % 60);
+
+    var hours = h > 0 ? String(h) + ':' : '' ;
+    var minutes = String(m) + ':' ; 
+    var seconds = s > 9 ? "" + s: "0" + s ;
+    return (hours + minutes + seconds) ;
 }
 
 function getUserIP(onNewIP) {

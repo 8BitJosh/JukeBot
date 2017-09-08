@@ -34,8 +34,17 @@ class PlaylistList:
         return msg
 
 
-    def getsongs(self, index, name):
-        if self.playlists[index]['data']['name'] in name:
-            return self.playlists[index]
-        else:
-            return {}
+    def getsongs(self, name):
+        try:
+            songs = self.playlists[name]
+        except:
+            songs = {}
+        return songs
+
+
+    async def addqueue(self, songs):
+        name = songs['data']['name']
+        self.playlists[name] = songs
+        self.saveFile()
+        self.loadFile()
+        await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
