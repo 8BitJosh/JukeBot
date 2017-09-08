@@ -1,22 +1,27 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <title id="page_title">JukeBot</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <meta charset="utf-8" name="viewport" content = "width=device-width, initial-scale=1.0">
+
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
     <script type="text/javascript" src="/static/main.js"></script>
     
-    <title id="page_title">JukeBot</title>
     <link rel="icon" href="/static/icon.png">
-    <link rel="stylesheet" media="screen" href ="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-    <meta name="viewport" content = "width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 <div class="container">
  
-  <h2>JukeBot Song Request</h2>
-  
-    <form id="send" method="POST" action='#'>
+    <h2>JukeBot Song Request</h2>
+
+    <form id="send">
         <div class="form-group">
             <label for="title_sent">Song Title:</label>
             <input type="text" class="form-control" name="title_sent" id="title_sent" placeholder="Song?" autofocus>
@@ -28,7 +33,7 @@
         <label for="volume">Volume: </label>
         <input type="range" id="volume" class="slider" value="0" min="0" max="150">
     </form>
-
+    <br>
     <div class="btn-group btn-group-justified">
         <div class="btn-group">
             <button type="submit" name="skip" id="skip" class="btn btn-success btn-lg">Skip</button>
@@ -42,27 +47,51 @@
     </div>
     
     <br>
-    <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"></div>
+    <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"> </div>
+  
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a  href="#1" data-toggle="tab">Now Playing</a>
+        </li>
+        <li>
+            <a href="#2" data-toggle="tab">Playlists</a>
+        </li>
+        <li>
+            <a href="#3" data-toggle="tab">Playlist creator</a>
+        </li>
+    </ul>
+
+    <div class="tab-content ">
+        <div class="tab-pane active" id="1">
+            <table id="nowplay_table" class="table">
+                <tr><td>Now Playing:</td><td align="center" id='nowplay'></td></tr>
+                <tr><td>Progress:</td><td align="center" id='timer'></td></tr>
+            </table> 
     
-    <table id="nowplay_table" class="table">
-        <tr><td>Now Playing:</td><td align="center" id='nowplay'></td>
-        <tr><td>Progress:</td><td align="center" id='timer'></td>
-    </table> 
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="progress" style="width:0%">
+                </div>
+            </div>
     
-    <div class="progress">
-        <div class="progress-bar" role="progressbar" id="progress" style="width:0%">
+            <button type="submit" name="clear" id="clearall" class="btn btn-success">Clear Playlist
+            </button>
+    
+            <h4>Playlist:</h4>
+            <h5 id="totalDur">Total Duration - </h5>
+            <table id="playlist_table" class="table">
+                <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
+            </table>
+        </div>
+        
+        <div class="tab-pane" id="2">
+            <h3>Playlists</h3>
+        </div>
+    
+        <div class="tab-pane" id="3">
+            <h3>Playlist Creator</h3>
         </div>
     </div>
-    
-    <button type="submit" name="clear" id="clearall" class="btn btn-success">Clear Playlist</button>
-    
-    <h4>Playlist:</h4>
-    <h5 id="totalDur">Total Duration - </h5>
-    <table id="playlist_table" class="table">
-    <tr><td>#</td><td>Song Title</td><td>Remove</td>
-    </table>
-    
-        
+
 </div>
 </body>
 </html>

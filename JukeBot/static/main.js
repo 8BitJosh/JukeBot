@@ -37,7 +37,6 @@ $(document).ready(function() {
         position = msg.position;
         duration = msg.length;
         paused = (msg.paused == 1) ? true : false; 
- 
     });
 
     var position = 0;
@@ -53,8 +52,6 @@ $(document).ready(function() {
 
         $('.progress-bar').css('width', progress + '%');
         $('#timer').text(genTime(position) + '/' + genTime(duration));
-
-
     }, 1000);
 
     socket.on('volume_set', function(msg) {
@@ -78,30 +75,30 @@ $(document).ready(function() {
     });
     
     function clearMsg(){
-        $('#user_alerts').empty();
+        $('#user_alerts').text(' ');
     }
 
     socket.on('sent_playlist', function(msg) {
         $('#playlist_table tr:gt(0)').remove();
         $.each(msg, function(index, item) {
-          if(index == '-'){
-            $('#nowplay').text("There is no song playing");
-            $('#page_title').text("JukeBot");
-        }
-        else if(index == '0'){
-            $('#nowplay').text(item);
-            var str = item.slice(item.search("]")+ 2);
-            $('#page_title').text(str);
-        }
-        else if(index == 'dur'){
-            $('#totalDur').text('Total Duration - ' + item);
-        }
-        else{
-            $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
-                "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
-                "</td>").appendTo('#playlist_table');
-        }
-    });
+            if(index == '-'){
+                $('#nowplay').text("There is no song playing");
+                $('#page_title').text("JukeBot");
+            }
+            else if(index == '0'){
+                $('#nowplay').text(item);
+                var str = item.slice(item.search("]")+ 2);
+                $('#page_title').text(str);
+            }
+            else if(index == 'dur'){
+                $('#totalDur').text('Total Duration - ' + item);
+            }
+            else{
+                $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
+                    "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
+                    "</td>").appendTo('#playlist_table');
+                }
+        });
     });
     
     $('form#send').submit(function(event) {
