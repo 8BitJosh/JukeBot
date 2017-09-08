@@ -1,5 +1,4 @@
 youtube_dl
-flask
-flask_socketio
-eventlet
+aiohttp
+python-socketio
 python-vlc

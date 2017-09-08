@@ -1,27 +1,37 @@
 import vlc
 import os
-from utils import delete_file
+import time
+from utils import delete_file, logcsv
+
+import asyncio
 
 class Player:
     # create the player member
-    def __init__(self, _config):
+    def __init__(self, _config, _socketio, _loop):
         self.config = _config
+        self.socketio = _socketio
+        self.loop = _loop
+
         self.path = ''
         self.dur = 0
         self.instance = vlc.Instance("--no-video --aout=alsa")
-        #Create a MediaPlayer with the default instance
+        # Create a MediaPlayer with the default instance
         self.player = self.instance.media_player_new()
         self.setVolume(self.config['player']['defaultVol'])
 
 # start playing song at path
-    def play(self, _song):
+    async def play(self, _song):
         self.path = _song.dir
-        self.dur = _song.duration
+        self.dur = int(_song.duration)
         media = self.instance.media_new(self.path)
         self.player.set_media(media)
         self.player.play()
-        self.newSong = True
+        # Needs to be time so it is blocking to allow the player to start playing
+        time.sleep(0.01)
+        await logcsv(_song)
+        await self.sendDuration()
         print("playing - " + self.path, flush=True)
+
 
 # has a new song started playing
     def newsong(self):
@@ -32,17 +42,22 @@ class Player:
             return False
 
 # get song duration and current position
-    def getDuration(self):
+    async def sendDuration(self):
         durData = {}
 
-        durData['dur'] = self.dur
+        durData['length'] = self.dur
 
         if self.running() or self.isPaused():
-            durData['pos'] = int(self.player.get_time()/1000)
+            durData['position'] = int(self.player.get_time() / 1000)
         else:
-            durData['pos'] = 0
+            durData['position'] = 0
 
-        return durData
+        if self.isPaused() or not self.running():
+            durData['paused'] = 1
+        else:
+            durData['paused'] = 0
+
+        await self.socketio.emit('duration', durData, namespace='/main')
 
 # check if the song is still running
     def running(self):
@@ -60,22 +75,26 @@ class Player:
             return False
 
 # stop current song and cancel playback
-    def stop(self):
-        if self.running():
+    async def stop(self):
+        if self.running() or self.isPaused():
             self.player.stop()
             delete_file(self.path)
             self.path = ''
             self.dur = 0
+            time.sleep(0.01)
+            await self.sendDuration()
         else:
             print("Unable to skip - no song playing", flush=True)
 
 # pause/resume the current song
-    def pause(self):
+    async def pause(self):
         self.player.pause()
+        time.sleep(0.01)
+        await self.sendDuration()
 
 # check for a paused song
     def isPaused(self):
-        if ( self.player.get_state() == vlc.State.Paused ):
+        if (self.player.get_state() == vlc.State.Paused):
             return True
         return False
 

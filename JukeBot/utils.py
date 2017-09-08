@@ -1,8 +1,11 @@
 import re
 import unicodedata
-import time
+import asyncio
+from datetime import datetime, timedelta
 import traceback
 import os
+import csv
+import json
 
 
 # reformat the titles so the titles are suitable for windows file names
@@ -12,6 +15,10 @@ def do_format(message):
     endMsg = re.sub('[-\s]+', '-', endMsg)
     return endMsg
 
+async def logcsv(song):
+    with open('SongLog.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([datetime.now().strftime("[%d/%m/%y %H:%M:%S]"), song.requester, song.title, timedelta(seconds=int(song.duration)), song.url]) 
 
 def delete_file(dir):
     if dir == 'bad_path' or dir == '':
@@ -25,7 +32,7 @@ def delete_file(dir):
 
         except PermissionError as e:
             if e.winerror == 32:  # File is in use
-                time.sleep(0.25)
+                asyncio.sleep(0.25)
 
         except Exception as e:
             traceback.print_exc()
@@ -36,17 +43,20 @@ def delete_file(dir):
 
 
 class PlaylistEntry:
-    def __init__(self, url, title, duration=0):
+    def __init__(self, url, title, duration=0, requester=''):
         self.url = url
         self.title = title
         self.duration = duration
+        self.requester = requester
         self.downloaded = False
         self.downloading = False
         self.dir = ''
 
 
-def configCheck(_config):
-    config = _config
+def importConfig():
+    with open('config.json') as file:
+        config = json.load(file)
+
     # Main
     if type(config['main']['webPort']) != int:
         config['main']['webPort'] = defaults.webPort
@@ -54,9 +64,9 @@ def configCheck(_config):
 
     # Player
     vol = config['player']['defaultVol']
-    if (type(vol) != int) or (vol < 0) or (vol > 100):
+    if (type(vol) != int) or (vol < 0) or (vol > 150):
         config['player']['defaultVol'] = defaults.defaultVol
-        print('default needs to be an interger between 0-100', flush=True)
+        print('default needs to be an interger between 0-150', flush=True)
     # Playlist
     return config
 
@@ -66,6 +76,6 @@ class defaults:
     webPort = 80
 
     #player
-    defaultVol = 75
+    defaultVol = 100
 
     #playlist

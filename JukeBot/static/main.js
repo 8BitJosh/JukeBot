@@ -12,20 +12,50 @@ $(document).ready(function() {
     }
 
     socket.on('connect', function(){
-        socket.emit('connected', {data: 'client connected'});
+        socket.emit('connected');
+        getUserIP(function(ip){
+            socket.emit('device', ip);
+        });
     });
 
-    socket.on('duration', function(msg) {
-        if(msg.pos == 0){
-            var pro = 0;
-        }
-        else{
-            var pro = Math.round(100 * (msg.pos/msg.dur))
-        }
-        
-        $('.progress-bar').css('width', pro+'%');
-        $('#timer').text(genTime(msg.pos) + '/' + genTime(msg.dur));
+    socket.on('disconnect', function(){
+        socket.emit('disconnect');
     });
+
+    var lastSync = 0;
+    var syncInterval = 20000;
+
+    setInterval(function() {
+        var now = new Date().getTime();
+        if((now - lastSync) > syncInterval){
+            lastSync = new Date().getTime();
+            socket.emit('sendAll');
+        }
+    }, 5000);
+
+    socket.on('duration', function(msg) {
+        position = msg.position;
+        duration = msg.length;
+        paused = (msg.paused == 1) ? true : false; 
+ 
+    });
+
+    var position = 0;
+    var duration = 0;
+    var paused = true;
+
+    window.setInterval(function(){
+        if(paused != true){
+            position++;
+        }
+
+        var progress = (position == 0) ? 0 : Math.round(100 * (position/duration));
+
+        $('.progress-bar').css('width', progress + '%');
+        $('#timer').text(genTime(position) + '/' + genTime(duration));
+
+
+    }, 1000);
 
     socket.on('volume_set', function(msg) {
         var vol = msg.vol;
@@ -74,10 +104,6 @@ $(document).ready(function() {
     });
     });
     
-    window.setInterval(function() {
-        socket.emit('ping');
-    }, 1000);
-
     $('form#send').submit(function(event) {
         socket.emit('sent_song', {data: $('#title_sent').val()});
         $('form#send')[0].reset();
@@ -111,3 +137,40 @@ $(document).ready(function() {
         return false;
     });
 });
+
+function getUserIP(onNewIP) {
+    //compatibility for firefox and chrome
+    var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+    var pc = new myPeerConnection({
+        iceServers: []
+    }),
+    noop = function() {},
+    localIPs = {},
+    ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+    key;
+
+    function iterateIP(ip) {
+        if (!localIPs[ip]) onNewIP(ip);
+        localIPs[ip] = true;
+    }
+     //create a bogus data channel
+    pc.createDataChannel("");
+
+    // create offer and set local description
+    pc.createOffer().then(function(sdp) {
+        sdp.sdp.split('\n').forEach(function(line) {
+            if (line.indexOf('candidate') < 0) return;
+            line.match(ipRegex).forEach(iterateIP);
+        });
+        
+        pc.setLocalDescription(sdp, noop, noop);
+    }).catch(function(reason) {
+        // Handle the failure to connect
+    });
+
+    //listen for candidate events
+    pc.onicecandidate = function(ice) {
+        if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+        ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+    };
+}
