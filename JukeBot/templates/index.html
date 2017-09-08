@@ -84,14 +84,103 @@
         </div>
         
         <div class="tab-pane" id="2">
-            <h3>Playlists</h3>
+            <h4>Add Playlist To Queue</h4>
+            <table id="ServerPlaylistTable" class="table">
+                <tr><td>#</td><td>Dur</td><td>Playlist Name</td><td>Add</td></tr>
+            </table>
+            
         </div>
     
         <div class="tab-pane" id="3">
-            <h3>Playlist Creator</h3>
+            <br>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newPlaylistDialog">Create New Empty Playlist</button>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#SaveQueueDialog">Save Queue To New Playlist</button>
+
+            <h4>Modify Existing Playlist:</h4>
+
+            <div class="dropdown">
+                <button class="btn btn-success dropdown-toggle" type="button" id="dropdown1" data-toggle="dropdown">
+                    Select Playlist To Modify
+                    <span class="caret"></span>    
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">One</a></li>
+                    <li><a href="#">Two</a></li>
+                    <li><a href="#">Three</a></li>      
+                </ul>
+            </div>
+            <br>
+            <table id="PlaylistNameTable" class="table">
+                <tr><td>Playlist Name:</td><td align="center" id='ModifyPlaylistName'></td></tr>
+                <tr><td>Total Duration:</td><td align="center" id='PlaylistTotalDuration'></td></tr>
+            </table> 
+    
+            <button type="submit" id="ClearPlaylist" class="btn btn-success">Clear All
+            </button>
+    
+            <h4>Playlist:</h4>
+            <table id="PlaylistSongsTable" class="table">
+                <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
+            </table>
+            
         </div>
     </div>
 
 </div>
 </body>
 </html>
+<!--
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdown1" data-toggle="dropdown">
+                    Dropdown
+                <span class="caret"></span>    
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">One</a></li>
+                    <li><a href="#">Two</a></li>
+                    <li><a href="#">Three</a></li>
+                    
+                </ul>
+            </div>
+-->
+
+<div id="newPlaylistDialog" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="NewEmptyPlaylist">Submit</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="SaveQueueDialog" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+
+  </div>
+</div>
