@@ -21,6 +21,7 @@
  
     <h2>JukeBot Song Request</h2>
 
+<!--Main page header-->
     <form id="send">
         <div class="form-group">
             <label for="title_sent">Song Title:</label>
@@ -48,7 +49,8 @@
     
     <br>
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"> </div>
-  
+
+<!--Nav tabs-->
     <ul class="nav nav-tabs">
         <li class="active">
             <a  href="#1" data-toggle="tab">Now Playing</a>
@@ -61,6 +63,7 @@
         </li>
     </ul>
 
+<!--Now Playing-->
     <div class="tab-content ">
         <div class="tab-pane active" id="1">
             <table id="nowplay_table" class="table">
@@ -82,15 +85,17 @@
                 <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
             </table>
         </div>
-        
+
+<!--Server Playlists-->
         <div class="tab-pane" id="2">
             <h4>Add Playlist To Queue</h4>
             <table id="ServerPlaylistTable" class="table">
-                <tr><td>#</td><td>Dur</td><td>Playlist Name</td><td>Add</td></tr>
+                <tr><td>#</td><td>Duration</td><td>Playlist Name</td><td>Add</td></tr>
             </table>
             
         </div>
-    
+
+<!--Playlist Creator-->
         <div class="tab-pane" id="3">
             <br>
             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newPlaylistDialog">Create New Empty Playlist</button>
@@ -129,20 +134,6 @@
 </div>
 </body>
 </html>
-<!--
-            <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdown1" data-toggle="dropdown">
-                    Dropdown
-                <span class="caret"></span>    
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">One</a></li>
-                    <li><a href="#">Two</a></li>
-                    <li><a href="#">Three</a></li>
-                    
-                </ul>
-            </div>
--->
 
 <div id="newPlaylistDialog" class="modal fade" role="dialog">
   <div class="modal-dialog">

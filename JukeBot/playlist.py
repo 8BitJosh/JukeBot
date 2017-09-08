@@ -107,6 +107,21 @@ class Playlist:
         self.songqueue.clear()
         await self.sendPlaylist()
 
+    async def addPlaylist(self, songs, requester):
+        for song in songs
+            if 'data' not in song:
+                try:
+                    info = await self.downloader.extract_info(self.loop, songs[song]['url'], download = False, process = False)
+                    entry = PlaylistEntry(
+                        songs[song]['url'],
+                        info['title'],
+                        info['duration'],
+                        requester
+                    )
+                    self.songqueue.append(entry)
+                except:
+                    print('Server Playlist has a bad URL', flush=True)
+
     # called when user enters song to be processed
     async def process(self, _title, _requester):
         print('process called', flush=True)

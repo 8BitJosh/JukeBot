@@ -60,3 +60,4 @@ target/
 cache/
 CMDlog
 SongLog.csv
+savedPlaylists.json

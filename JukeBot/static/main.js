@@ -1,16 +1,10 @@
 $(document).ready(function() {
 
+// setup socket connection
     namespace = '/main';
-
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-    function genTime(time){
-        var minutes = Math.floor(time / 60);
-        var seconds = time - minutes * 60;
-        seconds = seconds > 9 ? "" + seconds: "0" + seconds;
-        return (String(minutes) + ':' + seconds);
-    }
-
+// connect / disconnect
     socket.on('connect', function(){
         socket.emit('connected');
         getUserIP(function(ip){
@@ -22,6 +16,7 @@ $(document).ready(function() {
         socket.emit('disconnect');
     });
 
+// Get all data from server on long interval to keep in sync
     var lastSync = 0;
     var syncInterval = 20000;
 
@@ -33,6 +28,7 @@ $(document).ready(function() {
         }
     }, 5000);
 
+// Progress bar webpage code
     socket.on('duration', function(msg) {
         position = msg.position;
         duration = msg.length;
@@ -47,37 +43,39 @@ $(document).ready(function() {
         if(paused != true){
             position++;
         }
-
         var progress = (position == 0) ? 0 : Math.round(100 * (position/duration));
 
         $('.progress-bar').css('width', progress + '%');
         $('#timer').text(genTime(position) + '/' + genTime(duration));
     }, 1000);
 
+
+// Set slider value from server when another user changes volume
     socket.on('volume_set', function(msg) {
         var vol = msg.vol;
         $('#volume').val(vol);
     });
 
+// User sets volume slider
     $('#volume').on('change', function(){
         var vol = $('#volume').val();
-        console.log(vol);
         socket.emit('volume', {'vol': vol});
     });
 
+// change name of pause button from server
     socket.on('pause_button', function(msg){
         $('button#pause').text(msg.data);
     });
-    
+
+// Set text in blue box
     socket.on('response', function(msg) {
         $('#user_alerts').text(msg.data);
-        setTimeout(clearMsg, 5000);
+        setTimeout(function(){
+            $('#user_alerts').text(' ');
+        }, 5000);
     });
-    
-    function clearMsg(){
-        $('#user_alerts').text(' ');
-    }
 
+// Update Main Now Playing playlist
     socket.on('sent_playlist', function(msg) {
         $('#playlist_table tr:gt(0)').remove();
         $.each(msg, function(index, item) {
@@ -87,7 +85,7 @@ $(document).ready(function() {
             }
             else if(index == '0'){
                 $('#nowplay').text(item);
-                var str = item.slice(item.search("]")+ 2);
+                var str = item.slice(item.search("]") + 2);
                 $('#page_title').text(str);
             }
             else if(index == 'dur'){
@@ -97,10 +95,21 @@ $(document).ready(function() {
                 $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
                     "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
                     "</td>").appendTo('#playlist_table');
-                }
+            }
         });
     });
-    
+
+// Update list of playlist avaliable on the server
+    socket.on('playlistList', function(msg) {
+        $('#ServerPlaylistTable tr:gt(0)').remove();
+         $.each(msg, function(index, item) {
+            $('<tr>').html("<td>" + index + "</td><td>[" + genTime(item.dur) + "]</td><td>" + item.name + "</td><td>" + 
+                    "<button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button>" +
+                    "</td>").appendTo('#ServerPlaylistTable');
+        });
+    });
+
+// Main header buttons
     $('form#send').submit(function(event) {
         socket.emit('sent_song', {data: $('#title_sent').val()});
         $('form#send')[0].reset();
@@ -117,13 +126,14 @@ $(document).ready(function() {
         return false;
     });
     
-    $('button#clearall').click(function(event) {
-        socket.emit('button', {data: 'clear'});
+    $('button#pause').click(function(event) {
+        socket.emit('button', {data: 'pause'});
         return false;
     });
 
-    $('button#pause').click(function(event) {
-        socket.emit('button', {data: 'pause'});
+// Now playing queue buttons
+    $('button#clearall').click(function(event) {
+        socket.emit('button', {data: 'clear'});
         return false;
     });
 
@@ -133,7 +143,24 @@ $(document).ready(function() {
         socket.emit('delete', {data: index, title: val});
         return false;
     });
+
+// Playlist Add buttons
+    $('#ServerPlaylistTable').on('click', '#add', function(){
+        var index = $(this).closest('tr').index();
+        var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
+        socket.emit('addPlaylist', {index: index-1, title: val});
+        return false;
+    });
+
+// Playlist creator buttons
 });
+
+function genTime(time){
+    var minutes = Math.floor(time / 60);
+    var seconds = time - minutes * 60;
+    seconds = seconds > 9 ? "" + seconds: "0" + seconds;
+    return (String(minutes) + ':' + seconds);
+}
 
 function getUserIP(onNewIP) {
     //compatibility for firefox and chrome

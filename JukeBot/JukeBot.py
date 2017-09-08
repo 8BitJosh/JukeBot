@@ -1,5 +1,6 @@
 from player import Player
 from playlist import Playlist
+from playlistList import PlaylistList
 from utils import importConfig
 
 from aiohttp import web
@@ -16,6 +17,7 @@ loop = asyncio.get_event_loop()
 
 playlist = Playlist(config, socketio, loop)
 player = Player(config, socketio, loop)
+playlistlist = PlaylistList(config, socketio, loop)
 
 connectedDevices = {}
 
@@ -51,9 +53,11 @@ async def resendAll(sid):
 async def sendAll():
     global playlist
     global player
+    global playlistlist
     await playlist.sendPlaylist()
     await player.sendDuration()
     await socketio.emit('volume_set', {'vol': player.getVolume()}, namespace='/main', broadcast = True)
+    await socketio.emit('playlistList', playlistlist.getPlaylists(), namespace='/main', broadcast = True)
 
 
 @socketio.on('sent_song', namespace='/main')
@@ -129,6 +133,18 @@ async def delete_song(sid, msg):
 
     s = 'Removed song from playlist - ' + title
     await socketio.emit('response', {'data': s}, namespace='/main', room=sid)
+
+
+@socketio.on('addPlaylist', namespace='/main')
+async def aPlaylist(sid, msg):
+    global playlist
+    global playlistlist
+    songs = playlistlist.getsongs(str(msg['index']), msg['title'])
+    if songs == {}:
+        return
+    await socketio.emit('response', {'data': 'added playlist - ' + msg['title']}, namespace='/main', room=sid)
+    await playlist.addPlaylist(songs, connectedDevices[sid]['ip'])
+
 
 # Thread constantly looping to playsong / process the current command
 async def player_update():
