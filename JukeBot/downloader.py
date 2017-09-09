@@ -19,7 +19,7 @@ options = {
 
 class Downloader:
 	def __init__(self, save_dir):
-		self.threadPool = ThreadPoolExecutor(max_workers=2)
+		self.threadPool = ThreadPoolExecutor(max_workers=3)
 		self.ydl = youtube_dl.YoutubeDL(options)
 		self.saveDir = save_dir
 

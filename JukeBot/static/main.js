@@ -153,11 +153,18 @@ $(document).ready(function() {
     });
 
 // Playlist creator buttons
+    $('button#NewEmptyPlaylist').click(function(event) {
+        var savename = $('#EmptyPlaylistName').val();
+        $('form#sendNameempty')[0].reset();
+        $('#newPlaylistDialog').modal('hide');
+        socket.emit('newempty', {name: savename});
+    });
+
     $('button#NewQueuePlaylist').click(function(event) {
         var savename = $('#QueuePlaylistName').val();
         $('form#sendNameQueue')[0].reset();
         $('#SaveQueueDialog').modal('hide');
-        socket.emit('savequeue', {name: savename})
+        socket.emit('savequeue', {name: savename});
     });
 
     $('button#NewQueueClose').click(function(event) {

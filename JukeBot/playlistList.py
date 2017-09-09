@@ -2,14 +2,18 @@ import socketio
 import asyncio
 import json
 
+from process import Processor
+
 
 class PlaylistList:
     def __init__(self, _config, _socketio, _loop):
         self.config = _config
         self.socketio = _socketio
         self.loop = _loop
+        self.savedir = self.config['main']['songcacheDir']
 
         self.loadFile()
+        self.processor = Processor(self.savedir, self.socketio, self.loop)
 
 
     def loadFile(self):
@@ -48,3 +52,26 @@ class PlaylistList:
         self.saveFile()
         self.loadFile()
         await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
+
+
+    async def newPlaylist(self, name):
+        data = {'name': name, 'dur' : 0}
+        self.playlists[name] = {}
+        self.playlists[name]['data'] = data
+        self.saveFile()
+        self.loadFile()
+        await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
+
+
+    async def addSong(self, playlistName, title):
+        pass
+
+
+    async def removeSong(self, playlistName, index, title):
+        pass
+
+
+    async def beingModified(self, playlistName):
+        pass
+
+

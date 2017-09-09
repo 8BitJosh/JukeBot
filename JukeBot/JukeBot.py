@@ -158,6 +158,14 @@ async def savequeue(sid, msg):
     await playlistlist.addqueue(songs)
 
 
+@socketio.on('newempty', namespace='/main')
+async def newempty(sid, msg):
+    global playlistlist
+    await socketio.emit('response', {'data': 'Creating a new empty playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
+    print(connectedDevices[sid]['ip'] + ' - Created a new playlist named - ' + str(msg['name']) ,flush=True)
+
+    await playlistlist.newPlaylist(msg['name'])
+
 
 # Thread constantly looping to playsong / process the current command
 async def player_update():

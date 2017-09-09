@@ -98,8 +98,8 @@
 <!--Playlist Creator-->
         <div class="tab-pane" id="3">
             <br>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newPlaylistDialog">Create New Empty Playlist</button>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#SaveQueueDialog">Save Queue To New Playlist</button>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newPlaylistDialog">Create Empty Playlist</button>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#SaveQueueDialog">Save Queue To Playlist</button>
 
             <h4>Modify Existing Playlist:</h4>
 
@@ -115,15 +115,12 @@
                 </ul>
             </div>
             <br>
-            <table id="PlaylistNameTable" class="table">
-                <tr><td>Playlist Name:</td><td align="center" id='ModifyPlaylistName'></td></tr>
-                <tr><td>Total Duration:</td><td align="center" id='PlaylistTotalDuration'></td></tr>
-            </table> 
     
-            <button type="submit" id="ClearPlaylist" class="btn btn-success">Clear All
+            <button type="submit" id="ClearPlaylist" class="btn btn-sm btn-success">Clear All
             </button>
     
-            <h4>Playlist:</h4>
+            <h5>Playlist:</h5>
+            <h5 id="totalDur">Total Duration - </h5>
             <table id="PlaylistSongsTable" class="table">
                 <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
             </table>
@@ -135,22 +132,32 @@
 </body>
 </html>
 
+
 <div id="newPlaylistDialog" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
-    <!-- Modal content-->
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Modal Header</h4>
-      </div>
-      <div class="modal-body">
-        <p>Some text in the modal.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" id="NewEmptyPlaylist">Submit</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-      </div>
+
+        <div class="modal-header">
+            <button type="button" class="close" id="NewQueueClose">&times;</button>
+            <h4 class="modal-title">Create New Playlist</h4>
+        </div>
+
+        <div class="modal-body">
+            <p>Set the name of the new playlist</p>
+            <form id="sendNameempty">
+                <div class="form-group">
+                    <label for="title_sent">Playlist Name:</label>
+                    <input type="text" class="form-control" id="EmptyPlaylistName" placeholder="Name?" autofocus>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="NewEmptyPlaylist">Submit</button>
+            <button type="button" class="btn btn-default" id="NewQueueClose">Cancel</button>
+        </div>
+
     </div>
 
   </div>

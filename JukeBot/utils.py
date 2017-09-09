@@ -62,6 +62,11 @@ def importConfig():
         config['main']['webPort'] = defaults.webPort
         print('webport value needs to be an interger', flush=True)
 
+    if type(config['main']['songcacheDir']) != str:
+        config['main']['songcacheDir'] = defaults.songcacheDir
+        print('cache dir needs to be a string')
+        ##todo check if it is a valid url
+
     # Player
     vol = config['player']['defaultVol']
     if (type(vol) != int) or (vol < 0) or (vol > 150):
@@ -74,6 +79,7 @@ def importConfig():
 class defaults:
     # Main
     webPort = 80
+    songcacheDir = "cache"
 
     #player
     defaultVol = 100
