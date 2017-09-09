@@ -103,7 +103,7 @@ $(document).ready(function() {
     socket.on('playlistList', function(msg) {
         $('#ServerPlaylistTable tr:gt(0)').remove();
          $.each(msg, function(index, item) {
-            $('<tr>').html("<td>" + index + "</td><td>[" + genTime(item.dur) + "]</td><td>" + item.name + "</td><td>" + 
+            $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td><td>" + 
                     "<button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button>" +
                     "</td>").appendTo('#ServerPlaylistTable');
         });
@@ -147,7 +147,7 @@ $(document).ready(function() {
 // Playlist Add buttons
     $('#ServerPlaylistTable').on('click', '#add', function(){
         var index = $(this).closest('tr').index();
-        var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
+        var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
         socket.emit('addPlaylist', {index: index-1, title: val});
         return false;
     });

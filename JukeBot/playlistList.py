@@ -1,6 +1,7 @@
 import socketio
 import asyncio
 import json
+import os
 
 from process import Processor
 
@@ -12,18 +13,17 @@ class PlaylistList:
         self.loop = _loop
         self.savedir = self.config['main']['songcacheDir']
 
+        if not os.path.isfile('savedPlaylists.json'):
+            with open('savedPlaylists.json', 'w') as file:
+                json.dump({}, file)
         self.loadFile()
+
         self.processor = Processor(self.savedir, self.socketio, self.loop)
 
 
     def loadFile(self):
-        try:
-            with open('savedPlaylists.json', 'r') as file:
-                self.playlists = json.load(file)
-        except:
-            with open('savedPlaylists.json', 'w') as file:
-                json.dump({}, file)
-            self.loadFile()
+        with open('savedPlaylists.json', 'r') as file:
+            self.playlists = json.load(file)
 
 
     def saveFile(self):
@@ -48,6 +48,10 @@ class PlaylistList:
 
     async def addqueue(self, songs):
         name = songs['data']['name']
+        
+        name = self.checkUnique(name)
+        songs['data']['name'] = name
+
         self.playlists[name] = songs
         self.saveFile()
         self.loadFile()
@@ -55,6 +59,7 @@ class PlaylistList:
 
 
     async def newPlaylist(self, name):
+        name = self.checkUnique(name)
         data = {'name': name, 'dur' : 0}
         self.playlists[name] = {}
         self.playlists[name]['data'] = data
@@ -74,4 +79,15 @@ class PlaylistList:
     async def beingModified(self, playlistName):
         pass
 
-
+    def checkUnique(self, name):
+        append = 1;
+        dupe = True
+        test = name
+        while dupe:
+            dupe = False
+            for names in self.playlists:
+                if self.playlists[names]['data']['name'] == test:
+                    dupe = True
+                    test = name + '-' + str(append)
+                    append += 1
+        return test

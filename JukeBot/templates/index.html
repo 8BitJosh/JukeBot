@@ -90,7 +90,7 @@
         <div class="tab-pane" id="2">
             <h4>Add Playlist To Queue</h4>
             <table id="ServerPlaylistTable" class="table">
-                <tr><td>#</td><td>Duration</td><td>Playlist Name</td><td>Add</td></tr>
+                <tr><td>Duration</td><td>Playlist Name</td><td>Add</td></tr>
             </table>
             
         </div>
@@ -115,7 +115,17 @@
                 </ul>
             </div>
             <br>
-    
+          
+            <form id="addNewSong">
+                <div class="form-group">
+                    <div class="col-auto">
+                        <input type="text" class="form-control" id="newSongName" placeholder="Song To Add?">
+                    </div>
+                    <br>
+                    <input type="submit" class="btn btn-success" value="Add Song">
+                </div>
+            </form>
+
             <button type="submit" id="ClearPlaylist" class="btn btn-sm btn-success">Clear All
             </button>
     
