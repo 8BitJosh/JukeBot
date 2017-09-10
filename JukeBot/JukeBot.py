@@ -167,6 +167,32 @@ async def newempty(sid, msg):
     await playlistlist.newPlaylist(msg['name'])
 
 
+@socketio.on('getplaylist', namespace='/main')
+async def sendaplaylist(sid, msg):
+    name = msg['data']
+    print('user modifing - ' + str(name))
+    songs = playlistlist.getsongs(name)
+    await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
+
+
+@socketio.on('add_song', namespace='/main')
+async def addplaylistsong(sid, msg):
+    await playlistlist.addSong(msg['playlistname'], msg['data'])
+    print(connectedDevices[sid]['ip'] + ' - Added - ' + msg['data'] + ' - to - ' + msg['playlistname'], flush=True)
+
+    songs = playlistlist.getsongs(msg['playlistname'])
+    await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
+
+
+@socketio.on('removePlaySong', namespace='/main')
+async def removeplaylistsong(sid, msg):
+    await playlistlist.removeSong(msg['playlistname'], msg['index'], msg['title'])
+    print(connectedDevices[sid]['ip'] + ' - Removed ' + msg['title'] + ' from playlist - ' + msg['playlistname'], flush=True)
+    
+    songs = playlistlist.getsongs(msg['playlistname'])
+    await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
+
+
 # Thread constantly looping to playsong / process the current command
 async def player_update():
     global playlist

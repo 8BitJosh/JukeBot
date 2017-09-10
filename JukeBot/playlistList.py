@@ -69,12 +69,34 @@ class PlaylistList:
 
 
     async def addSong(self, playlistName, title):
-        pass
+        entry = []
+        await self.processor.process(entry, title, 'playlist')
 
+        song = {'url': entry[0].url, 'title': entry[0].title, 'dur': entry[0].duration}
+
+        index = len(self.playlists[playlistName]) - 1
+        self.playlists[playlistName][index] = song
+        self.saveFile()
+        self.loadFile()
 
     async def removeSong(self, playlistName, index, title):
-        pass
-
+        temp = {}
+        ind = 0
+        duration = 0
+        for song in self.playlists[playlistName]:
+            if song == str(index) and self.playlists[playlistName][song]['title'] == title:
+                print('Song removed from playlist - ' + playlistName + ' - at index - ' + str(index))
+                pass
+            elif song == 'data':
+                temp['data'] = self.playlists[playlistName][song]
+            else:
+                temp[ind] = self.playlists[playlistName][song]
+                duration += self.playlists[playlistName][song]['dur']
+                ind += 1
+        temp['data']['dur'] = duration
+        self.playlists[playlistName] = temp
+        self.saveFile()
+        self.loadFile()
 
     async def beingModified(self, playlistName):
         pass

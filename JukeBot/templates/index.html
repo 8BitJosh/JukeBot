@@ -76,7 +76,7 @@
                 </div>
             </div>
     
-            <button type="submit" name="clear" id="clearall" class="btn btn-success">Clear Playlist
+            <button type="submit" name="clear" id="clearall" class="btn btn-danger btn-sm">Clear Playlist
             </button>
     
             <h4>Playlist:</h4>
@@ -103,17 +103,9 @@
 
             <h4>Modify Existing Playlist:</h4>
 
-            <div class="dropdown">
-                <button class="btn btn-success dropdown-toggle" type="button" id="dropdown1" data-toggle="dropdown">
-                    Select Playlist To Modify
-                    <span class="caret"></span>    
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">One</a></li>
-                    <li><a href="#">Two</a></li>
-                    <li><a href="#">Three</a></li>      
-                </ul>
-            </div>
+            <select class="form-control" id="playlistSelection">
+                <option value="">Select a Playlist</option>
+            </select>
             <br>
           
             <form id="addNewSong">
@@ -125,14 +117,11 @@
                     <input type="submit" class="btn btn-success" value="Add Song">
                 </div>
             </form>
-
-            <button type="submit" id="ClearPlaylist" class="btn btn-sm btn-success">Clear All
-            </button>
-    
-            <h5>Playlist:</h5>
-            <h5 id="totalDur">Total Duration - </h5>
+   
+            <h5 id="currentplaylist">Playlist:</h5>
+            <h5 id="totalPlayDur">Total Duration - </h5>
             <table id="PlaylistSongsTable" class="table">
-                <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
+                <tr><td>#</td><td>Dur</td><td>Song Title</td><td>Remove</td></tr>
             </table>
             
         </div>

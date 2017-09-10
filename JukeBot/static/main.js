@@ -99,13 +99,19 @@ $(document).ready(function() {
         });
     });
 
-// Update list of playlist avaliable on the server
+// Update list of playlist avaliable on the server + dropdown list
     socket.on('playlistList', function(msg) {
         $('#ServerPlaylistTable tr:gt(0)').remove();
+        $('#playlistSelection').find('option').not(':first').remove();
          $.each(msg, function(index, item) {
             $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td><td>" + 
                     "<button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button>" +
                     "</td>").appendTo('#ServerPlaylistTable');
+
+            $('#playlistSelection').append($('<option>', {
+                value: index,
+                text: index 
+            }));
         });
     });
 
@@ -170,6 +176,40 @@ $(document).ready(function() {
     $('button#NewQueueClose').click(function(event) {
         $('form#sendNameQueue')[0].reset();
         $('#SaveQueueDialog').modal('hide');
+    });
+
+    $('form#addNewSong').submit(function(event) {
+        var playname = $('#currentplaylist').text();
+        socket.emit('add_song', {data: $('#newSongName').val(), playlistname: playname});
+        $('form#addNewSong')[0].reset();
+        return false;
+    });
+
+// playlist dropdown select handler
+    $('#playlistSelection').change(function() {
+        socket.emit('getplaylist', {data : this.value});
+    });
+
+    socket.on('selectedplaylist', function(msg){
+        $('#PlaylistSongsTable tr:gt(0)').remove();
+        $.each(msg, function(index, item) {
+            if(index == 'data'){
+                $('#totalPlayDur').text('Total Duration - ' + genTime(item.dur));
+                $('#currentplaylist').text(item.name);
+            }
+            else{
+                $('<tr>').html("<td>" + index + "</td><td>" + genTime(item.dur) + "</td><td>"+ item.title + "</td><td>" + 
+                    "<button id='delEdit' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
+                    "</td>").appendTo('#PlaylistSongsTable');
+            }
+        });
+    });
+
+    $('#PlaylistSongsTable').on('click', '#delEdit', function() {
+        var index = $(this).closest('tr').index();
+        var val = $('table#PlaylistSongsTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
+        var playname = $('#currentplaylist').text();
+        socket.emit('removePlaySong', {title : val, index:index-1, playlistname: playname});
     });
 
 });
