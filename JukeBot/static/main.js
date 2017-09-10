@@ -154,7 +154,9 @@ $(document).ready(function() {
     $('#ServerPlaylistTable').on('click', '#add', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('addPlaylist', {index: index-1, title: val});
+        socket.emit('addPlaylist', {title: val});
+        return false;
+    });
         return false;
     });
 
@@ -164,6 +166,7 @@ $(document).ready(function() {
         $('form#sendNameempty')[0].reset();
         $('#newPlaylistDialog').modal('hide');
         socket.emit('newempty', {name: savename});
+        return false;
     });
 
     $('button#NewQueuePlaylist').click(function(event) {
@@ -171,15 +174,20 @@ $(document).ready(function() {
         $('form#sendNameQueue')[0].reset();
         $('#SaveQueueDialog').modal('hide');
         socket.emit('savequeue', {name: savename});
+        return false;
     });
 
     $('button#NewQueueClose').click(function(event) {
         $('form#sendNameQueue')[0].reset();
         $('#SaveQueueDialog').modal('hide');
+        return false;
     });
 
     $('form#addNewSong').submit(function(event) {
         var playname = $('#currentplaylist').text();
+        if(playname == 'Playlist:' || $('#newSongName').val() == ''){
+            return false;
+        }
         socket.emit('add_song', {data: $('#newSongName').val(), playlistname: playname});
         $('form#addNewSong')[0].reset();
         return false;
@@ -188,6 +196,7 @@ $(document).ready(function() {
 // playlist dropdown select handler
     $('#playlistSelection').change(function() {
         socket.emit('getplaylist', {data : this.value});
+        return false;
     });
 
     socket.on('selectedplaylist', function(msg){
@@ -210,6 +219,7 @@ $(document).ready(function() {
         var val = $('table#PlaylistSongsTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
         var playname = $('#currentplaylist').text();
         socket.emit('removePlaySong', {title : val, index:index-1, playlistname: playname});
+        return false
     });
 
 });
@@ -220,7 +230,7 @@ function genTime(time){
     var s = Math.floor(time % 3600 % 60);
 
     var hours = h > 0 ? String(h) + ':' : '' ;
-    var minutes = String(m) + ':' ; 
+    var minutes = h > 0 ? '0' + String(m) + ':' : String(m) + ':'; 
     var seconds = s > 9 ? "" + s: "0" + s ;
     return (hours + minutes + seconds) ;
 }

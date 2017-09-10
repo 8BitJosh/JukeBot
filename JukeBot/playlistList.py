@@ -68,14 +68,16 @@ class PlaylistList:
         await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
 
 
+
     async def addSong(self, playlistName, title):
         entry = []
         await self.processor.process(entry, title, 'playlist')
 
-        song = {'url': entry[0].url, 'title': entry[0].title, 'dur': entry[0].duration}
-
-        index = len(self.playlists[playlistName]) - 1
-        self.playlists[playlistName][index] = song
+        for songs in entry:
+            song = {'url': songs.url, 'title': songs.title, 'dur': songs.duration}
+            index = len(self.playlists[playlistName]) - 1
+            self.playlists[playlistName][index] = song
+            self.playlists[playlistName]['data']['dur'] += entry[0].duration
         self.saveFile()
         self.loadFile()
 
