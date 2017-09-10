@@ -104,9 +104,9 @@ $(document).ready(function() {
         $('#ServerPlaylistTable tr:gt(0)').remove();
         $('#playlistSelection').find('option').not(':first').remove();
          $.each(msg, function(index, item) {
-            $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td><td>" + 
-                    "<button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button>" +
-                    "</td>").appendTo('#ServerPlaylistTable');
+            $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td>" + 
+                    "<td><button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button></td>" +
+                    "<td><button id='remove' class='btn btn-sm btn-danger'><span class='glyphicon glyphicon-remove'></span></button></td>").appendTo('#ServerPlaylistTable');
 
             $('#playlistSelection').append($('<option>', {
                 value: index,
@@ -157,6 +157,11 @@ $(document).ready(function() {
         socket.emit('addPlaylist', {title: val});
         return false;
     });
+
+    $('#ServerPlaylistTable').on('click', '#remove', function(){
+        var index = $(this).closest('tr').index();
+        var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
+        socket.emit('removePlaylist', {index: index-1, title: val});
         return false;
     });
 

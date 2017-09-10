@@ -193,6 +193,12 @@ async def removeplaylistsong(sid, msg):
     await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
 
 
+@socketio.on('removePlaylist', namespace='/main')
+async def removePlaylist(sid, msg):
+    await playlistlist.removePlaylist(msg['title'])
+    print(connectedDevices[sid]['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
+    await socketio.emit('selectedplaylist', {'data': {'name': 'Playlist:', 'dur':0}}, namespace='/main', room=sid)
+
 # Thread constantly looping to playsong / process the current command
 async def player_update():
     global playlist

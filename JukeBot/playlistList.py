@@ -68,6 +68,12 @@ class PlaylistList:
         await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
 
 
+    async def removePlaylist(self, playlistName):
+        del self.playlists[playlistName]
+        self.saveFile()
+        self.loadFile()
+        await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
+
 
     async def addSong(self, playlistName, title):
         entry = []
@@ -80,6 +86,8 @@ class PlaylistList:
             self.playlists[playlistName]['data']['dur'] += entry[0].duration
         self.saveFile()
         self.loadFile()
+        await self.socketio.emit('playlistList', self.getPlaylists(), namespace='/main', broadcast = True)
+
 
     async def removeSong(self, playlistName, index, title):
         temp = {}
@@ -100,8 +108,10 @@ class PlaylistList:
         self.saveFile()
         self.loadFile()
 
+
     async def beingModified(self, playlistName):
         pass
+
 
     def checkUnique(self, name):
         append = 1;
