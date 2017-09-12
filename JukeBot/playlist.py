@@ -8,14 +8,6 @@ from random import shuffle
 from utils import PlaylistEntry, delete_file
 from process import Processor
 
-class ExtractionError(Exception):
-    def __init__(self, message):
-        self._message = message
-
-    @property
-    def message(self):
-        return self._message
-
 class Playlist:
     def __init__(self, _config, _socketio, loop):
         self.config = _config

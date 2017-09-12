@@ -8,6 +8,16 @@ import os
 from downloader import Downloader
 from utils import do_format, PlaylistEntry
 
+
+class ExtractionError(Exception):
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def message(self):
+        return self._message
+
+
 class Processor:
     def __init__(self, savedir, socketio, loop):
         self.savedir = savedir
