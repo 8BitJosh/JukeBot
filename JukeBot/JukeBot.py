@@ -22,11 +22,15 @@ playlistlist = PlaylistList(config, socketio, loop)
 connectedDevices = {}
 
 async def index(request):
+    return web.FileResponse('./JukeBot/templates/index.html')
+
+
+async def iprequest(request):
     peername = request.transport.get_extra_info('peername')
     if peername is not None:
         host, port = peername
     print("Client loaded page - " + str(host), flush=True)
-    return web.FileResponse('./JukeBot/templates/index.html')
+    return web.Response(text=str(host))
 
 
 @socketio.on('connected', namespace='/main')
@@ -218,5 +222,6 @@ async def player_update():
 loop.create_task(player_update())
 
 app.router.add_get('/', index)
+app.router.add_get('/ip', iprequest)
 app.router.add_static('/static/', path=str('./JukeBot/static'), name='static')
 web.run_app(app, port=config['main']['webPort'])
