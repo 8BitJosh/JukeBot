@@ -12,14 +12,9 @@ $(document).ready(function() {
     namespace = '/main';
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-// connect / disconnect
+// connect
     socket.on('connect', function(){
-        socket.emit('connected');
-        socket.emit('device', ip);
-    });
-
-    socket.on('disconnect', function(){
-        socket.emit('disconnect');
+        socket.emit('connected', ip);
     });
 
 // Get all data from server on long interval to keep in sync
@@ -80,7 +75,7 @@ $(document).ready(function() {
 // User sets volume slider
     $('#volume').on('change', function(){
         var vol = $('#volume').val();
-        socket.emit('volume', {'vol': vol});
+        socket.emit('volume', {'vol': vol, 'ip': ip});
     });
 
 // change name of pause button from server
@@ -138,36 +133,36 @@ $(document).ready(function() {
 
 // Main header buttons
     $('form#send').submit(function(event) {
-        socket.emit('sent_song', {data: $('#title_sent').val()});
+        socket.emit('sent_song', {data: $('#title_sent').val(), 'ip': ip});
         $('form#send')[0].reset();
         return false;
     });
 
     $('button#skip').click(function(event) {
-        socket.emit('button', {data: 'skip'});
+        socket.emit('button', {data: 'skip', 'ip': ip});
         return false;
     });
     
     $('button#shuffle').click(function(event) {
-        socket.emit('button', {data: 'shuffle'});
+        socket.emit('button', {data: 'shuffle', 'ip': ip});
         return false;
     });
     
     $('button#pause').click(function(event) {
-        socket.emit('button', {data: 'pause'});
+        socket.emit('button', {data: 'pause', 'ip': ip});
         return false;
     });
 
 // Now playing queue buttons
     $('button#clearall').click(function(event) {
-        socket.emit('button', {data: 'clear'});
+        socket.emit('button', {data: 'clear', 'ip': ip});
         return false;
     });
 
     $('#playlist_table').on('click', '#del', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('delete', {data: index, title: val});
+        socket.emit('delete', {data: index, title: val, 'ip': ip});
         return false;
     });
 
@@ -175,14 +170,14 @@ $(document).ready(function() {
     $('#ServerPlaylistTable').on('click', '#add', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('addPlaylist', {title: val});
+        socket.emit('addPlaylist', {title: val, 'ip': ip});
         return false;
     });
 
     $('#ServerPlaylistTable').on('click', '#remove', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('removePlaylist', {index: index-1, title: val});
+        socket.emit('removePlaylist', {index: index-1, title: val, 'ip': ip});
         return false;
     });
 
@@ -191,7 +186,7 @@ $(document).ready(function() {
         var savename = $('#EmptyPlaylistName').val();
         $('form#sendNameempty')[0].reset();
         $('#newPlaylistDialog').modal('hide');
-        socket.emit('newempty', {name: savename});
+        socket.emit('newempty', {name: savename, 'ip': ip});
         return false;
     });
 
@@ -199,7 +194,7 @@ $(document).ready(function() {
         var savename = $('#QueuePlaylistName').val();
         $('form#sendNameQueue')[0].reset();
         $('#SaveQueueDialog').modal('hide');
-        socket.emit('savequeue', {name: savename});
+        socket.emit('savequeue', {name: savename, 'ip': ip});
         return false;
     });
 
@@ -214,14 +209,14 @@ $(document).ready(function() {
         if(playname == 'Playlist:' || $('#newSongName').val() == ''){
             return false;
         }
-        socket.emit('add_song', {data: $('#newSongName').val(), playlistname: playname});
+        socket.emit('add_song', {data: $('#newSongName').val(), playlistname: playname, 'ip': ip});
         $('form#addNewSong')[0].reset();
         return false;
     });
 
 // playlist dropdown select handler
     $('#playlistSelection').change(function() {
-        socket.emit('getplaylist', {data : this.value});
+        socket.emit('getplaylist', {data : this.value, 'ip': ip});
         return false;
     });
 
@@ -244,7 +239,7 @@ $(document).ready(function() {
         var index = $(this).closest('tr').index();
         var val = $('table#PlaylistSongsTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
         var playname = $('#currentplaylist').text();
-        socket.emit('removePlaySong', {title : val, index:index-1, playlistname: playname});
+        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, 'ip': ip});
         return false
     });
 

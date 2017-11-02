@@ -19,7 +19,6 @@ playlist = Playlist(config, socketio, loop)
 player = Player(config, socketio, loop)
 playlistlist = PlaylistList(config, socketio, loop)
 
-connectedDevices = {}
 
 async def index(request):
     return web.FileResponse('./JukeBot/templates/index.html')
@@ -34,19 +33,9 @@ async def iprequest(request):
 
 
 @socketio.on('connected', namespace='/main')
-async def connect(sid):
-    await sendAll()
-
-
-@socketio.on('device', namespace='/main')
-def add_device(sid, ip):
+async def connect(sid, ip):
     print('Client Connected - ' + str(sid) + ' - ' + ip, flush=True)
-    connectedDevices[sid] = {'ip' : ip}
-
-@socketio.on('disconnect')
-def disconnect(sid):
-    print('disconnected - ' + str(sid) + ' - ' + connectedDevices[sid]['ip'])
-    del connectedDevices[sid]
+    await sendAll()
 
 
 @socketio.on('sendAll', namespace='/main')
@@ -68,7 +57,7 @@ async def sendAll():
 async def song_received(sid, message):
     global playlist
     title = message['data']
-    requester = connectedDevices[sid]['ip']  # todo convert ip to device name
+    requester = message['ip']  # todo convert ip to device name
 
     if title != '':
         str = 'Queued Song - ' + title
@@ -79,7 +68,7 @@ async def song_received(sid, message):
         else:
             msg = title
 
-        print(connectedDevices[sid]['ip'] + ' - Submitted - ' + title, flush=True)
+        print(requester + ' - Submitted - ' + title, flush=True)
         p = loop.create_task(playlist.process(_title=msg, _requester=requester))
     else:
         str = 'Enter a Song Name'
@@ -94,24 +83,24 @@ async def button_handler(sid, msg):
 
     if command == 'skip':
         await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
-        print(connectedDevices[sid]['ip'] + ' - Skipped song', flush=True)
+        print(msg['ip'] + ' - Skipped song', flush=True)
         await player.stop()
     elif command == 'shuffle':
         await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
-        print(connectedDevices[sid]['ip'] + ' - Shuffled playlist', flush=True)
+        print(msg['ip'] + ' - Shuffled playlist', flush=True)
         await playlist.shuff()
     elif command == 'clear':
         await playlist.clearall()
-        print(connectedDevices[sid]['ip'] + ' - Cleared all of playlist', flush=True)
+        print(msg['ip'] + ' - Cleared all of playlist', flush=True)
         await socketio.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
     elif command == 'pause':
         if player.isPaused():
-            print(connectedDevices[sid]['ip'] + ' - Resumed the song', flush=True)
+            print(msg['ip'] + ' - Resumed the song', flush=True)
             await socketio.emit('response', {'data': 'Song Resumed'}, namespace='/main')
             await socketio.emit('pause_button', {'data': 'Pause'}, namespace='/main', broadcast=True)
             await player.pause()
         elif player.running():
-            print(connectedDevices[sid]['ip'] + ' - Paused the song', flush=True)
+            print(msg['ip'] + ' - Paused the song', flush=True)
             await socketio.emit('response', {'data': 'Song Paused'}, namespace='/main')
             await socketio.emit('pause_button', {'data': 'Resume'}, namespace='/main', broadcast=True)
             await player.pause()
@@ -122,7 +111,7 @@ async def set_volume(sid, msg):
     global player
     vol = int(msg['vol'])
     player.setVolume(vol)
-    print(connectedDevices[sid]['ip'] + ' - Set volume to ' + str(vol), flush = True)
+    print(msg['ip'] + ' - Set volume to ' + str(vol), flush = True)
     await socketio.emit('volume_set', {'vol': vol}, namespace='/main', broadcast = True)
 
 
@@ -131,7 +120,7 @@ async def delete_song(sid, msg):
     global playlist
     title = msg['title']
     index = msg['data']
-    print(connectedDevices[sid]['ip'] + ' - Removed index ' + str(index) + ' title = ' + title, flush=True)
+    print(msg['ip'] + ' - Removed index ' + str(index) + ' title = ' + title, flush=True)
 
     await playlist.remove(index, title)
 
@@ -147,7 +136,7 @@ async def aPlaylist(sid, msg):
     if songs == {}:
         return
     await socketio.emit('response', {'data': 'added playlist - ' + msg['title']}, namespace='/main', room=sid)
-    await playlist.addPlaylist(songs, connectedDevices[sid]['ip'])
+    await playlist.addPlaylist(songs, msg['ip'])
 
 
 @socketio.on('savequeue', namespace='/main')
@@ -155,7 +144,7 @@ async def savequeue(sid, msg):
     global playlist
     global playlistlist
     await socketio.emit('response', {'data': 'Saving Current queue as playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
-    print(connectedDevices[sid]['ip'] + ' - Saved queue as - ' + str(msg['name']), flush=True)
+    print(msg['ip'] + ' - Saved queue as - ' + str(msg['name']), flush=True)
     
     songs = await playlist.getQueue()
     songs['data']['name'] = str(msg['name'])
@@ -166,7 +155,7 @@ async def savequeue(sid, msg):
 async def newempty(sid, msg):
     global playlistlist
     await socketio.emit('response', {'data': 'Creating a new empty playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
-    print(connectedDevices[sid]['ip'] + ' - Created a new playlist named - ' + str(msg['name']) ,flush=True)
+    print(msg['ip'] + ' - Created a new playlist named - ' + str(msg['name']) ,flush=True)
 
     await playlistlist.newPlaylist(msg['name'])
 
@@ -182,7 +171,7 @@ async def sendaplaylist(sid, msg):
 @socketio.on('add_song', namespace='/main')
 async def addplaylistsong(sid, msg):
     await playlistlist.addSong(msg['playlistname'], msg['data'])
-    print(connectedDevices[sid]['ip'] + ' - Added - ' + msg['data'] + ' - to - ' + msg['playlistname'], flush=True)
+    print(msg['ip'] + ' - Added - ' + msg['data'] + ' - to - ' + msg['playlistname'], flush=True)
 
     songs = playlistlist.getsongs(msg['playlistname'])
     await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
@@ -191,7 +180,7 @@ async def addplaylistsong(sid, msg):
 @socketio.on('removePlaySong', namespace='/main')
 async def removeplaylistsong(sid, msg):
     await playlistlist.removeSong(msg['playlistname'], msg['index'], msg['title'])
-    print(connectedDevices[sid]['ip'] + ' - Removed ' + msg['title'] + ' from playlist - ' + msg['playlistname'], flush=True)
+    print(msg['ip'] + ' - Removed ' + msg['title'] + ' from playlist - ' + msg['playlistname'], flush=True)
     
     songs = playlistlist.getsongs(msg['playlistname'])
     await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
@@ -200,7 +189,7 @@ async def removeplaylistsong(sid, msg):
 @socketio.on('removePlaylist', namespace='/main')
 async def removePlaylist(sid, msg):
     await playlistlist.removePlaylist(msg['title'])
-    print(connectedDevices[sid]['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
+    print(msg['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
     await socketio.emit('selectedplaylist', {'data': {'name': 'Playlist:', 'dur':0}}, namespace='/main', room=sid)
 
 # Thread constantly looping to playsong / process the current command
