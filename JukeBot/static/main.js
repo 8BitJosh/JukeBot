@@ -204,6 +204,12 @@ $(document).ready(function() {
         return false;
     });
 
+    $('button#NewEmptyClose').click(function(event) {
+        $('form#sendNameempty')[0].reset();
+        $('#newPlaylistDialog').modal('hide');
+        return false;
+    });
+
     $('form#addNewSong').submit(function(event) {
         var playname = $('#currentplaylist').text();
         if(playname == 'Playlist:' || $('#newSongName').val() == ''){
