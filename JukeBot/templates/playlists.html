@@ -76,7 +76,7 @@
                 </div>
             </div>
     
-            <button type="submit" name="clear" id="clearall" class="btn btn-danger btn-sm">Clear Playlist
+            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#ClearAllDialog">Clear Playlist
             </button>
     
             <h4>Playlist:</h4>
@@ -189,5 +189,25 @@
 
     </div>
 
+  </div>
+</div>
+
+<div id="ClearAllDialog" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="ClearAllClose">&times;</button>
+            <h4 class="modal-title">Save Queue to Playlist</h4>
+        </div>
+
+        <div class="modal-body">
+            <p>Are you Sure You Want To Clear The Playlist</p>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="ClearAllPlaylist">Submit</button>
+            <button type="button" class="btn btn-default" id="ClearAllClose">Cancel</button>
+        </div>
+    </div>
   </div>
 </div>

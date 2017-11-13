@@ -153,12 +153,19 @@ $(document).ready(function() {
         return false;
     });
 
-// Now playing queue buttons
-    $('button#clearall').click(function(event) {
+// Now playing queue buttons////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    $('button#ClearAllPlaylist').click(function(event) {
+        $('#ClearAllDialog').modal('hide');
         socket.emit('button', {data: 'clear', 'ip': ip});
         return false;
     });
 
+    $('button#ClearAllClose').click(function(event) {
+        $('#ClearAllDialog').modal('hide');
+        return false;
+    });
+    
+    
     $('#playlist_table').on('click', '#del', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();
@@ -257,7 +264,7 @@ function genTime(time){
     var s = Math.floor(time % 3600 % 60);
 
     var hours = h > 0 ? String(h) + ':' : '' ;
-    var minutes = h > 0 ? '0' + String(m) + ':' : String(m) + ':'; 
+    var minutes = m > 9 ? String(m) + ':' : "0" + String(m) + ':'; 
     var seconds = s > 9 ? "" + s: "0" + s ;
     return (hours + minutes + seconds) ;
 }
