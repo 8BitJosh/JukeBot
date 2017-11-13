@@ -84,7 +84,7 @@ class defaults:
     # Main
     webPort = 80
     songcacheDir = "cache"
-    loglength = 20
+    loglength = 30
 
     #player
     defaultVol = 100

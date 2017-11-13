@@ -32,6 +32,10 @@ async def index(request):
     return web.FileResponse('./JukeBot/templates/index.html')
 
 
+async def playlists(request):
+    return web.FileResponse('./JukeBot/templates/playlists.html')
+
+
 async def iprequest(request):
     peername = request.transport.get_extra_info('peername')
     if peername is not None:
@@ -132,7 +136,6 @@ async def set_volume(sid, msg):
     global player
     vol = int(msg['vol'])
     player.setVolume(vol)
-    log(msg['ip'] + ' - Set volume to ' + str(vol))
     await socketio.emit('volume_set', {'vol': vol}, namespace='/main', broadcast = True)
 
 
@@ -232,6 +235,7 @@ async def player_update():
 loop.create_task(player_update())
 
 app.router.add_get('/', index)
+app.router.add_get('/playlists', playlists)
 app.router.add_get('/ip', iprequest)
 app.router.add_get('/log', logrequest)
 app.router.add_static('/static/', path=str('./JukeBot/static'), name='static')

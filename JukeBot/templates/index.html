@@ -21,7 +21,6 @@
  
     <h2>JukeBot Song Request</h2>
 
-<!--Main page header-->
     <form id="send">
         <div class="form-group">
             <label for="title_sent">Song Title:</label>
@@ -50,144 +49,30 @@
     <br>
     <div class="alert alert-info" id="user_alerts" style="white-space: pre-wrap"> </div>
 
-<!--Nav tabs-->
-    <ul class="nav nav-tabs">
-        <li class="active">
-            <a  href="#1" data-toggle="tab">Now Playing</a>
-        </li>
-        <li>
-            <a href="#2" data-toggle="tab">Playlists</a>
-        </li>
-        <li>
-            <a href="#3" data-toggle="tab">Playlist creator</a>
-        </li>
-    </ul>
-
-<!--Now Playing-->
-    <div class="tab-content ">
-        <div class="tab-pane active" id="1">
-            <table id="nowplay_table" class="table">
-                <tr><td>Now Playing:</td><td align="center" id='nowplay'></td></tr>
-                <tr><td>Progress:</td><td align="center" id='timer'></td></tr>
-            </table> 
+    <div class="tab-pane active" id="1">
+        <table id="nowplay_table" class="table">
+            <tr><td>Now Playing:</td><td align="center" id='nowplay'></td></tr>
+            <tr><td>Progress:</td><td align="center" id='timer'></td></tr>
+        </table> 
     
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" id="progress" style="width:0%">
-                </div>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" id="progress" style="width:0%">
             </div>
+        </div>
     
-            <button type="submit" name="clear" id="clearall" class="btn btn-danger btn-sm">Clear Playlist
-            </button>
+        <button type="submit" name="clear" id="clearall" class="btn btn-danger btn-sm">Clear Playlist
+        </button>
     
-            <h4>Playlist:</h4>
-            <h5 id="totalDur">Total Duration - </h5>
-            <table id="playlist_table" class="table">
-                <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
-            </table>
-        </div>
+        <h4>Playlist:</h4>
+        <h5 id="totalDur">Total Duration - </h5>
+        <table id="playlist_table" class="table">
+            <tr><td>#</td><td>Song Title</td><td>Remove</td></tr>
+        </table>
 
-<!--Server Playlists-->
-        <div class="tab-pane" id="2">
-            <h4>Add Playlist To Queue</h4>
-            <table id="ServerPlaylistTable" class="table">
-                <tr><td>Duration</td><td>Playlist Name</td><td> Add</td><td>Delete</td></tr>
-            </table>
-            
-        </div>
 
-<!--Playlist Creator-->
-        <div class="tab-pane" id="3">
-            <br>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newPlaylistDialog">Create Empty Playlist</button>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#SaveQueueDialog">Save Queue To Playlist</button>
-
-            <h4>Modify Existing Playlist:</h4>
-
-            <select class="form-control" id="playlistSelection">
-                <option value="">Select a Playlist</option>
-            </select>
-            <br>
-          
-            <form id="addNewSong">
-                <div class="form-group">
-                    <div class="col-auto">
-                        <input type="text" class="form-control" id="newSongName" placeholder="Song To Add?">
-                    </div>
-                    <br>
-                    <input type="submit" class="btn btn-success" value="Add Song">
-                </div>
-            </form>
-   
-            <h5 id="currentplaylist">Playlist:</h5>
-            <h5 id="totalPlayDur">Total Duration - </h5>
-            <table id="PlaylistSongsTable" class="table">
-                <tr><td>#</td><td>Dur</td><td>Song Title</td><td>Remove</td></tr>
-            </table>
-            
-        </div>
     </div>
 
 </div>
 </body>
 </html>
 
-
-<div id="newPlaylistDialog" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <div class="modal-content">
-
-        <div class="modal-header">
-            <button type="button" class="close" id="NewEmptyClose">&times;</button>
-            <h4 class="modal-title">Create New Playlist</h4>
-        </div>
-
-        <div class="modal-body">
-            <p>Set the name of the new playlist</p>
-            <form id="sendNameempty">
-                <div class="form-group">
-                    <label for="title_sent">Playlist Name:</label>
-                    <input type="text" class="form-control" id="EmptyPlaylistName" placeholder="Name?" autofocus>
-                </div>
-            </form>
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" id="NewEmptyPlaylist">Submit</button>
-            <button type="button" class="btn btn-default" id="NewEmptyClose">Cancel</button>
-        </div>
-
-    </div>
-
-  </div>
-</div>
-
-<div id="SaveQueueDialog" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <div class="modal-content">
-
-        <div class="modal-header">
-            <button type="button" class="close" id="NewQueueClose">&times;</button>
-            <h4 class="modal-title">Save Queue to Playlist</h4>
-        </div>
-
-        <div class="modal-body">
-            <p>Set the name of the new playlist</p>
-            <form id="sendNameQueue">
-                <div class="form-group">
-                    <label for="title_sent">Playlist Name:</label>
-                    <input type="text" class="form-control" id="QueuePlaylistName" placeholder="Name?" autofocus>
-                </div>
-            </form>
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" id="NewQueuePlaylist">Submit</button>
-            <button type="button" class="btn btn-default" id="NewQueueClose">Cancel</button>
-        </div>
-
-    </div>
-
-  </div>
-</div>

@@ -2,7 +2,7 @@
 	"main" : {
 			"webPort" : 80,  
 			"songcacheDir" : "cache",
-			"loglength" : 20
+			"loglength" : 30
 		},
 
 	"player" : {
