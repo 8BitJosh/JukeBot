@@ -212,9 +212,13 @@ async def removeplaylistsong(sid, msg):
 
 @socketio.on('removePlaylist', namespace='/main')
 async def removePlaylist(sid, msg):
-    await playlistlist.removePlaylist(msg['title'])
-    print(msg['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
-    await socketio.emit('selectedplaylist', {'data': {'name': 'Playlist:', 'dur':0}}, namespace='/main', room=sid)
+    if msg['title'].lower() == msg['userinput'].lower():
+        await playlistlist.removePlaylist(msg['title'])
+        print(msg['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
+        await socketio.emit('selectedplaylist', {'data': {'name': 'Playlist:', 'dur':0}}, namespace='/main', room=sid)
+    else:
+        await socketio.emit('response', {'data': 'Incorrect name, Unable to remove playlist'}, namespace='/main', room=sid)
+
 
 # Thread constantly looping to playsong / process the current command
 async def player_update():

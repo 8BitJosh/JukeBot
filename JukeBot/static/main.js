@@ -30,16 +30,16 @@ $(document).ready(function() {
     }, 5000);
 
 // Refresh after wake from sleep
-    var lastCheck = new Date().getTime();
+    // var lastCheck = new Date().getTime();
 
-    setInterval(function() {
-        var now = new Date().getTime();
-        if((now - lastCheck) > 1000){
-            window.location.reload();
-            console.log(now);
-        }
-        lastCheck = new Date().getTime();
-    }, 100);
+    // setInterval(function() {
+    //     var now = new Date().getTime();
+    //     if((now - lastCheck) > 1000){
+    //         window.location.reload();
+    //         console.log(now);
+    //     }
+    //     lastCheck = new Date().getTime();
+    // }, 100);
 
 // Progress bar webpage code
     socket.on('duration', function(msg) {
@@ -153,7 +153,6 @@ $(document).ready(function() {
         return false;
     });
 
-// Now playing queue buttons////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     $('button#ClearAllPlaylist').click(function(event) {
         $('#ClearAllDialog').modal('hide');
         socket.emit('button', {data: 'clear', 'ip': ip});
@@ -184,8 +183,16 @@ $(document).ready(function() {
     $('#ServerPlaylistTable').on('click', '#remove', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('removePlaylist', {index: index-1, title: val, 'ip': ip});
-        return false;
+
+        var userinput = window.prompt("Enter the name of the playlist you are deleting", "");
+
+        if (userinput == null || userinput == ""){
+            return false;
+        }
+        else { 
+            socket.emit('removePlaylist', {index: index-1, "userinput" : userinput, title: val, 'ip': ip});
+            return false;
+        }
     });
 
 // Playlist creator buttons
@@ -252,8 +259,9 @@ $(document).ready(function() {
         var index = $(this).closest('tr').index();
         var val = $('table#PlaylistSongsTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
         var playname = $('#currentplaylist').text();
-        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, 'ip': ip});
-        return false
+        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, "userinput" : userinput, 'ip': ip});
+        return false;            
+
     });
 
 });
