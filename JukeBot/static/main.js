@@ -45,7 +45,7 @@ $(document).ready(function() {
     socket.on('duration', function(msg) {
         position = msg.position;
         duration = msg.length;
-        paused = (msg.paused == 1) ? true : false; 
+        paused = (msg.paused == 1) ? true : false;
     });
 
     var position = 0;
@@ -108,7 +108,7 @@ $(document).ready(function() {
                 $('#totalDur').text('Total Duration - ' + item);
             }
             else{
-                $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" + 
+                $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" +
                     "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
                     "</td>").appendTo('#playlist_table');
             }
@@ -120,13 +120,13 @@ $(document).ready(function() {
         $('#ServerPlaylistTable tr:gt(0)').remove();
         $('#playlistSelection').find('option').not(':first').remove();
          $.each(msg, function(index, item) {
-            $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td>" + 
+            $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td>" +
                     "<td><button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button></td>" +
                     "<td><button id='remove' class='btn btn-sm btn-danger'><span class='glyphicon glyphicon-remove'></span></button></td>").appendTo('#ServerPlaylistTable');
 
             $('#playlistSelection').append($('<option>', {
                 value: index,
-                text: index 
+                text: index
             }));
         });
     });
@@ -142,12 +142,12 @@ $(document).ready(function() {
         socket.emit('button', {data: 'skip', 'ip': ip});
         return false;
     });
-    
+
     $('button#shuffle').click(function(event) {
         socket.emit('button', {data: 'shuffle', 'ip': ip});
         return false;
     });
-    
+
     $('button#pause').click(function(event) {
         socket.emit('button', {data: 'pause', 'ip': ip});
         return false;
@@ -163,8 +163,8 @@ $(document).ready(function() {
         $('#ClearAllDialog').modal('hide');
         return false;
     });
-    
-    
+
+
     $('#playlist_table').on('click', '#del', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();
@@ -189,7 +189,7 @@ $(document).ready(function() {
         if (userinput == null || userinput == ""){
             return false;
         }
-        else { 
+        else {
             socket.emit('removePlaylist', {index: index-1, "userinput" : userinput, title: val, 'ip': ip});
             return false;
         }
@@ -248,7 +248,7 @@ $(document).ready(function() {
                 $('#currentplaylist').text(item.name);
             }
             else{
-                $('<tr>').html("<td>" + index + "</td><td>" + genTime(item.dur) + "</td><td>"+ item.title + "</td><td>" + 
+                $('<tr>').html("<td>" + index + "</td><td>" + genTime(item.dur) + "</td><td>"+ item.title + "</td><td>" +
                     "<button id='delEdit' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
                     "</td>").appendTo('#PlaylistSongsTable');
             }
@@ -259,8 +259,8 @@ $(document).ready(function() {
         var index = $(this).closest('tr').index();
         var val = $('table#PlaylistSongsTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
         var playname = $('#currentplaylist').text();
-        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, "userinput" : userinput, 'ip': ip});
-        return false;            
+        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, 'ip': ip});
+        return false;
 
     });
 
@@ -272,8 +272,7 @@ function genTime(time){
     var s = Math.floor(time % 3600 % 60);
 
     var hours = h > 0 ? String(h) + ':' : '' ;
-    var minutes = m > 9 ? String(m) + ':' : "0" + String(m) + ':'; 
+    var minutes = m > 9 ? String(m) + ':' : "0" + String(m) + ':';
     var seconds = s > 9 ? "" + s: "0" + s ;
     return (hours + minutes + seconds) ;
 }
-
