@@ -1,6 +1,8 @@
 { 
 	"main" : {
-			"webPort" : 80  
+			"webPort" : 80,  
+			"songcacheDir" : "cache",
+			"loglength" : 30
 		},
 
 	"player" : {
@@ -8,6 +10,6 @@
 		},
 
 	"playlist" : {
-		
+
 		}
 }

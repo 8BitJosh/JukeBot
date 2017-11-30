@@ -1,22 +1,12 @@
-import os, shutil
-import youtube_dl
-import traceback
+import os
+import shutil
 import datetime
-import time
 
 import asyncio
 
 from random import shuffle
-from utils import do_format, PlaylistEntry, delete_file
-from downloader import Downloader
-
-class ExtractionError(Exception):
-    def __init__(self, message):
-        self._message = message
-
-    @property
-    def message(self):
-        return self._message
+from utils import PlaylistEntry, delete_file
+from process import Processor
 
 class Playlist:
     def __init__(self, _config, _socketio, loop):
@@ -27,16 +17,18 @@ class Playlist:
         self.songqueue = []
         self.currently_play = ''
 
-        self.savedir = "cache"
+        self.savedir = self.config['main']['songcacheDir']
         if os.path.exists(self.savedir):
             shutil.rmtree(self.savedir)
         os.makedirs(self.savedir)
 
-        self.downloader = Downloader(self.savedir)
+        self.processor = Processor(self.savedir, self.socketio, self.loop)
+
 
     async def shuff(self):
         shuffle(self.songqueue)
         await self.sendPlaylist()
+
 
     async def empty(self):
         if self.songqueue:
@@ -47,6 +39,7 @@ class Playlist:
             self.currently_play = ''
             await self.sendPlaylist()
             return True
+
 
     async def get_next(self):
         if not self.songqueue[0].downloaded:
@@ -59,6 +52,7 @@ class Playlist:
         del self.songqueue[0]
         await self.sendPlaylist()
         return song
+
 
     async def sendPlaylist(self):
         endmsg = {}
@@ -76,6 +70,20 @@ class Playlist:
             endmsg['dur'] = str(datetime.timedelta(seconds=int(totalDur)))
 
         await self.socketio.emit('sent_playlist', endmsg, namespace='/main')
+
+
+    async def getQueue(self):
+        queue = {}
+        x = 0
+        length = 0
+        for song in self.songqueue:
+            s = {'url': song.url, 'title': song.title, 'dur': song.duration}
+            length += song.duration
+            queue[x] = s
+            x += 1
+        queue['data'] = {'name': '', 'dur': length}
+        return queue
+
 
     async def remove(self, _index, _title):
         index = _index - 1
@@ -107,146 +115,17 @@ class Playlist:
         self.songqueue.clear()
         await self.sendPlaylist()
 
-    # called when user enters song to be processed
+
+    async def addPlaylist(self, songs, requester):
+        for song in songs:
+            if 'data' not in song:
+                await self.processor.checkPlaylistURL(self.songqueue, songs[song]['url'], requester)
+                    
+
     async def process(self, _title, _requester):
-        print('process called', flush=True)
-        song_url = _title.strip()
-
-####get info for song
-        try:
-            info = await self.downloader.extract_info(self.loop, song_url, download = False, process = False)
-        except Exception:
-            print('info extraction error', flush=True)
-            pass
-
-####if song is search term
-
-        if info.get('url', '').startswith('ytsearch'):
-            info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
-            if not info:
-                return
-            if not all(info.get('entries', [])):
-                return
-
-            song_url = info['entries'][0]['webpage_url']
-
-            info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
-
-            try:
-                entry = PlaylistEntry(
-                    song_url,
-                    info['title'],
-                    info['duration'],
-                    _requester
-                )
-                self.songqueue.append(entry)
-            except:
-                print('oh no url YT error again', flush=True)
-
-####if song is playlist
-        elif 'entries' in info:
-            try:
-                info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
-            except Exception as e:
-                print('Could not extract information from {}\n\n{}'.format(playlist_url, e), flush=True)
-                return
-
-            if not info:
-                print('Could not extract information from %s' % playlist_url, flush=True)
-                return
-
-            items = 0
-            baditems = 0
-            playlist_url = song_url
-    # youtube playlist
-            if info['extractor'].lower() == 'youtube:playlist':
-                try:
-                    for entry_data in info['entries']:
-                        items += 1
-                        if entry_data:
-                            baseurl = info['webpage_url'].split('playlist?list=')[0]
-                            song_url = baseurl + 'watch?v=%s' % entry_data['id']
-                            try:
-                                try:
-                                    playlist_info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
-                                except Exception as e:
-                                    raise ExtractionError('Could not extract information from {}\n\n{}'.format(song_url, e))
-
-                                entry = PlaylistEntry(
-                                    song_url,
-                                    playlist_info.get('title', 'Untitled'),
-                                    playlist_info.get('duration', 0) or 0,
-                                    _requester
-                                )
-                                print('added from playlist - ' + playlist_info['title'], flush=True)
-                                self.songqueue.append(entry)
-                                await self.sendPlaylist()
-                            except ExtractionError:
-                                baditems += 1
-                            except Exception as e:
-                                baditems += 1
-                                print('There was an error adding the song from playlist %s' %  entry_data['id'], flush=True)
-                                print(e)
-                        else:
-                            baditems += 1
-
-                except Exception:
-                    print('Error handling playlist %s queuing.' % playlist_url, flush=True)
-    # soundcloud and bandcamp
-            elif info['extractor'].lower() in ['soundcloud:set', 'soundcloud:user', 'bandcamp:album']:
-                try:
-                    for entry_data in info['entries']:
-                        items += 1
-                        if entry_data:
-                            song_url = entry_data['url']
-                            try:
-                                try:
-                                    playlist_info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
-                                except Exception as e:
-                                    raise ExtractionError('Could not extract information from {}\n\n{}'.format(song_url, e))
-
-                                entry = PlaylistEntry(
-                                    song_url,
-                                    playlist_info.get('title', 'Untitled'),
-                                    playlist_info.get('duration', 0) or 0,
-                                    _requester
-                                )
-                                print('added from playlist - ' + playlist_info['title'], flush=True)
-                                self.songqueue.append(entry)
-                                await self.sendPlaylist()
-                            except ExtractionError:
-                                baditems += 1
-                            except Exception as e:
-                                baditems += 1
-                                print('There was an error adding the song from playlist %s' %  entry_data['id'], flush=True)
-                                print(e)
-                        else:
-                            baditems += 1
-
-                except Exception:
-                    print('Error handling playlist %s queuing.' % playlist_url, flush=True)
-
-            if baditems:
-                print("Skipped %s bad entries" % baditems, flush=True)
-
-            print('Added {}/{} songs from playlist'.format(items - baditems, items), flush=True)
-
-####else if song is a url or other thing
-        else:
-            info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
-            try:
-                entry = PlaylistEntry(
-                    song_url,
-                    info['title'],
-                    info['duration'],
-                    _requester
-                )
-                self.songqueue.append(entry)
-            except:
-                print('Error with other option', flush=True)
-
-        print('user input processed - ' + _title, flush=True)
+        await self.processor.process(self.songqueue, _title, _requester)
         await self.sendPlaylist()
+    
 
     #download next non downloaded song
     async def download_next(self):
@@ -255,32 +134,8 @@ class Playlist:
                 if things.downloading == True:
                     break
                 things.downloading = True
-                things.dir = await self.download_song(things)
+                things.dir = await self.processor.download_song(things)
                 things.downloaded = True
                 break
 
-    #download song from url or search term and return the save path of the file
-    async def download_song(self, to_down):
-        song_url = to_down.url.strip()
-        print('Starting to download - ' + to_down.title, flush=True)
 
-        try:
-            title = do_format(to_down.title)
-            title = title + '-' + str(int(time.time()))
-            savepath = os.path.join(self.savedir, "%s" % (title))
-        except Exception as e:
-            print("Can't access song! %s\n" % traceback.format_exc(), flush=True)
-            return 'bad_path'
-
-        try:
-            os.stat(savepath)
-            return savepath
-        except OSError:
-            try:
-                result = await self.downloader.extract_info(self.loop, song_url, download=True, process=True)
-                os.rename(result['id'], savepath)
-                print('Downloaded - ' + to_down.title, flush=True)
-                return savepath
-            except Exception as e:
-                print ("Can't download audio! %s\n" % traceback.format_exc(), flush=True)
-                return 'bad_path'
