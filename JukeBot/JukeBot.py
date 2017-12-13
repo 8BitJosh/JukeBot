@@ -106,7 +106,7 @@ async def button_handler(sid, msg):
     global player
     command = msg['data']
 
-    if command == 'skip':
+    if command == 'skip' and config['playlist']['skippingEnable']:
         await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
         log(msg['ip'] + ' - Skipped song')
         await player.stop()

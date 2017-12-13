@@ -15,10 +15,12 @@ def do_format(message):
     endMsg = re.sub('[-\s]+', '-', endMsg)
     return endMsg
 
+
 async def logcsv(song):
     with open('SongLog.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([datetime.now().strftime("[%d/%m/%y %H:%M:%S]"), song.requester, song.title, timedelta(seconds=int(song.duration)), song.url]) 
+
 
 def delete_file(dir):
     if dir == 'bad_path' or dir == '':
@@ -65,7 +67,7 @@ def importConfig():
     if type(config['main']['songcacheDir']) != str:
         config['main']['songcacheDir'] = defaults.songcacheDir
         print('cache dir needs to be a string', flush=True)
-        ##todo check if it is a valid url
+        # todo check if it is a valid url
 
     if type(config['main']['loglength']) != int:
         config['main']['loglength'] = defaults.loglength
@@ -76,7 +78,13 @@ def importConfig():
     if (type(vol) != int) or (vol < 0) or (vol > 150):
         config['player']['defaultVol'] = defaults.defaultVol
         print('default needs to be an interger between 0-150', flush=True)
+
     # Playlist
+    if config['playlist']['skippingEnable']:
+        config['playlist']['skippingEnable'] = True
+    elif not config['playlist']['skippingEnable']:
+        config['playlist']['skippingEnable'] = False
+
     return config
 
 
@@ -86,7 +94,8 @@ class defaults:
     songcacheDir = "cache"
     loglength = 30
 
-    #player
+    # player
     defaultVol = 100
 
-    #playlist
+    # playlist
+    defaultSkipping = True
