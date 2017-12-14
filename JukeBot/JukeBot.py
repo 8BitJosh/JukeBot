@@ -167,23 +167,25 @@ async def aPlaylist(sid, msg):
 
 @socketio.on('savequeue', namespace='/main')
 async def savequeue(sid, msg):
-    global playlist
-    global playlistlist
-    await socketio.emit('response', {'data': 'Saving Current queue as playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
-    print(msg['ip'] + ' - Saved queue as - ' + str(msg['name']), flush=True)
+    if config.newPlaylists:
+        global playlist
+        global playlistlist
+        await socketio.emit('response', {'data': 'Saving Current queue as playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
+        print(msg['ip'] + ' - Saved queue as - ' + str(msg['name']), flush=True)
 
-    songs = await playlist.getQueue()
-    songs['data']['name'] = str(msg['name'])
-    await playlistlist.addqueue(songs)
+        songs = await playlist.getQueue()
+        songs['data']['name'] = str(msg['name'])
+        await playlistlist.addqueue(songs)
 
 
 @socketio.on('newempty', namespace='/main')
 async def newempty(sid, msg):
-    global playlistlist
-    await socketio.emit('response', {'data': 'Creating a new empty playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
-    print(msg['ip'] + ' - Created a new playlist named - ' + str(msg['name']) ,flush=True)
+    if config.newPlaylists:
+        global playlistlist
+        await socketio.emit('response', {'data': 'Creating a new empty playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
+        print(msg['ip'] + ' - Created a new playlist named - ' + str(msg['name']) ,flush=True)
 
-    await playlistlist.newPlaylist(msg['name'])
+        await playlistlist.newPlaylist(msg['name'])
 
 
 @socketio.on('getplaylist', namespace='/main')
@@ -196,30 +198,33 @@ async def sendaplaylist(sid, msg):
 
 @socketio.on('add_song', namespace='/main')
 async def addplaylistsong(sid, msg):
-    await playlistlist.addSong(msg['playlistname'], msg['data'])
-    print(msg['ip'] + ' - Added - ' + msg['data'] + ' - to - ' + msg['playlistname'], flush=True)
+    if config.enablePlaylistEditing:
+        await playlistlist.addSong(msg['playlistname'], msg['data'])
+        print(msg['ip'] + ' - Added - ' + msg['data'] + ' - to - ' + msg['playlistname'], flush=True)
 
-    songs = playlistlist.getsongs(msg['playlistname'])
-    await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
+        songs = playlistlist.getsongs(msg['playlistname'])
+        await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
 
 
 @socketio.on('removePlaySong', namespace='/main')
 async def removeplaylistsong(sid, msg):
-    await playlistlist.removeSong(msg['playlistname'], msg['index'], msg['title'])
-    print(msg['ip'] + ' - Removed ' + msg['title'] + ' from playlist - ' + msg['playlistname'], flush=True)
-    
-    songs = playlistlist.getsongs(msg['playlistname'])
-    await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
+    if config.enablePlaylistEditing:
+        await playlistlist.removeSong(msg['playlistname'], msg['index'], msg['title'])
+        print(msg['ip'] + ' - Removed ' + msg['title'] + ' from playlist - ' + msg['playlistname'], flush=True)
+        
+        songs = playlistlist.getsongs(msg['playlistname'])
+        await socketio.emit('selectedplaylist', songs, namespace='/main', room=sid)
 
 
 @socketio.on('removePlaylist', namespace='/main')
 async def removePlaylist(sid, msg):
-    if msg['title'].lower() == msg['userinput'].lower():
-        await playlistlist.removePlaylist(msg['title'])
-        print(msg['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
-        await socketio.emit('selectedplaylist', {'data': {'name': 'Playlist:', 'dur':0}}, namespace='/main', room=sid)
-    else:
-        await socketio.emit('response', {'data': 'Incorrect name, Unable to remove playlist'}, namespace='/main', room=sid)
+    if config.enablePlaylistDeletion:
+        if msg['title'].lower() == msg['userinput'].lower():
+            await playlistlist.removePlaylist(msg['title'])
+            print(msg['ip'] + ' - Removed playlist from server - ' + msg['title'], flush=True)
+            await socketio.emit('selectedplaylist', {'data': {'name': 'Playlist:', 'dur':0}}, namespace='/main', room=sid)
+        else:
+            await socketio.emit('response', {'data': 'Incorrect name, Unable to remove playlist'}, namespace='/main', room=sid)
 
 
 # Thread constantly looping to playsong / process the current command

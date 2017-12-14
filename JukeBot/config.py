@@ -14,8 +14,17 @@ class Config:
 
         # playlist
         self.skippingEnable = True
+        self.voteSkipEnable = False     #
+        self.voteSkipNum = 2            #
+
         self.songDeletionEnable = True
-        self.shuffleEnable = True
+        self.shuffleEnable = True       
+        self.shuffleLimit = 0           #
+
+        # stored Playlists
+        self.newPlaylists = True            #
+        self.enablePlaylistDeletion = True  #
+        self.enablePlaylistEditing = True   #
 
         self.importConfig()
 
@@ -38,9 +47,11 @@ class Config:
             print('cache Dir needs to be a valid directory', flush=True)
             print("Setting cache Directory to a default of \"{}\"".format(self.songcacheDir))            
 
-        if type(config['loglength']) != int:
-            config['loglength'] = defaults.loglength
+        if type(config['logLength']) is int:
+            self.logLength = config['logLength']
+        else:
             print('The length of the web log needs to be an interger', flush=True)
+            print('Setting the log length to a default of {}'.format(self.logLength))
 
         # Player
         vol = config['defaultVol']
@@ -56,6 +67,10 @@ class Config:
         elif not config['skippingEnable']:
             self.skippingEnable = False
 
+        # need to do checking on this data to check user input
+        self.skippingEnable = config['skippingEnable']
+        self.voteSkipNum = config['voteSkipNum']
+
         if config['songDeletionEnable']:
             self.songDeletionEnable = True
         elif not config['songDeletionEnable']:
@@ -65,6 +80,13 @@ class Config:
             self.shuffleEnable = True
         elif not config['shuffleEnable']:
             self.shuffleEnable = False
+
+        # need to do checks on this data to check user input
+        self.shuffleLimit = config['shuffleLimit']
+
+        self.newPlaylists = config['newPlaylists']
+        self.enablePlaylistDeletion = config['enablePlaylistDeletion']
+        self.enablePlaylistEditing = config['enablePlaylistEditing']
 
 
     def exportConfig(self):
@@ -76,7 +98,7 @@ class defaults:
     # Main 
     webPort = 80 
     songcacheDir = "cache" 
-    loglength = 30 
+    logLength = 30 
  
     # player 
     defaultVol = 100 
