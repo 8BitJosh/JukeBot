@@ -15,6 +15,7 @@ class Config:
         # playlist
         self.skippingEnable = True
         self.songDeletionEnable = True
+        self.shuffleEnable = True
 
         self.importConfig()
 
@@ -51,14 +52,19 @@ class Config:
 
         # Playlist
         if config['skippingEnable']:
-            config['skippingEnable'] = True
+            self.skippingEnable = True
         elif not config['skippingEnable']:
-            config['skippingEnable'] = False
+            self.skippingEnable = False
 
         if config['songDeletionEnable']:
-            config['songDeletionEnable'] = True
+            self.songDeletionEnable = True
         elif not config['songDeletionEnable']:
-            config['songDeletionEnable'] = False
+            self.songDeletionEnable = False
+
+        if config['shuffleEnable']:
+            self.shuffleEnable = True
+        elif not config['shuffleEnable']:
+            self.shuffleEnable = False
 
 
     def exportConfig(self):

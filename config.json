@@ -4,5 +4,6 @@
 	"loglength" : 30,
 	"defaultVol" : 100,
 	"skippingEnable" : true,
-	"songDeletionEnable" : true
+	"songDeletionEnable" : true,
+	"shuffleEnable" : true
 }

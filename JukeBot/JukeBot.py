@@ -111,7 +111,7 @@ async def button_handler(sid, msg):
         await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
         log(msg['ip'] + ' - Skipped song')
         await player.stop()
-    elif command == 'shuffle':
+    elif command == 'shuffle' and config.shuffleEnable:
         await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
         log(msg['ip'] + ' - Shuffled playlist')
         await playlist.shuff()
