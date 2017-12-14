@@ -1,14 +1,14 @@
 from player import Player
 from playlist import Playlist
 from playlistList import PlaylistList
-from config import importConfig
+from config import Config
 
 from aiohttp import web
 import socketio
 import asyncio
 
 
-config = importConfig()
+config = Config()
 logs = []
 
 socketio = socketio.AsyncServer()
@@ -25,7 +25,7 @@ playlistlist = PlaylistList(config, socketio, loop)
 def log(string):
     print(string, flush=True)
     logs.append(string)
-    if len(logs) > config['main']['loglength']:
+    if len(logs) > config.logLength:
         del logs[0]
 
 
@@ -107,7 +107,7 @@ async def button_handler(sid, msg):
     global player
     command = msg['data']
 
-    if command == 'skip' and config['playlist']['skippingEnable']:
+    if command == 'skip' and config.skippingEnable:
         await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
         log(msg['ip'] + ' - Skipped song')
         await player.stop()
@@ -115,7 +115,7 @@ async def button_handler(sid, msg):
         await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
         log(msg['ip'] + ' - Shuffled playlist')
         await playlist.shuff()
-    elif command == 'clear' and config['playlist']['songDeletionEnable']:
+    elif command == 'clear' and config.songDeletionEnable:
         await playlist.clearall()
         log(msg['ip'] + ' - Cleared all of playlist')
         await socketio.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
@@ -142,7 +142,7 @@ async def set_volume(sid, msg):
 
 @socketio.on('delete', namespace='/main')
 async def delete_song(sid, msg):
-    if config['playlist']['songDeletionEnable']:
+    if config.songDeletionEnable:
         global playlist
         title = msg['title']
         index = msg['data']
@@ -245,4 +245,4 @@ app.router.add_get('/playlists', playlists)
 app.router.add_get('/ip', iprequest)
 app.router.add_get('/log', logrequest)
 app.router.add_static('/static/', path=str('./JukeBot/static'), name='static')
-web.run_app(app, port=config['main']['webPort'])
+web.run_app(app, port=config.webPort)

@@ -17,7 +17,7 @@ class Playlist:
         self.songqueue = []
         self.currently_play = ''
 
-        self.savedir = self.config['main']['songcacheDir']
+        self.savedir = self.config.songcacheDir
         if os.path.exists(self.savedir):
             shutil.rmtree(self.savedir)
         os.makedirs(self.savedir)
@@ -44,7 +44,7 @@ class Playlist:
     async def get_next(self):
         if not self.songqueue[0].downloaded:
             asyncio.sleep(0.5)
-            return  PlaylistEntry('', 'title', 0)
+            return PlaylistEntry('', 'title', 0)
 
         self.currently_play = "[" + str(datetime.timedelta(seconds=int(self.songqueue[0].duration))) + "] " + self.songqueue[0].title
         song = self.songqueue[0]

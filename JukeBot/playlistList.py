@@ -11,7 +11,7 @@ class PlaylistList:
         self.config = _config
         self.socketio = _socketio
         self.loop = _loop
-        self.savedir = self.config['main']['songcacheDir']
+        self.savedir = self.config.songcacheDir
 
         if not os.path.isfile('savedPlaylists.json'):
             with open('savedPlaylists.json', 'w') as file:

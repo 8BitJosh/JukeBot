@@ -1,53 +1,80 @@
 import json
 
 
-def importConfig():
-    with open('config.json') as file:
-        config = json.load(file)
+class Config:
+    def __init__(self):
+        # Defaults for values
+        # main
+        self.webPort = 80
+        self.songcacheDir = "cache"
+        self.logLength = 30
 
-    # Main
-    if type(config['main']['webPort']) != int:
-        config['main']['webPort'] = defaults.webPort
-        print('webport value needs to be an interger', flush=True)
+        # player
+        self.defaultVol = 100
 
-    if type(config['main']['songcacheDir']) != str:
-        config['main']['songcacheDir'] = defaults.songcacheDir
-        print('cache dir needs to be a string', flush=True)
-        # todo check if it is a valid url
+        # playlist
+        self.skippingEnable = True
+        self.songDeletionEnable = True
 
-    if type(config['main']['loglength']) != int:
-        config['main']['loglength'] = defaults.loglength
-        print('The length of the web log needs to be an interger', flush=True)
-
-    # Player
-    vol = config['player']['defaultVol']
-    if (type(vol) != int) or (vol < 0) or (vol > 150):
-        config['player']['defaultVol'] = defaults.defaultVol
-        print('default needs to be an interger between 0-150', flush=True)
-
-    # Playlist
-    if config['playlist']['skippingEnable']:
-        config['playlist']['skippingEnable'] = True
-    elif not config['playlist']['skippingEnable']:
-        config['playlist']['skippingEnable'] = False
-
-    if config['playlist']['songDeletionEnable']:
-        config['playlist']['songDeletionEnable'] = True
-    elif not config['playlist']['songDeletionEnable']:
-        config['playlist']['songDeletionEnable'] = False
-
-    return config
+        self.importConfig()
 
 
-class defaults:
-    # Main
-    webPort = 80
-    songcacheDir = "cache"
-    loglength = 30
+    def importConfig(self):
+        with open('config.json') as file:
+            config = json.load(file)
 
-    # player
-    defaultVol = 100
+        # Main
+        if type(config['webPort']) is int:
+            self.webPort = config['webPort']
+        else:
+            print('Webport value needs to be an interger', flush=True)
+            print("Setting Webport to a default of {}".format(self.webPort))
 
-    # playlist
-    defaultSkipping = True
-    defaultsongDeletionEnable = True
+        # TODO check if the dir is a valid path
+        if type(config['songcacheDir']) is str:
+            self.songcacheDir = config['songcacheDir']
+        else:
+            print('cache Dir needs to be a valid directory', flush=True)
+            print("Setting cache Directory to a default of \"{}\"".format(self.songcacheDir))            
+
+        if type(config['loglength']) != int:
+            config['loglength'] = defaults.loglength
+            print('The length of the web log needs to be an interger', flush=True)
+
+        # Player
+        vol = config['defaultVol']
+        if (type(vol) is int) and (vol >= 0) and (vol <= 150):
+            self.defaultVol = config['defaultVol']
+        else:
+            print('Default volume needs to be an interger between 0-150', flush=True)
+            print('Setting the volume to a default of {}'.format(self.defaultVol))
+
+        # Playlist
+        if config['skippingEnable']:
+            config['skippingEnable'] = True
+        elif not config['skippingEnable']:
+            config['skippingEnable'] = False
+
+        if config['songDeletionEnable']:
+            config['songDeletionEnable'] = True
+        elif not config['songDeletionEnable']:
+            config['songDeletionEnable'] = False
+
+
+    def exportConfig(self):
+        with open('config.json', 'w') as file:
+            json.dump(self.__dict__, file, indent="\t")
+
+
+class defaults: 
+    # Main 
+    webPort = 80 
+    songcacheDir = "cache" 
+    loglength = 30 
+ 
+    # player 
+    defaultVol = 100 
+ 
+    # playlist 
+    defaultSkipping = True 
+    defaultsongDeletionEnable = True 
