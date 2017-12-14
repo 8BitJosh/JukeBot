@@ -30,7 +30,7 @@ class Player:
         time.sleep(0.01)
         await logcsv(_song)
         await self.sendDuration()
-        print("playing - " + self.path, flush=True)
+        print("playing - {}".format(self.path), flush=True)
 
 
 # has a new song started playing

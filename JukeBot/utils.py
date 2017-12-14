@@ -28,7 +28,7 @@ def delete_file(dir):
     for x in range(30):
         try:
             os.unlink(dir)
-            print("file deleted - " + dir, flush=True)
+            print("file deleted - {}".format(dir), flush=True)
             break
 
         except PermissionError as e:
@@ -37,7 +37,7 @@ def delete_file(dir):
 
         except Exception as e:
             traceback.print_exc()
-            print("Error trying to delete - " + dir, flush=True)
+            print("Error trying to delete - {}".format(dir), flush=True)
             break
     else:
         print("Could not delete file {}, giving up and moving on".format(dir), flush=True)

@@ -95,7 +95,7 @@ class PlaylistList:
         duration = 0
         for song in self.playlists[playlistName]:
             if song == str(index) and self.playlists[playlistName][song]['title'] == title:
-                print('Song removed from playlist - ' + playlistName + ' - at index - ' + str(index))
+                print('Song removed from playlist - {} - at index - {}'.format(playlistName, index), flush=True)
                 pass
             elif song == 'data':
                 temp['data'] = self.playlists[playlistName][song]
