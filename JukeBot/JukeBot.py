@@ -1,12 +1,12 @@
 from player import Player
 from playlist import Playlist
 from playlistList import PlaylistList
-from utils import importConfig
+from config import importConfig
 
 from aiohttp import web
 import socketio
 import asyncio
-import queue
+
 
 config = importConfig()
 logs = []
@@ -20,6 +20,7 @@ loop = asyncio.get_event_loop()
 playlist = Playlist(config, socketio, loop)
 player = Player(config, socketio, loop)
 playlistlist = PlaylistList(config, socketio, loop)
+
 
 def log(string):
     print(string, flush=True)
@@ -49,7 +50,7 @@ async def logrequest(request):
     if peername is not None:
         host, port = peername
     print("Person loaded the logs - " + str(host), flush=True)
-    
+
     loglist = 'Web user logs - \n'
     for entry in logs:
         loglist = loglist + '\n' + entry
@@ -67,7 +68,7 @@ async def connect(sid, ip):
 async def resendAll(sid):
     await sendAll()
 
-    
+
 async def sendAll():
     global playlist
     global player
@@ -114,7 +115,7 @@ async def button_handler(sid, msg):
         await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
         log(msg['ip'] + ' - Shuffled playlist')
         await playlist.shuff()
-    elif command == 'clear':
+    elif command == 'clear' and config['playlist']['songDeletionEnable']:
         await playlist.clearall()
         log(msg['ip'] + ' - Cleared all of playlist')
         await socketio.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
@@ -141,15 +142,16 @@ async def set_volume(sid, msg):
 
 @socketio.on('delete', namespace='/main')
 async def delete_song(sid, msg):
-    global playlist
-    title = msg['title']
-    index = msg['data']
-    log(msg['ip'] + ' - Removed index ' + str(index) + ' title = ' + title)
+    if config['playlist']['songDeletionEnable']:
+        global playlist
+        title = msg['title']
+        index = msg['data']
+        log(msg['ip'] + ' - Removed index ' + str(index) + ' title = ' + title)
 
-    await playlist.remove(index, title)
+        await playlist.remove(index, title)
 
-    s = 'Removed song from playlist - ' + title
-    await socketio.emit('response', {'data': s}, namespace='/main', room=sid)
+        s = 'Removed song from playlist - ' + title
+        await socketio.emit('response', {'data': s}, namespace='/main', room=sid)
 
 
 @socketio.on('addPlaylist', namespace='/main')
@@ -169,7 +171,7 @@ async def savequeue(sid, msg):
     global playlistlist
     await socketio.emit('response', {'data': 'Saving Current queue as playlist named - ' + str(msg['name'])}, namespace='/main', room=sid)
     print(msg['ip'] + ' - Saved queue as - ' + str(msg['name']), flush=True)
-    
+
     songs = await playlist.getQueue()
     songs['data']['name'] = str(msg['name'])
     await playlistlist.addqueue(songs)

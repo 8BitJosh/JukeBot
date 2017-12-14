@@ -10,6 +10,7 @@
 		},
 
 	"playlist" : {
-			"skippingEnable" : 1
+			"skippingEnable" : true,
+			"songDeletionEnable" : true
 		}
 }
