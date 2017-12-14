@@ -7,9 +7,9 @@ from aiohttp import web
 import socketio
 import asyncio
 
-
-config = Config()
 logs = []
+shuffles = {}
+skips = []
 
 socketio = socketio.AsyncServer()
 app = web.Application()
@@ -17,6 +17,7 @@ socketio.attach(app)
 
 loop = asyncio.get_event_loop()
 
+config = Config()
 playlist = Playlist(config, socketio, loop)
 player = Player(config, socketio, loop)
 playlistlist = PlaylistList(config, socketio, loop)
@@ -105,20 +106,45 @@ async def song_received(sid, message):
 async def button_handler(sid, msg):
     global playlist
     global player
+    global skips
+    global shuffles
     command = msg['data']
 
     if command == 'skip' and config.skippingEnable:
-        await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
-        log(msg['ip'] + ' - Skipped song')
-        await player.stop()
+        if config.voteSkipNum is 0:
+            await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
+            log(msg['ip'] + ' - Skipped song')
+            await player.stop()
+        else:
+            if msg['ip'] not in skips:
+                skips.append(msg['ip'])
+                print("{} - Voted to skip the song".format(msg['ip']), flush=True)
+            if len(skips) >= config.voteSkipNum:
+                await socketio.emit('response', {'data': 'Song Skipped'}, namespace='/main', room=sid)
+                log('Song was vote Skipped by {} people'.format(len(skips)))
+                await player.stop()
+
     elif command == 'shuffle' and config.shuffleEnable:
-        await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
-        log(msg['ip'] + ' - Shuffled playlist')
-        await playlist.shuff()
+        if config.shuffleLimit is 0:
+            await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
+            log(msg['ip'] + ' - Shuffled playlist')
+            await playlist.shuff()
+        else:
+            if msg['ip'] in shuffles:
+                shuffles[msg['ip']] = shuffles[msg['ip']] + 1
+            else:
+                shuffles[msg['ip']] = 1
+            
+            if shuffles[msg['ip']] <= config.shuffleLimit:
+                await socketio.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
+                log(msg['ip'] + ' - Shuffled playlist')
+                await playlist.shuff()
+    
     elif command == 'clear' and config.songDeletionEnable:
         await playlist.clearall()
         log(msg['ip'] + ' - Cleared all of playlist')
         await socketio.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
+    
     elif command == 'pause':
         if player.isPaused():
             log(msg['ip'] + ' - Resumed the song')
@@ -231,11 +257,15 @@ async def removePlaylist(sid, msg):
 async def player_update():
     global playlist
     global player
+    global skips
+    global shuffles
 
     while True:
         p = loop.create_task(playlist.download_next())
 
         if not player.running() and not player.isPaused():
+            skips = []
+            shuffles = {}
             if not (await playlist.empty()):
                 song = await playlist.get_next()
                 if song.dir != '':

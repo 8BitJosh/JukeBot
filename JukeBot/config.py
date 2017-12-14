@@ -14,8 +14,7 @@ class Config:
 
         # playlist
         self.skippingEnable = True
-        self.voteSkipEnable = False     #
-        self.voteSkipNum = 2            #
+        self.voteSkipNum = 0            #
 
         self.songDeletionEnable = True
         self.shuffleEnable = True       
@@ -68,7 +67,6 @@ class Config:
             self.skippingEnable = False
 
         # need to do checking on this data to check user input
-        self.skippingEnable = config['skippingEnable']
         self.voteSkipNum = config['voteSkipNum']
 
         if config['songDeletionEnable']:
