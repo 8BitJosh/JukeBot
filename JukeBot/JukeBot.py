@@ -1,6 +1,7 @@
 from player import Player
 from playlist import Playlist
 from playlistList import PlaylistList
+from process import Processor
 from config import Config
 from mainNamespace import mainNamespace
 
@@ -17,9 +18,12 @@ socketio.attach(app)
 loop = asyncio.get_event_loop()
 
 config = Config()
-playlist = Playlist(config, socketio, loop)
+
+processor = Processor(config.songcacheDir, socketio, loop)
+
+playlist = Playlist(config, socketio, loop, processor)
+playlistlist = PlaylistList(config, socketio, loop, processor)
 player = Player(config, socketio, loop)
-playlistlist = PlaylistList(config, socketio, loop)
 
 main = mainNamespace(_playlist=playlist, _player=player, _playlistlist=playlistlist,
     _config=config, _loop=loop, _logs=logs, _namespace='/main')

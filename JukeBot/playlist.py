@@ -6,13 +6,13 @@ import asyncio
 
 from random import shuffle
 from utils import PlaylistEntry, delete_file
-from process import Processor
 
 class Playlist:
-    def __init__(self, _config, _socketio, loop):
+    def __init__(self, _config, _socketio, loop, _processor):
         self.config = _config
         self.socketio = _socketio
         self.loop = loop
+        self.processor = _processor
 
         self.songqueue = []
         self.currently_play = ''
@@ -22,7 +22,6 @@ class Playlist:
             shutil.rmtree(self.savedir)
         os.makedirs(self.savedir)
 
-        self.processor = Processor(self.savedir, self.socketio, self.loop)
 
 
     async def shuff(self):
