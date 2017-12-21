@@ -29,6 +29,26 @@ $(document).ready(function() {
         }
     }, 5000);
 
+    var config;
+    
+// disable buttons depending on server config
+    socket.on('featureDisable', function(msg) {
+        config = msg;
+        $('#skip').prop('disabled', !msg.skip);      // skip button
+
+        $('#clearAll').prop('disabled', !msg.delete);  // clear current playlist
+        $('.del').prop('disabled', !msg.delete);
+
+        $('#shuffle').prop('disabled', !msg.shuffle);   // shuffle playlist
+
+        $('.newPlaylist').prop('disabled', !msg.newplaylists); // playlist creation
+
+        $('.remove').prop('disabled', !msg.playlistdeletion);    // remove playlist from server
+
+        $('.delEdit').prop('disabled', !msg.playlistediting);   // remove song from server playlist
+        $('#addSongToPlaylist').prop('disabled', !msg.playlistediting); // add song to server playlist
+    });
+
 // Refresh after wake from sleep
     // var lastCheck = new Date().getTime();
 
@@ -109,9 +129,10 @@ $(document).ready(function() {
             }
             else{
                 $('<tr>').html("<td>" + index + "</td><td>" + item + "</td><td>" +
-                    "<button id='del' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
+                    "<button id='del' class='btn btn-sm btn-success del'><span class='glyphicon glyphicon-remove'></span></button>" +
                     "</td>").appendTo('#playlist_table');
             }
+            $('.del').prop('disabled', !config.delete);
         });
     });
 
@@ -122,12 +143,14 @@ $(document).ready(function() {
          $.each(msg, function(index, item) {
             $('<tr>').html("<td>[" + genTime(item.dur) + "]</td><td>" + index + "</td>" +
                     "<td><button id='add' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-plus'></span></button></td>" +
-                    "<td><button id='remove' class='btn btn-sm btn-danger'><span class='glyphicon glyphicon-remove'></span></button></td>").appendTo('#ServerPlaylistTable');
+                    "<td><button id='remove' class='btn btn-sm btn-danger remove'><span class='glyphicon glyphicon-remove'></span></button></td>").appendTo('#ServerPlaylistTable');
 
             $('#playlistSelection').append($('<option>', {
                 value: index,
                 text: index
             }));
+
+            $('.remove').prop('disabled', !config.playlistdeletion);
         });
     });
 
@@ -249,9 +272,10 @@ $(document).ready(function() {
             }
             else{
                 $('<tr>').html("<td>" + index + "</td><td>" + genTime(item.dur) + "</td><td>"+ item.title + "</td><td>" +
-                    "<button id='delEdit' class='btn btn-sm btn-success'><span class='glyphicon glyphicon-remove'></span></button>" +
+                    "<button id='delEdit' class='btn btn-sm btn-success delEdit'><span class='glyphicon glyphicon-remove'></span></button>" +
                     "</td>").appendTo('#PlaylistSongsTable');
             }
+            $('.delEdit').prop('disabled', !config.playlistediting);
         });
     });
 

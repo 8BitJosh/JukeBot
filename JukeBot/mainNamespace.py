@@ -38,6 +38,12 @@ class mainNamespace(socketio.AsyncNamespace):
 
 
     async def resendAll(self):
+        await self.emit('featureDisable', { 'skip': self.config.skippingEnable, 
+                                            'delete': self.config.songDeletionEnable,
+                                            'shuffle': self.config.shuffleEnable,
+                                            'newplaylists': self.config.newPlaylists,
+                                            'playlistdeletion': self.config.enablePlaylistDeletion,
+                                            'playlistediting': self.config.enablePlaylistEditing })
         await self.playlist.sendPlaylist()
         await self.player.sendDuration()
         await self.emit('volume_set', {'vol': self.player.getVolume()})

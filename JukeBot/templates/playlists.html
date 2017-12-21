@@ -76,7 +76,7 @@
                 </div>
             </div>
     
-            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#ClearAllDialog">Clear Playlist
+            <button type="button" id="clearAll" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#ClearAllDialog">Clear Playlist
             </button>
     
             <h4>Playlist:</h4>
@@ -98,8 +98,8 @@
 <!--Playlist Creator-->
         <div class="tab-pane" id="3">
             <br>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newPlaylistDialog">Create Empty Playlist</button>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#SaveQueueDialog">Save Queue To Playlist</button>
+            <button type="button" class="btn btn-success newPlaylist" data-toggle="modal" data-target="#newPlaylistDialog">Create Empty Playlist</button>
+            <button type="button" class="btn btn-success newPlaylist" data-toggle="modal" data-target="#SaveQueueDialog">Save Queue To Playlist</button>
 
             <h4>Modify Existing Playlist:</h4>
 
@@ -114,7 +114,7 @@
                         <input type="text" class="form-control" id="newSongName" placeholder="Song To Add?">
                     </div>
                     <br>
-                    <input type="submit" class="btn btn-success" value="Add Song">
+                    <input type="submit" id="addSongToPlaylist" class="btn btn-success" value="Add Song">
                 </div>
             </form>
    
