@@ -3,22 +3,18 @@ import asyncio
 import json
 import os
 
-from process import Processor
-
 
 class PlaylistList:
-    def __init__(self, _config, _socketio, _loop):
+    def __init__(self, _config, _socketio, _loop, _processor):
         self.config = _config
         self.socketio = _socketio
         self.loop = _loop
-        self.savedir = self.config['main']['songcacheDir']
+        self.processor = _processor
 
         if not os.path.isfile('savedPlaylists.json'):
             with open('savedPlaylists.json', 'w') as file:
                 json.dump({}, file)
         self.loadFile()
-
-        self.processor = Processor(self.savedir, self.socketio, self.loop)
 
 
     def loadFile(self):
@@ -95,7 +91,7 @@ class PlaylistList:
         duration = 0
         for song in self.playlists[playlistName]:
             if song == str(index) and self.playlists[playlistName][song]['title'] == title:
-                print('Song removed from playlist - ' + playlistName + ' - at index - ' + str(index))
+                print('Song removed from playlist - {} - at index - {}'.format(playlistName, index), flush=True)
                 pass
             elif song == 'data':
                 temp['data'] = self.playlists[playlistName][song]

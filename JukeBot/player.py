@@ -17,7 +17,7 @@ class Player:
         self.instance = vlc.Instance("--no-video --aout=alsa")
         # Create a MediaPlayer with the default instance
         self.player = self.instance.media_player_new()
-        self.setVolume(self.config['player']['defaultVol'])
+        self.setVolume(self.config.defaultVol)
 
 # start playing song at path
     async def play(self, _song):
@@ -30,7 +30,7 @@ class Player:
         time.sleep(0.01)
         await logcsv(_song)
         await self.sendDuration()
-        print("playing - " + self.path, flush=True)
+        print("playing - {}".format(self.path), flush=True)
 
 
 # has a new song started playing

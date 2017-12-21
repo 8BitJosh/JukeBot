@@ -1,15 +1,14 @@
-{ 
-	"main" : {
-			"webPort" : 80,  
-			"songcacheDir" : "cache",
-			"loglength" : 30
-		},
-
-	"player" : {
-			"defaultVol" : 100
-		},
-
-	"playlist" : {
-
-		}
+{
+	"webPort": 80,
+	"songcacheDir": "cache",
+	"logLength": 30,
+	"defaultVol": 100,
+	"skippingEnable": true,
+	"voteSkipNum": 0,
+	"songDeletionEnable": true,
+	"shuffleEnable": true,
+	"shuffleLimit": 0,
+	"newPlaylists": true,
+	"enablePlaylistDeletion": true,
+	"enablePlaylistEditing": true
 }

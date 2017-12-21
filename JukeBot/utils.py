@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import traceback
 import os
 import csv
-import json
 
 
 # reformat the titles so the titles are suitable for windows file names
@@ -15,10 +14,12 @@ def do_format(message):
     endMsg = re.sub('[-\s]+', '-', endMsg)
     return endMsg
 
+
 async def logcsv(song):
     with open('SongLog.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([datetime.now().strftime("[%d/%m/%y %H:%M:%S]"), song.requester, song.title, timedelta(seconds=int(song.duration)), song.url]) 
+
 
 def delete_file(dir):
     if dir == 'bad_path' or dir == '':
@@ -27,7 +28,7 @@ def delete_file(dir):
     for x in range(30):
         try:
             os.unlink(dir)
-            print("file deleted - " + dir, flush=True)
+            print("file deleted - {}".format(dir), flush=True)
             break
 
         except PermissionError as e:
@@ -36,7 +37,7 @@ def delete_file(dir):
 
         except Exception as e:
             traceback.print_exc()
-            print("Error trying to delete - " + dir, flush=True)
+            print("Error trying to delete - {}".format(dir), flush=True)
             break
     else:
         print("Could not delete file {}, giving up and moving on".format(dir), flush=True)
@@ -51,42 +52,3 @@ class PlaylistEntry:
         self.downloaded = False
         self.downloading = False
         self.dir = ''
-
-
-def importConfig():
-    with open('config.json') as file:
-        config = json.load(file)
-
-    # Main
-    if type(config['main']['webPort']) != int:
-        config['main']['webPort'] = defaults.webPort
-        print('webport value needs to be an interger', flush=True)
-
-    if type(config['main']['songcacheDir']) != str:
-        config['main']['songcacheDir'] = defaults.songcacheDir
-        print('cache dir needs to be a string', flush=True)
-        ##todo check if it is a valid url
-
-    if type(config['main']['loglength']) != int:
-        config['main']['loglength'] = defaults.loglength
-        print('The length of the web log needs to be an interger', flush=True)
-
-    # Player
-    vol = config['player']['defaultVol']
-    if (type(vol) != int) or (vol < 0) or (vol > 150):
-        config['player']['defaultVol'] = defaults.defaultVol
-        print('default needs to be an interger between 0-150', flush=True)
-    # Playlist
-    return config
-
-
-class defaults:
-    # Main
-    webPort = 80
-    songcacheDir = "cache"
-    loglength = 30
-
-    #player
-    defaultVol = 100
-
-    #playlist
