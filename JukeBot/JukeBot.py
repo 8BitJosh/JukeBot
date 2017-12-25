@@ -5,15 +5,20 @@ from process import Processor
 from config import Config
 from mainNamespace import mainNamespace
 
-from aiohttp import web
 import socketio
 import asyncio
 
+from sanic import Sanic, response
+from sanic_session import InMemorySessionInterface
+
 logs = []
 
-socketio = socketio.AsyncServer()
-app = web.Application()
+socketio = socketio.AsyncServer(async_mode='sanic', logger=False)
+app = Sanic(__name__, log_config=None, configure_logging=False)
+
 socketio.attach(app)
+
+session_interface = InMemorySessionInterface(expiry=43200)
 
 loop = asyncio.get_event_loop()
 
@@ -30,22 +35,36 @@ main = mainNamespace(_playlist=playlist, _player=player, _playlistlist=playlistl
 socketio.register_namespace(main)
 
 
+@app.middleware('request')
+async def add_session_to_request(request):
+    await session_interface.open(request)
+
+
+@app.middleware('response')
+async def save_session(request, response):
+    await session_interface.save(request, response)
+
+
+@app.route('/')
 async def index(request):
-    return web.FileResponse('./JukeBot/templates/index.html')
+    return await response.file('./JukeBot/templates/index.html')
 
 
+@app.route('/playlists')
 async def playlists(request):
-    return web.FileResponse('./JukeBot/templates/playlists.html')
+    return await response.file('./JukeBot/templates/playlists.html')
 
 
+@app.route('/ip')
 async def iprequest(request):
     peername = request.transport.get_extra_info('peername')
     if peername is not None:
         host, port = peername
     print("Client loaded page - {}".format(host), flush=True)
-    return web.Response(text=str(host))
+    return response.text(str(host))
 
 
+@app.route('/log')
 async def logrequest(request):
     peername = request.transport.get_extra_info('peername')
     if peername is not None:
@@ -56,7 +75,7 @@ async def logrequest(request):
     for entry in logs:
         loglist = loglist + '\n' + entry
 
-    return web.Response(text=loglist)
+    return response.text(loglist)
 
 
 async def player_update():
@@ -78,10 +97,5 @@ async def player_update():
 
 loop.create_task(player_update())
 
-app.router.add_get('/', index)
-app.router.add_get('/playlists', playlists)
-app.router.add_get('/ip', iprequest)
-app.router.add_get('/log', logrequest)
-app.router.add_static('/static/', path=str('./JukeBot/static'), name='static')
-
-web.run_app(app, port=config.webPort)
+app.static('/static', './JukeBot/static')
+app.run(host='0.0.0.0', port=config.webPort, access_log=False)
