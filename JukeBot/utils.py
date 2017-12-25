@@ -47,7 +47,10 @@ class PlaylistEntry:
     def __init__(self, url, title, duration=0, requester=''):
         self.url = url
         self.title = title
-        self.duration = duration
+        if type(duration) is int or type(duration) is float:
+            self.duration = duration
+        else:
+            self.duration = 0            
         self.requester = requester
         self.downloaded = False
         self.downloading = False
