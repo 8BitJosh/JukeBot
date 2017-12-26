@@ -47,7 +47,11 @@ class Processor:
             if not all(info.get('entries', [])):
                 return
 
-            song_url = info['entries'][0]['webpage_url']
+            try:
+                song_url = info['entries'][0]['webpage_url']
+            except:
+                print('Error - No search results for query - {}'.format(song_url), flush=True)
+                return
 
             info = await self.downloader.extract_info(self.loop, song_url, download=False, process=False)
 
