@@ -1,25 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title id="page_title">JukeBot - Admin</title>
+	<title id="page_title">JukeBot - Admin</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <meta charset="utf-8" name="viewport" content = "width=device-width, initial-scale=1.0">
+	<meta charset="utf-8" name="viewport" content = "width=device-width, initial-scale=1.0">
 
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-    <script type="text/javascript" src="/static/admin.js"></script>
-    
-    <link rel="icon" href="/static/icon.png">
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+	<script type="text/javascript" src="/static/admin.js"></script>
+
+	<link rel="icon" href="/static/icon.png">
 </head>
 
 <body>
+	<div class="container">
 
-<h4>Admin page</h4>
+		<h2>Admin page</h2>
 
+		<!--Nav tabs-->
+		<ul class="nav nav-tabs">
+			<li class="active">
+				<a  href="#1" data-toggle="tab">Settings</a>
+			</li>
+			<li>
+				<a href="#2" data-toggle="tab">Log</a>
+			</li>
+		</ul>
+
+		<!--Now Playing-->
+		<div class="tab-content ">
+			<div class="tab-pane active" id="1">
+				<br>
+				<form id='settings'>
+					<div class="form-group ">
+						<label class="control-label ">
+							Enable Song Skipping
+						</label>
+						<div class=" ">
+							<div class="radio">
+								<label class="radio">
+									<input name="skippingEnable" type="radio" value="true"/>
+									Enable
+								</label>
+							</div>
+							<div class="radio">
+								<label class="radio">
+									<input name="skippingEnable" type="radio" value="false"/>
+									Disable
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group ">
+						<label class="control-label " for="voteSkipNum">
+							Vote Skip Number
+						</label>
+						<input class="form-control" id="voteSkipNum" name="voteSkipNum" type="number"/>
+					</div>
+					<div class="form-group ">
+						<label class="control-label ">
+							Song Deletion Enable
+						</label>
+						<div class=" ">
+							<div class="radio">
+								<label class="radio">
+									<input name="songDeletionEnable" type="radio" value="true"/>
+									Enable
+								</label>
+							</div>
+							<div class="radio">
+								<label class="radio">
+									<input name="songDeletionEnable" type="radio" value="false"/>
+									Disable
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group ">
+						<label class="control-label ">
+							Song Shuffle Enable
+						</label>
+						<div class=" ">
+							<div class="radio">
+								<label class="radio">
+									<input name="shuffleEnable" type="radio" value="true"/>
+									Enable
+								</label>
+							</div>
+							<div class="radio">
+								<label class="radio">
+									<input name="shuffleEnable" type="radio" value="false"/>
+									Disable
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group ">
+						<label class="control-label " for="shuffleLimit">
+							Shuffle Limit
+						</label>
+						<input class="form-control" id="shuffleLimit" name="shuffleLimit" type="number"/>
+					</div>
+					<div class="form-group ">
+						<label class="control-label ">
+							Allow Creation Of New Playlists
+						</label>
+						<div class=" ">
+							<div class="radio">
+								<label class="radio">
+									<input name="newPlaylists" type="radio" value="true"/>
+									Enable
+								</label>
+							</div>
+							<div class="radio">
+								<label class="radio">
+									<input name="newPlaylists" type="radio" value="false"/>
+									Disable
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group ">
+						<label class="control-label ">
+							Enable Deletion Of Server Playlists
+						</label>
+						<div class=" ">
+							<div class="radio">
+								<label class="radio">
+									<input name="enablePlaylistDeletion" type="radio" value="true"/>
+									Enable
+								</label>
+							</div>
+							<div class="radio">
+								<label class="radio">
+									<input name="enablePlaylistDeletion" type="radio" value="false"/>
+									Disable
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group ">
+						<label class="control-label ">
+							Enable Editing Of Server Playlists
+						</label>
+						<div class=" ">
+							<div class="radio">
+								<label class="radio">
+									<input name="enablePlaylistEditing" type="radio" value="true"/>
+									Enable
+								</label>
+							</div>
+							<div class="radio">
+								<label class="radio">
+									<input name="enablePlaylistEditing" type="radio" value="false"/>
+									Disable
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div>
+							<button class="btn btn-primary " id="submit" name="submit" type="button">
+								Update Configuration
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="tab-pane" id="2">
+				<h4>Log page</h4>
+			</div>
+		</div>
+
+	</div>
 </body>
 </html>
 

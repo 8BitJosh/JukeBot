@@ -4,11 +4,12 @@ from playlistList import PlaylistList
 from process import Processor
 from config import Config
 from mainNamespace import mainNamespace
+from adminNamespace import adminNamespace
 
 from aiohttp import web
 import socketio
 import asyncio
-import time, os, base64
+import time, os, base64, sys
 
 logs = []
 authUsers = {}
@@ -28,9 +29,11 @@ playlist = Playlist(config, socketio, loop, processor)
 playlistlist = PlaylistList(config, socketio, loop, processor)
 player = Player(config, socketio, loop)
 
-main = mainNamespace(_playlist=playlist, _player=player, _playlistlist=playlistlist,
-    _config=config, _loop=loop, _logs=logs, _namespace='/main')
+main = mainNamespace(playlist, player, playlistlist, config, loop, logs, '/main')
+admin = adminNamespace(config, authUsers, loop, logs, '/admin')
+
 socketio.register_namespace(main)
+socketio.register_namespace(admin)
 
 
 async def index(request):
@@ -97,6 +100,7 @@ async def login(request):
 
 async def post_login(request):
     global adminLogins
+
     data = await request.post()
 
     if data['login'] in adminLogins:
@@ -105,7 +109,7 @@ async def post_login(request):
     else:
         print('User just entered incorrect password for admin login', flush=True)
     return web.Response(text='reload')
-    
+
 
 async def player_update():
     global playlist
@@ -113,6 +117,7 @@ async def player_update():
     global main
 
     while True:
+        sys.stdout.flush()
         loop.create_task(playlist.download_next())
 
         if not player.running() and not player.isPaused():

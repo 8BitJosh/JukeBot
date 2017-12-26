@@ -1,5 +1,5 @@
 import json
-
+import pprint
 
 class Config:
     def __init__(self):
@@ -25,71 +25,100 @@ class Config:
         self.enablePlaylistDeletion = True  #
         self.enablePlaylistEditing = True   #
 
-        self.importConfig()
-
-
-    def importConfig(self):
         with open('config.json') as file:
             config = json.load(file)
+        self.updateConfig(config)
 
+
+    def updateConfig(self, config):
         # Main
-        if type(config['webPort']) is int:
-            self.webPort = config['webPort']
-        else:
-            print('Webport value needs to be an interger', flush=True)
-            print("Setting Webport to a default of {}".format(self.webPort))
+        if 'webPort' in config:
+            if type(config['webPort']) is int:
+                self.webPort = config['webPort']
+            else:
+                print('Webport value needs to be an interger', flush=True)
+                print("Setting Webport to a default of {}".format(self.webPort))
+
 
         # TODO check if the dir is a valid path
-        if type(config['songcacheDir']) is str:
-            self.songcacheDir = config['songcacheDir']
-        else:
-            print('cache Dir needs to be a valid directory', flush=True)
-            print("Setting cache Directory to a default of \"{}\"".format(self.songcacheDir))            
+        if 'songcacheDir' in config:
+            if type(config['songcacheDir']) is str:
+                self.songcacheDir = config['songcacheDir']
+            else:
+                print('cache Dir needs to be a valid directory', flush=True)
+                print("Setting cache Directory to a default of \"{}\"".format(self.songcacheDir))            
 
-        if type(config['logLength']) is int:
-            self.logLength = config['logLength']
-        else:
-            print('The length of the web log needs to be an interger', flush=True)
-            print('Setting the log length to a default of {}'.format(self.logLength))
+        if 'logLength' in config:
+            if type(config['logLength']) is int:
+                self.logLength = config['logLength']
+            else:
+                print('The length of the web log needs to be an interger', flush=True)
+                print('Setting the log length to a default of {}'.format(self.logLength))
 
-        # Player
-        vol = config['defaultVol']
-        if (type(vol) is int) and (vol >= 0) and (vol <= 150):
-            self.defaultVol = config['defaultVol']
-        else:
-            print('Default volume needs to be an interger between 0-150', flush=True)
-            print('Setting the volume to a default of {}'.format(self.defaultVol))
+            # Player
+        if 'defaultVol' in config:
+            vol = config['defaultVol']
+            if (type(vol) is int) and (vol >= 0) and (vol <= 150):
+                self.defaultVol = config['defaultVol']
+            else:
+                print('Default volume needs to be an interger between 0-150', flush=True)
+                print('Setting the volume to a default of {}'.format(self.defaultVol))
 
-        # Playlist
-        if config['skippingEnable']:
-            self.skippingEnable = True
-        elif not config['skippingEnable']:
-            self.skippingEnable = False
+            # Playlist
+        if 'skippingEnable' in config:
+            if config['skippingEnable']:
+                self.skippingEnable = True
+            elif not config['skippingEnable']:
+                self.skippingEnable = False
 
-        # need to do checking on this data to check user input
-        self.voteSkipNum = config['voteSkipNum']
+            # need to do checking on this data to check user input
+        if 'voteSkipNum' in config:
+            self.voteSkipNum = config['voteSkipNum']
 
-        if config['songDeletionEnable']:
-            self.songDeletionEnable = True
-        elif not config['songDeletionEnable']:
-            self.songDeletionEnable = False
+        if 'songDeletionEnable' in config:
+            if config['songDeletionEnable']:
+                self.songDeletionEnable = True
+            elif not config['songDeletionEnable']:
+                self.songDeletionEnable = False
 
-        if config['shuffleEnable']:
-            self.shuffleEnable = True
-        elif not config['shuffleEnable']:
-            self.shuffleEnable = False
+        if 'shuffleEnable' in config:
+            if config['shuffleEnable']:
+                self.shuffleEnable = True
+            elif not config['shuffleEnable']:
+                self.shuffleEnable = False
 
-        # need to do checks on this data to check user input
-        self.shuffleLimit = config['shuffleLimit']
+            # need to do checks on this data to check user input
+        if 'shuffleLimit' in config:
+            self.shuffleLimit = config['shuffleLimit']
 
-        self.newPlaylists = config['newPlaylists']
-        self.enablePlaylistDeletion = config['enablePlaylistDeletion']
-        self.enablePlaylistEditing = config['enablePlaylistEditing']
+        if 'newPlaylists' in config:
+            self.newPlaylists = config['newPlaylists']
+            
+        if 'enablePlaylistDeletion' in config:
+            self.enablePlaylistDeletion = config['enablePlaylistDeletion']
+            
+        if 'enablePlaylistEditing' in config:
+            self.enablePlaylistEditing = config['enablePlaylistEditing']
+
+        self.exportConfig()
+      
+        pp = pprint.PrettyPrinter()
+        print('Current Configuration-')
+        pp.pprint(self.__dict__)
 
 
     def exportConfig(self):
         with open('config.json', 'w') as file:
             json.dump(self.__dict__, file, indent="\t")
+
+
+    def getConfig(self):
+        values = dict(self.__dict__)
+        del values['webPort']
+        del values['songcacheDir']
+        del values['logLength']
+        del values['defaultVol']
+        return values
 
 
 class defaults: 
