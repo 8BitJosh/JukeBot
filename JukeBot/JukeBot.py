@@ -64,20 +64,7 @@ async def iprequest(request):
     return response
 
 
-async def logrequest(request):
-    peername = request.transport.get_extra_info('peername')
-    if peername is not None:
-        host, port = peername
-    print("Person loaded the logs - {}".format(host), flush=True)
-
-    loglist = 'Web user logs - \n'
-    for entry in logs:
-        loglist = loglist + '\n' + entry
-
-    return web.Response(text=loglist)
-
-
-async def admin(request):
+async def adminpage(request):
     global authUsers
 
     if 'session' in request.cookies:
@@ -115,9 +102,12 @@ async def player_update():
     global playlist
     global player
     global main
+    global admin
 
     while True:
         sys.stdout.flush()
+        await admin.sendLog()
+
         loop.create_task(playlist.download_next())
 
         if not player.running() and not player.isPaused():
@@ -134,8 +124,7 @@ loop.create_task(player_update())
 app.router.add_get('/', index)
 app.router.add_get('/playlists', playlists)
 app.router.add_get('/ip', iprequest)
-app.router.add_get('/log', logrequest)
-app.router.add_get('/admin', admin)
+app.router.add_get('/admin', adminpage)
 app.router.add_get('/login', login)
 app.router.add_post('/postlogin', post_login)
 

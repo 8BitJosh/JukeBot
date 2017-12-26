@@ -13,10 +13,21 @@ class adminNamespace(socketio.AsyncNamespace):
 
         socketio.AsyncNamespace.__init__(self, namespace=_namespace)
 
+    def logrequest(self):
+        loglist = ''
+        for entry in self.logs:
+            loglist = loglist + entry + '\n'
+        return loglist
+
+
+    async def sendLog(self):
+        await self.emit('logs', self.logrequest())
+
 
     async def on_connected(self, sid, cookie):
         if cookie in self.authUsers:
             await self.emit('currentConfig', self.config.getConfig())
+            await self.emit('logs', self.logrequest())
         else:
             await self.emit('reloadpage')
 

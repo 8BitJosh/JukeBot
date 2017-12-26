@@ -26,6 +26,10 @@ $(document).ready(function() {
 		});
 	});
 
+	socket.on('logs', function(msg){
+		$('#log').text(msg);
+	});
+
 	$('button#submit').click(function(event) {
 		var settings = $('#settings').serializeArray()
 		var processed = {};
