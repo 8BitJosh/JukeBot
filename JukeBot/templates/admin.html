@@ -24,16 +24,27 @@
 		<!--Nav tabs-->
 		<ul class="nav nav-tabs">
 			<li class="active">
-				<a  href="#1" data-toggle="tab">Settings</a>
+				<a  href="#1" data-toggle="tab">Log</a>
 			</li>
 			<li>
-				<a href="#2" data-toggle="tab">Log</a>
+				<a href="#2" data-toggle="tab">Settings</a>
 			</li>
 		</ul>
 
-		<!--Now Playing-->
+		
 		<div class="tab-content ">
+			<!--Log page-->
 			<div class="tab-pane active" id="1">
+				<br>
+				<div class="form-group">
+					<textarea class="form-control" id="log" rows="55" style="overflow:scroll;" readonly>
+					</textarea>
+				</div>
+
+			</div>
+
+			<!--Settings-->
+			<div class="tab-pane" id="2">
 				<br>
 				<form id='settings'>
 					<div class="form-group ">
@@ -172,16 +183,6 @@
 				</form>
 			</div>
 
-			<div class="tab-pane" id="2">
-				<br>
-				<h4>Log page</h4>
-
-				<div class="form-group">
-					<textarea class="form-control" id="log" rows="20" style="overflow:scroll;" readonly>
-					</textarea>
-				</div>
-
-			</div>
 		</div>
 
 	</div>

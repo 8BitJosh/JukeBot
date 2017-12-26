@@ -1,7 +1,7 @@
 {
 	"webPort": 80,
 	"songcacheDir": "cache",
-	"logLength": 30,
+	"logLength": 50,
 	"defaultVol": 100,
 	"skippingEnable": true,
 	"voteSkipNum": 0,

@@ -11,7 +11,6 @@ import socketio
 import asyncio
 import time, os, base64, sys
 
-logs = []
 authUsers = {}
 adminLogins = ['63e780c3f321d13109c71bf81805476e'] # user,pass
 
@@ -29,8 +28,8 @@ playlist = Playlist(config, socketio, loop, processor)
 playlistlist = PlaylistList(config, socketio, loop, processor)
 player = Player(config, socketio, loop)
 
-main = mainNamespace(playlist, player, playlistlist, config, loop, logs, '/main')
-admin = adminNamespace(config, authUsers, loop, logs, '/admin')
+main = mainNamespace(playlist, player, playlistlist, config, loop, '/main')
+admin = adminNamespace(config, authUsers, loop, '/admin')
 
 socketio.register_namespace(main)
 socketio.register_namespace(admin)

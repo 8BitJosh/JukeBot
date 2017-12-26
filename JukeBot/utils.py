@@ -43,6 +43,38 @@ def delete_file(dir):
         print("Could not delete file {}, giving up and moving on".format(dir), flush=True)
 
 
+def tail(filename, linesback=10):
+    avgcharsperline = 75
+
+    file = open(filename, 'r')
+    while 1:
+        try:
+            file.seek(-1 * avgcharsperline * linesback, 2)
+        except IOError:
+            file.seek(0)
+        if file.tell() == 0:
+            atstart = 1
+        else:
+            atstart = 0
+
+        lines = file.read().split("\n")
+        if (len(lines) > (linesback + 1)) or atstart:
+            break
+
+        avgcharsperline = avgcharsperline * 1.3
+    file.close()
+
+    if len(lines) > linesback:
+        start = len(lines) - linesback - 1
+    else:
+        start = 0
+
+    out = ''
+    for l in lines[start:len(lines) - 1]:
+        out = out + l + "\n"
+    return out
+
+
 class PlaylistEntry:
     def __init__(self, url, title, duration=0, requester=''):
         self.url = url

@@ -1,11 +1,11 @@
 import socketio
+from utils import tail
 
 
 class adminNamespace(socketio.AsyncNamespace):
-    def __init__(self, _config, _authUsers, _loop, _logs, _namespace):
+    def __init__(self, _config, _authUsers, _loop, _namespace):
         self.config = _config
         self.loop = _loop
-        self.logs = _logs
         self.authUsers = _authUsers
 
         self.shuffles = {}
@@ -13,21 +13,15 @@ class adminNamespace(socketio.AsyncNamespace):
 
         socketio.AsyncNamespace.__init__(self, namespace=_namespace)
 
-    def logrequest(self):
-        loglist = ''
-        for entry in self.logs:
-            loglist = loglist + entry + '\n'
-        return loglist
-
 
     async def sendLog(self):
-        await self.emit('logs', self.logrequest())
+        await self.emit('logs', tail('CMDlog', self.config.logLength))
 
 
     async def on_connected(self, sid, cookie):
         if cookie in self.authUsers:
             await self.emit('currentConfig', self.config.getConfig())
-            await self.emit('logs', self.logrequest())
+            await self.sendLog()
         else:
             await self.emit('reloadpage')
 
@@ -40,4 +34,4 @@ class adminNamespace(socketio.AsyncNamespace):
         else:
             print('Unautherized user tried to update the config', flush=True)
 
-        #await self.emit('currentConfig', self.config.getConfig())
+        await self.emit('currentConfig', self.config.getConfig())

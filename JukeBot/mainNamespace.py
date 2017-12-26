@@ -2,25 +2,17 @@ import socketio
 
 
 class mainNamespace(socketio.AsyncNamespace):
-    def __init__(self, _playlist, _player, _playlistlist, _config, _loop, _logs, _namespace):
+    def __init__(self, _playlist, _player, _playlistlist, _config, _loop, _namespace):
         self.playlist = _playlist
         self.player = _player
         self.playlistlist = _playlistlist
         self.config = _config
         self.loop = _loop
-        self.logs = _logs
 
         self.shuffles = {}
         self.skips = []
 
         socketio.AsyncNamespace.__init__(self, namespace=_namespace)
-
-
-    def log(self, string):
-        print(string, flush=True)
-        self.logs.append(string)
-        if len(self.logs) > self.config.logLength:
-            del self.logs[0]
 
 
     def newSong(self):
@@ -64,7 +56,7 @@ class mainNamespace(socketio.AsyncNamespace):
             else:
                 msg = title
 
-            self.log('{} - Submitted - {}'.format(requester, title))
+            print('{} - Submitted - {}'.format(requester, title), flush=True)
             p = self.loop.create_task(self.playlist.process(_title=msg, _requester=requester))
         else:
             str = 'Enter a Song Name'
@@ -77,7 +69,7 @@ class mainNamespace(socketio.AsyncNamespace):
         if command == 'skip' and self.config.skippingEnable:
             if self.config.voteSkipNum is 0:
                 await self.emit('response', {'data': 'Song Skipped'}, room=sid)
-                self.log('{} - Skipped song'.format(msg['ip']))
+                print('{} - Skipped song'.format(msg['ip']), flush=True)
                 await self.player.stop()
             else:
                 if msg['ip'] not in self.skips:
@@ -85,13 +77,13 @@ class mainNamespace(socketio.AsyncNamespace):
                     print("{} - Voted to skip the song".format(msg['ip']), flush=True)
                 if len(self.skips) >= self.config.voteSkipNum:
                     await self.emit('response', {'data': 'Song Skipped'}, room=sid)
-                    self.log('Song was vote Skipped by {} people'.format(len(self.skips)))
+                    print('Song was vote Skipped by {} people'.format(len(self.skips)), flush=True)
                     await self.player.stop()
 
         elif command == 'shuffle' and self.config.shuffleEnable:
             if self.config.shuffleLimit is 0:
                 await self.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
-                self.log('{} - Shuffled playlist'.format(msg['ip']))
+                print('{} - Shuffled playlist'.format(msg['ip']), flush=True)
                 await self.playlist.shuff()
             else:
                 if msg['ip'] in self.shuffles:
@@ -101,22 +93,22 @@ class mainNamespace(socketio.AsyncNamespace):
 
                 if self.shuffles[msg['ip']] <= self.config.shuffleLimit:
                     await self.emit('response', {'data': 'Songs Shuffled'}, namespace='/main')
-                    self.log('{} - Shuffled playlist'.format(msg['ip']))
+                    print('{} - Shuffled playlist'.format(msg['ip']), flush=True)
                     await self.playlist.shuff()
 
         elif command == 'clear' and self.config.songDeletionEnable:
             await self.playlist.clearall()
-            self.log('{} - Cleared all of playlist'.format(msg['ip']))
+            print('{} - Cleared all of playlist'.format(msg['ip']), flush=True)
             await self.emit('response', {'data': 'Playlist Cleared'}, namespace='/main')
 
         elif command == 'pause':
             if self.player.isPaused():
-                self.log('{} - Resumed the song'.format(msg['ip']))
+                print('{} - Resumed the song'.format(msg['ip']), flush=True)
                 await self.emit('response', {'data': 'Song Resumed'}, namespace='/main')
                 await self.emit('pause_button', {'data': 'Pause'})
                 await self.player.pause()
             elif self.player.running():
-                self.log('{} - Paused the song'.format(msg['ip']))
+                print('{} - Paused the song'.format(msg['ip']), flush=True)
                 await self.emit('response', {'data': 'Song Paused'}, namespace='/main')
                 await self.emit('pause_button', {'data': 'Resume'})
                 await self.player.pause()
@@ -132,7 +124,7 @@ class mainNamespace(socketio.AsyncNamespace):
         if self.config.songDeletionEnable:
             title = msg['title']
             index = msg['data']
-            self.log('{} - Removed index {} title = {}'.format(msg['ip'], index, title))
+            print('{} - Removed index {} title = {}'.format(msg['ip'], index, title), flush=True)
 
             await self.playlist.remove(index, title)
 
