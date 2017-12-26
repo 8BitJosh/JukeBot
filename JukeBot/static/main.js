@@ -1,12 +1,7 @@
 $(document).ready(function() {
 
     var ip = '';
-    $.get(
-        "ip",
-        function(data) {
-            ip = data;
-        }
-    );
+    $.get("ip", function(data){ ip = data; });
 
 // setup socket connection
     namespace = '/main';
