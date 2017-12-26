@@ -73,7 +73,7 @@ class Config:
 
             # need to do checking on this data to check user input
         if 'voteSkipNum' in config:
-            self.voteSkipNum = config['voteSkipNum']
+            self.voteSkipNum = int(config['voteSkipNum'])
 
         if 'songDeletionEnable' in config:
             if config['songDeletionEnable']:
@@ -89,7 +89,7 @@ class Config:
 
             # need to do checks on this data to check user input
         if 'shuffleLimit' in config:
-            self.shuffleLimit = config['shuffleLimit']
+            self.shuffleLimit = int(config['shuffleLimit'])
 
         if 'newPlaylists' in config:
             self.newPlaylists = config['newPlaylists']
