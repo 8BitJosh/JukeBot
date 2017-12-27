@@ -98,6 +98,18 @@ async def post_login(request):
         print('User just entered incorrect password for admin login', flush=True)
     return web.Response(text='reload')
 
+async def change_login(request):
+    global users
+
+    data = await request.post()
+
+    if users.updatePass(request.cookies['Jukebot'], data['oldPassword'], data['newPassword']):
+        print('Admin Updated the admin password', flush=True)
+        return web.Response(text='Password successfully changed')
+    else:
+        print('Admin failed to update the admin password', flush=True)
+        return web.Response(text='Incorrect password entered')
+
 
 async def player_update():
     global playlist
@@ -130,6 +142,7 @@ app.router.add_get('/ip', iprequest)
 app.router.add_get('/admin', adminpage)
 app.router.add_get('/login', login)
 app.router.add_post('/postlogin', post_login)
+app.router.add_post('/changelogin', change_login)
 
 app.router.add_static('/static/', path=str('./JukeBot/static'), name='static')
 

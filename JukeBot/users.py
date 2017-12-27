@@ -51,8 +51,8 @@ class Users:
 
             with open('config.json', 'w') as file:
                 json.dump(Tosave, file, indent="\t")
-        else:
-            return False
+            return True
+        return False
 
 
     def removeOld(self):

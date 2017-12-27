@@ -53,13 +53,25 @@ $(document).ready(function() {
 		socket.emit('logout', cookie);
 	});
 
+	$('#passwordUpdate').click(function(event){
+		_oldPassword = md5('JukeBot' + $('#oldPassword').val());
+		_newPassword = md5('JukeBot' + $('#newPassword').val());
+		pass = {oldPassword: _oldPassword, newPassword: _newPassword};
+
+		$.post('changelogin', pass, function(msg){
+			$('#oldPassword').val('');
+			$('#newPassword').val('');
+			alert(msg);
+		});
+	});
+
 });
 
 function getCookie(cname) {
 	var name = cname + "=";
 	var decodedCookie = decodeURIComponent(document.cookie);
 	var ca = decodedCookie.split(';');
-	for(var i = 0; i <ca.length; i++) {
+	for(var i = 0; i < ca.length; i++) {
 		var c = ca[i];
 		while (c.charAt(0) == ' ') {
 			c = c.substring(1);
