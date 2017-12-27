@@ -8,7 +8,9 @@
 	"songDeletionEnable": true,
 	"shuffleEnable": true,
 	"shuffleLimit": 0,
+	"maxPlaylistLength": 10,
 	"newPlaylists": true,
 	"enablePlaylistDeletion": true,
-	"enablePlaylistEditing": true
+	"enablePlaylistEditing": true,
+	"enablePlaylistPage": true
 }

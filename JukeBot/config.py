@@ -14,16 +14,19 @@ class Config:
 
         # playlist
         self.skippingEnable = True
-        self.voteSkipNum = 0            #
+        self.voteSkipNum = 0
 
         self.songDeletionEnable = True
         self.shuffleEnable = True       
-        self.shuffleLimit = 0           #
+        self.shuffleLimit = 0
+
+        self.maxPlaylistLength = 100
 
         # stored Playlists
-        self.newPlaylists = True            #
-        self.enablePlaylistDeletion = True  #
-        self.enablePlaylistEditing = True   #
+        self.newPlaylists = True
+        self.enablePlaylistDeletion = True
+        self.enablePlaylistEditing = True
+        self.enablePlaylistPage = True
 
         with open('config.json') as file:
             config = json.load(file)
@@ -91,6 +94,9 @@ class Config:
         if 'shuffleLimit' in config:
             self.shuffleLimit = int(config['shuffleLimit'])
 
+        if 'maxPlaylistLength' in config:
+            self.maxPlaylistLength = int(config['maxPlaylistLength'])
+
         if 'newPlaylists' in config:
             self.newPlaylists = config['newPlaylists']
             
@@ -99,6 +105,9 @@ class Config:
             
         if 'enablePlaylistEditing' in config:
             self.enablePlaylistEditing = config['enablePlaylistEditing']
+
+        if 'enablePlaylistPage' in config:
+            self.enablePlaylistPage = config['enablePlaylistPage']
 
         self.exportConfig()
       

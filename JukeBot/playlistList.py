@@ -73,7 +73,7 @@ class PlaylistList:
 
     async def addSong(self, playlistName, title):
         entry = []
-        await self.processor.process(entry, title, 'playlist')
+        await self.processor.process(entry, title, requester='playlist')
 
         for songs in entry:
             song = {'url': songs.url, 'title': songs.title, 'dur': songs.duration}

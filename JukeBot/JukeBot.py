@@ -22,7 +22,7 @@ loop = asyncio.get_event_loop()
 config = Config()
 users = Users()
 
-processor = Processor(config.songcacheDir, socketio, loop)
+processor = Processor(config.songcacheDir, socketio, loop, config)
 
 playlist = Playlist(config, socketio, loop, processor)
 playlistlist = PlaylistList(config, socketio, loop, processor)
@@ -44,12 +44,15 @@ async def index(request):
 
 
 async def playlists(request):
-    peername = request.transport.get_extra_info('peername')
-    if peername is not None:
-        host, port = peername
-    print("Client loaded playlists - {}".format(host), flush=True)
-    return web.FileResponse('./JukeBot/templates/playlists.html')
+    global config
 
+    if config.enablePlaylistPage:
+        peername = request.transport.get_extra_info('peername')
+        if peername is not None:
+            host, port = peername
+        print("Client loaded playlists - {}".format(host), flush=True)
+        return web.FileResponse('./JukeBot/templates/playlists.html')
+    return web.HTTPFound('/')
 
 async def iprequest(request):
     peername = request.transport.get_extra_info('peername')

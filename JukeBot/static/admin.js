@@ -16,7 +16,7 @@ $(document).ready(function() {
 
 	socket.on('currentConfig', function(msg){
 		$.each(msg, function(index, item){
-			if(index == 'voteSkipNum' || index == 'shuffleLimit'){
+			if(index == 'voteSkipNum' || index == 'shuffleLimit' || index == 'maxPlaylistLength'){
 				$('#' + index).val(item);
 			}
 			else{
@@ -34,7 +34,7 @@ $(document).ready(function() {
 		var settings = $('#settings').serializeArray()
 		var processed = {};
 		$.each(settings, function(index, item){
-			if(item.name == 'voteSkipNum' || item.name == 'shuffleLimit'){
+			if(item.name == 'voteSkipNum' || item.name == 'shuffleLimit' || item.name == 'maxPlaylistLength'){
 				processed[item.name] = item.value;
 			}
 			else if(item.value == 'true'){

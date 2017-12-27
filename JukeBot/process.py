@@ -19,15 +19,16 @@ class ExtractionError(Exception):
 
 
 class Processor:
-    def __init__(self, savedir, socketio, loop):
+    def __init__(self, savedir, socketio, loop, _config):
         self.savedir = savedir
         self.socketio = socketio
         self.loop = loop
+        self.config = _config
 
         self.downloader = Downloader(self.savedir)
 
 
-    async def process(self, songqueue, _title, _requester):
+    async def process(self, songqueue, _title, **options):
         print('process called', flush=True)
         song_url = _title.strip()
 
@@ -60,7 +61,7 @@ class Processor:
                     song_url,
                     info['title'],
                     info['duration'],
-                    _requester
+                    options['requester']
                 )
                 songqueue.append(entry)
             except:
@@ -99,7 +100,7 @@ class Processor:
                                     song_url,
                                     playlist_info.get('title', 'Untitled'),
                                     playlist_info.get('duration', 0) or 0,
-                                    _requester
+                                    options['requester']
                                 )
                                 print('added from playlist - ' + playlist_info['title'], flush=True)
                                 songqueue.append(entry)
@@ -111,6 +112,10 @@ class Processor:
                                 print(e)
                         else:
                             baditems += 1
+
+                        if items == self.config.maxPlaylistLength:
+                            print('Playlist length longer than the allowed length', flush=True)
+                            return
 
                 except Exception:
                     print('Error handling playlist %s queuing.' % playlist_url, flush=True)
@@ -131,7 +136,7 @@ class Processor:
                                     song_url,
                                     playlist_info.get('title', 'Untitled'),
                                     playlist_info.get('duration', 0) or 0,
-                                    _requester
+                                    options['requester']
                                 )
                                 print('added from playlist - ' + playlist_info['title'], flush=True)
                                 songqueue.append(entry)
@@ -143,6 +148,10 @@ class Processor:
                                 print(e)
                         else:
                             baditems += 1
+
+                        if items == self.config.maxPlaylistLength:
+                            print('Playlist length longer than the allowed length', flush=True)
+                            return
 
                 except Exception:
                     print('Error handling playlist %s queuing.' % playlist_url, flush=True)
@@ -160,7 +169,7 @@ class Processor:
                     song_url,
                     info['title'],
                     info['duration'],
-                    _requester
+                    options['requester']
                 )
                 songqueue.append(entry)
             except:
@@ -169,14 +178,14 @@ class Processor:
         print('user input processed - ' + _title, flush=True)
 
 
-    async def checkPlaylistURL(self, songqueue, title, requester):
+    async def checkPlaylistURL(self, songqueue, title, **options):
         try:
             info = await self.downloader.extract_info(self.loop, title, download = False, process = False)
             entry = PlaylistEntry(
                         title,
                         info['title'],
                         info['duration'],
-                        requester
+                        options['requester']
                     )
             songqueue.append(entry)
             print('added from playlist - ' + entry.title, flush=True)

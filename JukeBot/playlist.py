@@ -115,14 +115,14 @@ class Playlist:
         await self.sendPlaylist()
 
 
-    async def addPlaylist(self, songs, requester):
+    async def addPlaylist(self, songs, _requester):
         for song in songs:
             if 'data' not in song:
-                await self.processor.checkPlaylistURL(self.songqueue, songs[song]['url'], requester)
+                await self.processor.checkPlaylistURL(self.songqueue, songs[song]['url'], requester=_requester)
                     
 
     async def process(self, _title, _requester):
-        await self.processor.process(self.songqueue, _title, _requester)
+        await self.processor.process(self.songqueue, _title, requester=_requester)
         await self.sendPlaylist()
     
 
