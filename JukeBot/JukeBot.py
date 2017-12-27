@@ -57,17 +57,17 @@ async def iprequest(request):
         host, port = peername
 
     response = web.Response(text=str(host))
-    if 'session' not in request.cookies:
+    if 'Jukebot' not in request.cookies:
         randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + '-' + str(int(time.time()))
-        response.set_cookie('session', randomSID, expires=43200)
+        response.set_cookie('Jukebot', randomSID, expires=43200)
     return response
 
 
 async def adminpage(request):
     global users
 
-    if 'session' in request.cookies:
-        user = request.cookies['session']
+    if 'Jukebot' in request.cookies:
+        user = request.cookies['Jukebot']
         if users.isAdmin(user):
             print('Admin loaded the admin page', flush=True)
             return web.FileResponse('./JukeBot/templates/admin.html')
@@ -76,7 +76,7 @@ async def adminpage(request):
     else:
         response = web.HTTPFound('/login')
         randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + '-' + str(int(time.time()))
-        response.set_cookie('session', randomSID, expires=43200)
+        response.set_cookie('Jukebot', randomSID, expires=43200)
         return response
 
 
@@ -89,7 +89,7 @@ async def post_login(request):
 
     data = await request.post()
 
-    if users.userLogin(data['login'], request.cookies['session']):
+    if users.userLogin(data['login'], request.cookies['Jukebot']):
         print('User just logged into admin page', flush=True)
     else:
         print('User just entered incorrect password for admin login', flush=True)

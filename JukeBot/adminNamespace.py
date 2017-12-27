@@ -19,7 +19,8 @@ class adminNamespace(socketio.AsyncNamespace):
 
 
     async def on_connected(self, sid, cookie):
-        if self.users.isAdmin(cookie):
+        _cookie = cookie
+        if self.users.isAdmin(_cookie):
             await self.emit('currentConfig', self.config.getConfig())
             await self.sendLog()
         else:

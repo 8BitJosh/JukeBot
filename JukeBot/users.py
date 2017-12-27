@@ -9,7 +9,14 @@ class Users:
 
 
     def isAdmin(self, session):
-        if session in self.authUsers:
+        # somewhere " " is added to the ends of the session cookie
+        # this took me over an hour of my life to find and debug
+        # this error only occurs on mobile devices, but this fix will do for now
+        # session.strip('"')
+        # most mobile browsers also create a cookie named session that would change 
+        # this stopped my session tracker from working. The cookie is now named Jukebot
+
+        if session.strip('"') in list(self.authUsers):
             return True
         return False
 

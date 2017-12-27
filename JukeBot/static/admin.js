@@ -6,7 +6,7 @@ $(document).ready(function() {
 
 // connect
 	socket.on('connect', function(){
-		var cookie = getCookie('session')
+		var cookie = getCookie('Jukebot')
 		socket.emit('connected', cookie);
 	});
 
@@ -44,7 +44,7 @@ $(document).ready(function() {
 				processed[item.name] = false;
 			}
 		});		
-		processed['cookie'] = getCookie('session');
+		processed['cookie'] = getCookie('Jukebot');
 		socket.emit('updateConfig', processed);
 	});
 
