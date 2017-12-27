@@ -1,16 +1,24 @@
 {
-	"webPort": 80,
-	"songcacheDir": "cache",
-	"logLength": 50,
-	"defaultVol": 100,
-	"skippingEnable": true,
-	"voteSkipNum": 0,
-	"songDeletionEnable": true,
-	"shuffleEnable": true,
-	"shuffleLimit": 0,
-	"maxPlaylistLength": 10,
-	"newPlaylists": true,
-	"enablePlaylistDeletion": true,
-	"enablePlaylistEditing": true,
-	"enablePlaylistPage": true
+	"bootConfig": {
+		"webPort": 80,
+		"songcacheDir": "cache",
+		"logLength": 30,
+		"defaultVol": 100
+	},
+	"liveConfig": {
+		"skippingEnable": true,
+		"voteSkipNum": 0,
+		"songDeletionEnable": true,
+		"shuffleEnable": true,
+		"shuffleLimit": 0,
+		"maxPlaylistLength": 100,
+		"newPlaylists": true,
+		"enablePlaylistDeletion": true,
+		"enablePlaylistEditing": true,
+		"enablePlaylistPage": true
+	},
+	"users": {
+		"pass": "d3f1584e5812f297bf27f7648d9dd6b4"
+	},
+	"blacklist": {}
 }

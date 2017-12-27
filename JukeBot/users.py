@@ -1,11 +1,17 @@
 import time
-
+import json
 
 class Users:
     def __init__(self):
         self.authUsers = {}
+        self.adminLogin = []
+        self.blacklisted = {}
 
-        self.adminLogins = ['63e780c3f321d13109c71bf81805476e']  # user,pass
+        with open('config.json') as file:
+            configfile = json.load(file)
+
+        self.adminLogin.append(configfile['users']['pass'])
+        self.blacklisted = configfile['blacklist']
 
 
     def isAdmin(self, session):
@@ -22,7 +28,7 @@ class Users:
 
 
     def userLogin(self, passhash, session):
-        if passhash in self.adminLogins:
+        if passhash in self.adminLogin:
             self.authUsers[session] = int(time.time())
             return True
         return False
@@ -34,6 +40,21 @@ class Users:
             return True
 
 
+    def updatePass(self, session, oldPasshash, newPasshash):
+        if (oldPasshash in self.adminLogin) and (session in self.authUsers):
+            self.adminLogin[0] = newPasshash
+            
+            with open('config.json', 'r') as file:
+                Tosave = json.load(file)
+        
+            Tosave['users']['pass'] = self.adminLogin[0]
+
+            with open('config.json', 'w') as file:
+                json.dump(Tosave, file, indent="\t")
+        else:
+            return False
+
+
     def removeOld(self):
         expireTime = int(time.time()) - 43200
         for key in list(self.authUsers):
@@ -43,4 +64,12 @@ class Users:
 
 
     def isBlacklisted(self, session):
+        pass
+
+
+    def addBlacklist(self, session):
+        pass
+
+
+    def removeBlacklist(self, session):
         pass
