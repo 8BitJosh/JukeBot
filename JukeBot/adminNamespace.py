@@ -3,10 +3,10 @@ from utils import tail
 
 
 class adminNamespace(socketio.AsyncNamespace):
-    def __init__(self, _config, _authUsers, _loop, _namespace):
+    def __init__(self, _config, _users, _loop, _namespace):
         self.config = _config
         self.loop = _loop
-        self.authUsers = _authUsers
+        self.users = _users
 
         self.shuffles = {}
         self.skips = []
@@ -19,7 +19,7 @@ class adminNamespace(socketio.AsyncNamespace):
 
 
     async def on_connected(self, sid, cookie):
-        if cookie in self.authUsers:
+        if self.users.isAdmin(cookie):
             await self.emit('currentConfig', self.config.getConfig())
             await self.sendLog()
         else:
@@ -27,7 +27,7 @@ class adminNamespace(socketio.AsyncNamespace):
 
 
     async def on_updateConfig(self, sid, data):
-        if data['cookie'] in self.authUsers:
+        if self.users.isAdmin(data['cookie']):
             print('Admin updated the server config', flush=True)
 
             self.config.updateConfig(data)

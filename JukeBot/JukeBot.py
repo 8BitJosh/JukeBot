@@ -3,6 +3,7 @@ from playlist import Playlist
 from playlistList import PlaylistList
 from process import Processor
 from config import Config
+from users import Users
 from mainNamespace import mainNamespace
 from adminNamespace import adminNamespace
 
@@ -11,8 +12,6 @@ import socketio
 import asyncio
 import time, os, base64, sys
 
-authUsers = {}
-adminLogins = ['63e780c3f321d13109c71bf81805476e'] # user,pass
 
 socketio = socketio.AsyncServer()
 app = web.Application()
@@ -21,6 +20,7 @@ socketio.attach(app)
 loop = asyncio.get_event_loop()
 
 config = Config()
+users = Users()
 
 processor = Processor(config.songcacheDir, socketio, loop)
 
@@ -29,7 +29,7 @@ playlistlist = PlaylistList(config, socketio, loop, processor)
 player = Player(config, socketio, loop)
 
 main = mainNamespace(playlist, player, playlistlist, config, loop, '/main')
-admin = adminNamespace(config, authUsers, loop, '/admin')
+admin = adminNamespace(config, users, loop, '/admin')
 
 socketio.register_namespace(main)
 socketio.register_namespace(admin)
@@ -58,24 +58,24 @@ async def iprequest(request):
 
     response = web.Response(text=str(host))
     if 'session' not in request.cookies:
-        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + str(int(time.time()))
+        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + '-' + str(int(time.time()))
         response.set_cookie('session', randomSID, expires=43200)
     return response
 
 
 async def adminpage(request):
-    global authUsers
+    global users
 
     if 'session' in request.cookies:
         user = request.cookies['session']
-        if user in authUsers:
+        if users.isAdmin(user):
             print('Admin loaded the admin page', flush=True)
             return web.FileResponse('./JukeBot/templates/admin.html')
         else:
             return web.HTTPFound('/login')
     else:
         response = web.HTTPFound('/login')
-        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + str(int(time.time()))
+        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + '-' + str(int(time.time()))
         response.set_cookie('session', randomSID, expires=43200)
         return response
 
@@ -85,13 +85,12 @@ async def login(request):
 
 
 async def post_login(request):
-    global adminLogins
+    global users
 
     data = await request.post()
 
-    if data['login'] in adminLogins:
+    if users.userLogin(data['login'], request.cookies['session']):
         print('User just logged into admin page', flush=True)
-        authUsers[request.cookies['session']] = int(time.time())
     else:
         print('User just entered incorrect password for admin login', flush=True)
     return web.Response(text='reload')
@@ -102,10 +101,12 @@ async def player_update():
     global player
     global main
     global admin
+    global users
 
     while True:
         sys.stdout.flush()
         await admin.sendLog()
+        users.removeOld()
 
         loop.create_task(playlist.download_next())
 
