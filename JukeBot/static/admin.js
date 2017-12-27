@@ -48,6 +48,11 @@ $(document).ready(function() {
 		socket.emit('updateConfig', processed);
 	});
 
+	$('#logout').click(function(event){
+		var cookie = getCookie('Jukebot');
+		socket.emit('logout', cookie);
+	});
+
 });
 
 function getCookie(cname) {

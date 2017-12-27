@@ -28,6 +28,12 @@ class Users:
         return False
 
 
+    def userLogout(self, session):
+        if session in self.authUsers:
+            del self.authUsers[session]
+            return True
+
+
     def removeOld(self):
         expireTime = int(time.time()) - 43200
         for key in list(self.authUsers):

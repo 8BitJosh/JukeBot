@@ -21,10 +21,10 @@ class adminNamespace(socketio.AsyncNamespace):
     async def on_connected(self, sid, cookie):
         _cookie = cookie
         if self.users.isAdmin(_cookie):
-            await self.emit('currentConfig', self.config.getConfig())
+            await self.emit('currentConfig', self.config.getConfig(), room=sid)
             await self.sendLog()
         else:
-            await self.emit('reloadpage')
+            await self.emit('reloadpage', room=sid)
 
 
     async def on_updateConfig(self, sid, data):
@@ -36,3 +36,9 @@ class adminNamespace(socketio.AsyncNamespace):
             print('Unautherized user tried to update the config', flush=True)
 
         await self.emit('currentConfig', self.config.getConfig())
+
+
+    async def on_logout(self, sid, cookie):
+        self.users.userLogout(cookie)
+        await self.emit('reloadpage', room=sid)
+
