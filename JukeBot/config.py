@@ -22,6 +22,8 @@ class Config:
 
         self.maxPlaylistLength = 100
 
+        self.enabledSources = {}
+
         # stored Playlists
         self.newPlaylists = True
         self.enablePlaylistDeletion = True
@@ -66,6 +68,12 @@ class Config:
 
         if 'maxPlaylistLength' in config:
             self.maxPlaylistLength = int(config['maxPlaylistLength'])
+
+        if 'enabledSources' in config:
+            for key in self.enabledSources:
+                self.enabledSources[key] = False
+            for key in config['enabledSources']:
+                self.enabledSources[key] = config['enabledSources'][key]
 
         if 'newPlaylists' in config:
             self.newPlaylists = config['newPlaylists']
@@ -155,7 +163,12 @@ class Config:
 
     def printConfig(self, config):
         for key in list(config):
-            print('\t{} = {}'.format(key, config[key]))
+            if type(config[key]) is dict:
+                print('\t{} -'.format(key))
+                for subkey in list(config[key]):
+                    print('\t\t{} = {}'.format(subkey, config[key][subkey]))
+            else:
+                print('\t{} = {}'.format(key, config[key]))
 
 
 class defaults: 

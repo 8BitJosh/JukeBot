@@ -42,6 +42,9 @@ class Processor:
 ####if song is search term
 
         if info.get('url', '').startswith('ytsearch'):
+            if self.config.enabledSources['youtube'] == False:
+                print('Youtube as a source is disabled')
+                return
             info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
             if not info:
                 return
@@ -84,6 +87,9 @@ class Processor:
             playlist_url = song_url
     # youtube playlist
             if info['extractor'].lower() == 'youtube:playlist':
+                if self.config.enabledSources['youtube-playlists'] == False:
+                    print('Youtube playlists as a source are disabled')
+                    return
                 try:
                     for entry_data in info['entries']:
                         items += 1
@@ -121,6 +127,12 @@ class Processor:
                     print('Error handling playlist %s queuing.' % playlist_url, flush=True)
     # soundcloud and bandcamp
             elif info['extractor'].lower() in ['soundcloud:set', 'soundcloud:user', 'bandcamp:album']:
+                if (self.config.enabledSources['soundcloud'] == False) and (info['extractor'].lower() in ['soundcloud:set', 'soundcloud:user']):
+                    print('Soundcloud as a source is disabled')
+                    return
+                if (self.config.enabledSources['bandcamp'] == False) and (info['extractor'].lower() in ['bandcamp:album']):
+                    print('Bandcamp as a source is disabled')
+                    return
                 try:
                     for entry_data in info['entries']:
                         items += 1
@@ -163,6 +175,9 @@ class Processor:
 
 ####else if song is a url or other thing
         else:
+            if self.config.enabledSources['wildcard'] == False:
+                print('Wildcarding as a source is disabled')
+                return
             info = await self.downloader.extract_info(self.loop, song_url, download=False, process=True)
             try:
                 entry = PlaylistEntry(

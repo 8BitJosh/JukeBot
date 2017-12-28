@@ -2,7 +2,7 @@
 	"bootConfig": {
 		"webPort": 80,
 		"songcacheDir": "cache",
-		"logLength": 30,
+		"logLength": 50,
 		"defaultVol": 100
 	},
 	"liveConfig": {
@@ -12,6 +12,13 @@
 		"shuffleEnable": true,
 		"shuffleLimit": 0,
 		"maxPlaylistLength": 100,
+		"enabledSources": {
+			"youtube": true,
+			"youtube-playlists": true,
+			"soundcloud": true,
+			"bandcamp": true,
+			"wildcard": true
+		},
 		"newPlaylists": true,
 		"enablePlaylistDeletion": true,
 		"enablePlaylistEditing": true,

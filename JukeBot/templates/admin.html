@@ -96,7 +96,7 @@
 							</div>
 							<div class="form-group ">
 								<label class="control-label " for="voteSkipNum">
-									Vote Skip Number
+									Vote Skip Number (0 for no vote skip)
 								</label>
 								<input class="form-control" id="voteSkipNum" name="voteSkipNum" type="number"/>
 							</div>
@@ -140,13 +140,13 @@
 							</div>
 							<div class="form-group ">
 								<label class="control-label " for="shuffleLimit">
-									Shuffle Limit
+									Shuffle Limit (0 for no limit)
 								</label>
 								<input class="form-control" id="shuffleLimit" name="shuffleLimit" type="number"/>
 							</div>
 							<div class="form-group ">
 								<label class="control-label " for="maxPlaylistLength">
-									Maximum number of songs added from a playlist
+									Maximum number of songs added from a playlist (0 for no limit)
 								</label>
 								<input class="form-control" id="maxPlaylistLength" name="maxPlaylistLength" type="number"/>
 							</div>
@@ -226,6 +226,45 @@
 									</div>
 								</div>
 							</div>
+
+							<div class="form-group ">
+								<label class="control-label ">
+									Select the allowed sources of music (wildcard enables any other option not on the list)
+								</label>
+								<div class=" ">
+									<div class="checkbox">
+										<label class="checkbox">
+											<input name="enabledSources" type="checkbox" value="youtube"/>
+											youtube
+										</label>
+									</div>
+									<div class="checkbox">
+										<label class="checkbox">
+											<input name="enabledSources" type="checkbox" value="youtube-playlists"/>
+											youtube-playlists
+										</label>
+									</div>
+									<div class="checkbox">
+										<label class="checkbox">
+											<input name="enabledSources" type="checkbox" value="soundcloud"/>
+											soundcloud
+										</label>
+									</div>
+									<div class="checkbox">
+										<label class="checkbox">
+											<input name="enabledSources" type="checkbox" value="bandcamp"/>
+											bandcamp
+										</label>
+									</div>
+									<div class="checkbox">
+										<label class="checkbox">
+											<input name="enabledSources" type="checkbox" value="wildcard"/>
+											wildcard
+										</label>
+									</div>
+								</div>
+							</div>
+
 							<div class="form-group">
 								<div>
 									<button class="btn btn-primary " id="submit" name="submit" type="button">

@@ -19,6 +19,11 @@ $(document).ready(function() {
 			if(index == 'voteSkipNum' || index == 'shuffleLimit' || index == 'maxPlaylistLength'){
 				$('#' + index).val(item);
 			}
+			else if(index == 'enabledSources'){
+				$.each(item, function(web, enable){
+					$('input:checkbox[name=enabledSources][value=' + web + ']').prop("checked", enable);
+				});
+			}
 			else{
 				$('input:radio[name=' + index + ']:nth(0)').prop("checked", item);
 				$('input:radio[name=' + index + ']:nth(1)').prop("checked", !item);
@@ -33,9 +38,14 @@ $(document).ready(function() {
 	$('button#submit').click(function(event) {
 		var settings = $('#settings').serializeArray()
 		var processed = {};
+		processed['enabledSources'] = {};
+
 		$.each(settings, function(index, item){
 			if(item.name == 'voteSkipNum' || item.name == 'shuffleLimit' || item.name == 'maxPlaylistLength'){
 				processed[item.name] = item.value;
+			}
+			else if(item.name == 'enabledSources'){
+				processed['enabledSources'][item.value] = true;
 			}
 			else if(item.value == 'true'){
 				processed[item.name] = true;
