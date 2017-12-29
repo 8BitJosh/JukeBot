@@ -28,7 +28,7 @@ playlist = Playlist(config, socketio, loop, processor)
 playlistlist = PlaylistList(config, socketio, loop, processor)
 player = Player(config, socketio, loop)
 
-main = mainNamespace(playlist, player, playlistlist, config, loop, '/main')
+main = mainNamespace(playlist, player, playlistlist, config, loop, users, '/main')
 admin = adminNamespace(config, users, loop, '/admin')
 
 socketio.register_namespace(main)

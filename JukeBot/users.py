@@ -6,6 +6,7 @@ class Users:
         self.authUsers = {}
         self.adminLogin = []
         self.blacklisted = {}
+        self.connected = []
 
         with open('config.json') as file:
             configfile = json.load(file)
@@ -62,13 +63,64 @@ class Users:
                 del self.authUsers[key]
 
 
+    def userConnect(self, sid, session, ip):
+        for user in self.connected:
+            if user.session == session:
+                user.sid = sid
+                user.ip = ip
+                return
+        self.connected.append(User(session, sid, ip))
+
+
+    def getSidSession(self, sid):
+        for user in list(self.connected):
+            if user.sid == sid:
+                return user.session
+        return None
+
+
+    def isSidAdmin(self, sid):
+        for user in list(self.connected):
+            if (user.sid == sid) and (user.session in self.authUsers):
+                return True
+        return False
+
+
+    def getSidName(self, sid):
+        for user in list(self.connected):
+            if user.sid == sid:
+                return user.ip
+        return None
+
+
     def isBlacklisted(self, session):
-        pass
+        if session in self.blacklisted:
+            return True
+        return False
 
 
     def addBlacklist(self, session):
-        pass
+        self.blacklisted['session'] = int(time.time())
+        self.saveBlacklist()
 
 
     def removeBlacklist(self, session):
-        pass
+        del self.blacklisted[session]
+        self.saveBlacklist()
+
+
+    def saveBlacklist(self):
+        with open('config.json', 'r') as file:
+            Tosave = json.load(file)
+        
+        Tosave['blacklist'] = self.blacklisted
+
+        with open('config.json', 'w') as file:
+            json.dump(Tosave, file, indent="\t")
+
+
+class User:
+    def __init__(self, session, sid, ip):
+        self.session = session
+        self.sid = sid
+        self.ip = ip
