@@ -39,7 +39,7 @@ async def index(request):
     peername = request.transport.get_extra_info('peername')
     if peername is not None:
         host, port = peername
-    print("Client loaded page - {}".format(host), flush=True)
+    print("Client loaded page - {}".format(host))
     return web.FileResponse('./JukeBot/templates/index.html')
 
 
@@ -50,7 +50,7 @@ async def playlists(request):
         peername = request.transport.get_extra_info('peername')
         if peername is not None:
             host, port = peername
-        print("Client loaded playlists - {}".format(host), flush=True)
+        print("Client loaded playlists - {}".format(host))
         return web.FileResponse('./JukeBot/templates/playlists.html')
     return web.HTTPFound('/')
 
@@ -61,8 +61,8 @@ async def iprequest(request):
 
     response = web.Response(text=str(host))
     if 'Jukebot' not in request.cookies:
-        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + '-' + str(int(time.time()))
-        response.set_cookie('Jukebot', randomSID, expires=43200)
+        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + str(int(time.time()))
+        response.set_cookie('Jukebot', randomSID)
     return response
 
 
@@ -72,14 +72,14 @@ async def adminpage(request):
     if 'Jukebot' in request.cookies:
         user = request.cookies['Jukebot']
         if users.isAdmin(user):
-            print('Admin loaded the admin page', flush=True)
+            print('Admin loaded the admin page')
             return web.FileResponse('./JukeBot/templates/admin.html')
         else:
             return web.HTTPFound('/login')
     else:
         response = web.HTTPFound('/login')
-        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + '-' + str(int(time.time()))
-        response.set_cookie('Jukebot', randomSID, expires=43200)
+        randomSID = base64.b64encode(os.urandom(16)).decode('utf-8').strip('=') + str(int(time.time()))
+        response.set_cookie('Jukebot', randomSID)
         return response
 
 
@@ -93,9 +93,9 @@ async def post_login(request):
     data = await request.post()
 
     if users.userLogin(data['login'], request.cookies['Jukebot']):
-        print('User just logged into admin page', flush=True)
+        print('User just logged into admin page')
     else:
-        print('User just entered incorrect password for admin login', flush=True)
+        print('User just entered incorrect password for admin login')
     return web.Response(text='reload')
 
 
@@ -105,10 +105,10 @@ async def change_login(request):
     data = await request.post()
 
     if users.updatePass(request.cookies['Jukebot'], data['oldPassword'], data['newPassword']):
-        print('Admin Updated the admin password', flush=True)
+        print('Admin Updated the admin password')
         return web.Response(text='Password successfully changed')
     else:
-        print('Admin failed to update the admin password', flush=True)
+        print('Admin failed to update the admin password')
         return web.Response(text='Incorrect password entered')
 
 

@@ -23,12 +23,12 @@ async def logcsv(song):
 
 def delete_file(dir):
     if dir == 'bad_path' or dir == '':
-        print('No file exists - badpath/""', flush=True)
+        print('No file exists - badpath/""')
         return
     for x in range(30):
         try:
             os.unlink(dir)
-            print("file deleted - {}".format(dir), flush=True)
+            print("file deleted - {}".format(dir))
             break
 
         except PermissionError as e:
@@ -37,10 +37,10 @@ def delete_file(dir):
 
         except Exception as e:
             traceback.print_exc()
-            print("Error trying to delete - {}".format(dir), flush=True)
+            print("Error trying to delete - {}".format(dir))
             break
     else:
-        print("Could not delete file {}, giving up and moving on".format(dir), flush=True)
+        print("Could not delete file {}, giving up and moving on".format(dir))
 
 
 def tail(filename, linesback=10):

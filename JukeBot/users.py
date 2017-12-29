@@ -58,8 +58,7 @@ class Users:
     def removeOld(self):
         expireTime = int(time.time()) - 43200
         for key in list(self.authUsers):
-            keyCreation = int(key.split('-')[-1])
-            if (self.authUsers[key] < expireTime) or (keyCreation < expireTime):
+            if (self.authUsers[key] < expireTime):
                 del self.authUsers[key]
 
 

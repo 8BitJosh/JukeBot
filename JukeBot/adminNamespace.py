@@ -29,11 +29,11 @@ class adminNamespace(socketio.AsyncNamespace):
 
     async def on_updateConfig(self, sid, data):
         if self.users.isAdmin(data['cookie']):
-            print('Admin updated the server config', flush=True)
+            print('Admin updated the server config')
 
             self.config.updateConfig(data)
         else:
-            print('Unautherized user tried to update the config', flush=True)
+            print('Unautherized user tried to update the config')
 
         await self.emit('currentConfig', self.config.getConfig())
 

@@ -98,7 +98,7 @@ class Config:
             if type(config['webPort']) is int:
                 self.webPort = config['webPort']
             else:
-                print('Webport value needs to be an interger', flush=True)
+                print('Webport value needs to be an interger')
                 print("Setting Webport to a default of {}".format(self.webPort))
 
         # TODO check if the dir is a valid path
@@ -106,14 +106,14 @@ class Config:
             if type(config['songcacheDir']) is str:
                 self.songcacheDir = config['songcacheDir']
             else:
-                print('cache Dir needs to be a valid directory', flush=True)
+                print('cache Dir needs to be a valid directory')
                 print("Setting cache Directory to a default of \"{}\"".format(self.songcacheDir))            
 
         if 'logLength' in config:
             if type(config['logLength']) is int:
                 self.logLength = config['logLength']
             else:
-                print('The length of the web log needs to be an interger', flush=True)
+                print('The length of the web log needs to be an interger')
                 print('Setting the log length to a default of {}'.format(self.logLength))
 
             # Player
@@ -122,7 +122,7 @@ class Config:
             if (type(vol) is int) and (vol >= 0) and (vol <= 150):
                 self.defaultVol = config['defaultVol']
             else:
-                print('Default volume needs to be an interger between 0-150', flush=True)
+                print('Default volume needs to be an interger between 0-150')
                 print('Setting the volume to a default of {}'.format(self.defaultVol))
 
         self.exportConfig()
