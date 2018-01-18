@@ -122,7 +122,7 @@ class Config:
             if (type(vol) is int) and (vol >= 0) and (vol <= 150):
                 self.defaultVol = config['defaultVol']
             else:
-                print('Default volume needs to be an interger between 0-150')
+                print('Default volume needs to be an interger between 0-100')
                 print('Setting the volume to a default of {}'.format(self.defaultVol))
 
         self.exportConfig()
@@ -178,7 +178,7 @@ class defaults:
     logLength = 30 
  
     # player 
-    defaultVol = 100 
+    defaultVol = 80 
  
     # playlist 
     defaultSkipping = True 
