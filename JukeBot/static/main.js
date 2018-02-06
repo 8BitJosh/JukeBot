@@ -1,12 +1,9 @@
 $(document).ready(function() {
 
     var ip = '';
-    $.get(
-        "ip",
-        function(data) {
-            ip = data;
-        }
-    );
+    $.get("ip", function(data){ ip = data; });
+
+    var cookie = getCookie('Jukebot');
 
 // setup socket connection
     namespace = '/main';
@@ -14,7 +11,7 @@ $(document).ready(function() {
 
 // connect
     socket.on('connect', function(){
-        socket.emit('connected', ip);
+        socket.emit('connected', {'ip': ip, 'session': cookie});
     });
 
 // Get all data from server on long interval to keep in sync
@@ -95,7 +92,7 @@ $(document).ready(function() {
 // User sets volume slider
     $('#volume').on('change', function(){
         var vol = $('#volume').val();
-        socket.emit('volume', {'vol': vol, 'ip': ip});
+        socket.emit('volume', {'vol': vol, 'session': cookie});
     });
 
 // change name of pause button from server
@@ -156,29 +153,29 @@ $(document).ready(function() {
 
 // Main header buttons
     $('form#send').submit(function(event) {
-        socket.emit('sent_song', {data: $('#title_sent').val(), 'ip': ip});
+        socket.emit('sent_song', {data: $('#title_sent').val(), 'session': cookie});
         $('form#send')[0].reset();
         return false;
     });
 
     $('button#skip').click(function(event) {
-        socket.emit('button', {data: 'skip', 'ip': ip});
+        socket.emit('button', {data: 'skip', 'session': cookie});
         return false;
     });
 
     $('button#shuffle').click(function(event) {
-        socket.emit('button', {data: 'shuffle', 'ip': ip});
+        socket.emit('button', {data: 'shuffle', 'session': cookie});
         return false;
     });
 
     $('button#pause').click(function(event) {
-        socket.emit('button', {data: 'pause', 'ip': ip});
+        socket.emit('button', {data: 'pause', 'session': cookie});
         return false;
     });
 
     $('button#ClearAllPlaylist').click(function(event) {
         $('#ClearAllDialog').modal('hide');
-        socket.emit('button', {data: 'clear', 'ip': ip});
+        socket.emit('button', {data: 'clear', 'session': cookie});
         return false;
     });
 
@@ -191,7 +188,7 @@ $(document).ready(function() {
     $('#playlist_table').on('click', '#del', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#playlist_table tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('delete', {data: index, title: val, 'ip': ip});
+        socket.emit('delete', {data: index, title: val, 'session': cookie});
         return false;
     });
 
@@ -199,7 +196,7 @@ $(document).ready(function() {
     $('#ServerPlaylistTable').on('click', '#add', function(){
         var index = $(this).closest('tr').index();
         var val = $('table#ServerPlaylistTable tr:eq(' + index + ') td:eq(' + 1 + ')').text();
-        socket.emit('addPlaylist', {title: val, 'ip': ip});
+        socket.emit('addPlaylist', {title: val, 'session': cookie});
         return false;
     });
 
@@ -213,7 +210,7 @@ $(document).ready(function() {
             return false;
         }
         else {
-            socket.emit('removePlaylist', {index: index-1, "userinput" : userinput, title: val, 'ip': ip});
+            socket.emit('removePlaylist', {index: index-1, "userinput" : userinput, title: val, 'session': cookie});
             return false;
         }
     });
@@ -223,7 +220,7 @@ $(document).ready(function() {
         var savename = $('#EmptyPlaylistName').val();
         $('form#sendNameempty')[0].reset();
         $('#newPlaylistDialog').modal('hide');
-        socket.emit('newempty', {name: savename, 'ip': ip});
+        socket.emit('newempty', {name: savename, 'session': cookie});
         return false;
     });
 
@@ -231,7 +228,7 @@ $(document).ready(function() {
         var savename = $('#QueuePlaylistName').val();
         $('form#sendNameQueue')[0].reset();
         $('#SaveQueueDialog').modal('hide');
-        socket.emit('savequeue', {name: savename, 'ip': ip});
+        socket.emit('savequeue', {name: savename, 'session': cookie});
         return false;
     });
 
@@ -252,14 +249,14 @@ $(document).ready(function() {
         if(playname == 'Playlist:' || $('#newSongName').val() == ''){
             return false;
         }
-        socket.emit('add_song', {data: $('#newSongName').val(), playlistname: playname, 'ip': ip});
+        socket.emit('add_song', {data: $('#newSongName').val(), playlistname: playname, 'session': cookie});
         $('form#addNewSong')[0].reset();
         return false;
     });
 
 // playlist dropdown select handler
     $('#playlistSelection').change(function() {
-        socket.emit('getplaylist', {data : this.value, 'ip': ip});
+        socket.emit('getplaylist', {data : this.value, 'session': cookie});
         return false;
     });
 
@@ -283,7 +280,7 @@ $(document).ready(function() {
         var index = $(this).closest('tr').index();
         var val = $('table#PlaylistSongsTable tr:eq(' + index + ') td:eq(' + 2 + ')').text();
         var playname = $('#currentplaylist').text();
-        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, 'ip': ip});
+        socket.emit('removePlaySong', {title : val, index: index-1, playlistname: playname, 'session': cookie});
         return false;
 
     });
@@ -299,4 +296,20 @@ function genTime(time){
     var minutes = m > 9 ? String(m) + ':' : "0" + String(m) + ':';
     var seconds = s > 9 ? "" + s: "0" + s ;
     return (hours + minutes + seconds) ;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

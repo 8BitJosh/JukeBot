@@ -47,7 +47,7 @@ class Playlist:
 
         self.currently_play = "[" + str(datetime.timedelta(seconds=int(self.songqueue[0].duration))) + "] " + self.songqueue[0].title
         song = self.songqueue[0]
-        print("Removed from to play queue - " + self.songqueue[0].title, flush=True)
+        print("Removed from to play queue - " + self.songqueue[0].title)
         del self.songqueue[0]
         await self.sendPlaylist()
         return song
@@ -93,7 +93,7 @@ class Playlist:
             playlistTitle = self.songqueue[index].title
             del_path = self.songqueue[index].dir
         except IndexError:
-            print('More than one user removed a song at the same time', flush=True)
+            print('More than one user removed a song at the same time')
             return
 
         if title.strip() == playlistTitle.strip():
@@ -102,7 +102,7 @@ class Playlist:
             if del_path != '':
                 delete_file(del_path)
         else:
-            print('More than one user removed a song at the same time', flush=True)
+            print('More than one user removed a song at the same time')
             return
 
     async def clearall(self):
@@ -115,14 +115,14 @@ class Playlist:
         await self.sendPlaylist()
 
 
-    async def addPlaylist(self, songs, requester):
+    async def addPlaylist(self, songs, _requester):
         for song in songs:
             if 'data' not in song:
-                await self.processor.checkPlaylistURL(self.songqueue, songs[song]['url'], requester)
+                await self.processor.checkPlaylistURL(self.songqueue, songs[song]['url'], requester=_requester)
                     
 
     async def process(self, _title, _requester):
-        await self.processor.process(self.songqueue, _title, _requester)
+        await self.processor.process(self.songqueue, _title, requester=_requester)
         await self.sendPlaylist()
     
 

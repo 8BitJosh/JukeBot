@@ -30,7 +30,7 @@ class Player:
         time.sleep(0.01)
         await logcsv(_song)
         await self.sendDuration()
-        print("playing - {}".format(self.path), flush=True)
+        print("playing - {}".format(self.path))
 
 
 # has a new song started playing
@@ -68,7 +68,7 @@ class Player:
                 return False
             self.player.stop()
             if self.path != '' and os.path.exists(self.path):
-                print("deleting", flush=True)
+                print("deleting")
                 delete_file(self.path)
             self.path = ''
             self.dur = 0
@@ -84,7 +84,7 @@ class Player:
             time.sleep(0.01)
             await self.sendDuration()
         else:
-            print("Unable to skip - no song playing", flush=True)
+            print("Unable to skip - no song playing")
 
 # pause/resume the current song
     async def pause(self):

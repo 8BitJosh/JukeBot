@@ -73,7 +73,7 @@ class PlaylistList:
 
     async def addSong(self, playlistName, title):
         entry = []
-        await self.processor.process(entry, title, 'playlist')
+        await self.processor.process(entry, title, requester='playlist')
 
         for songs in entry:
             song = {'url': songs.url, 'title': songs.title, 'dur': songs.duration}
@@ -91,7 +91,7 @@ class PlaylistList:
         duration = 0
         for song in self.playlists[playlistName]:
             if song == str(index) and self.playlists[playlistName][song]['title'] == title:
-                print('Song removed from playlist - {} - at index - {}'.format(playlistName, index), flush=True)
+                print('Song removed from playlist - {} - at index - {}'.format(playlistName, index))
                 pass
             elif song == 'data':
                 temp['data'] = self.playlists[playlistName][song]

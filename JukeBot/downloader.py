@@ -18,11 +18,19 @@ options = {
     }
 
 class Downloader:
-	def __init__(self, save_dir):
-		self.threadPool = ThreadPoolExecutor(max_workers=2)
-		self.ydl = youtube_dl.YoutubeDL(options)
-		self.saveDir = save_dir
+    def __init__(self, save_dir):
+        self.threadPool = ThreadPoolExecutor(max_workers=2)
+        options['progress_hooks'] = [self.hook]
 
-	async def extract_info(self, loop, url, download, process):
-		info = await loop.run_in_executor(self.threadPool, functools.partial(self.ydl.extract_info, url=url, download=download, process=process))
-		return info
+        self.ydl = youtube_dl.YoutubeDL(options)
+        self.saveDir = save_dir
+
+
+    async def extract_info(self, loop, url, download, process):
+        return await loop.run_in_executor(self.threadPool, functools.partial(self.ydl.extract_info, url=url, download=download, process=process))
+
+
+    def hook(self, data):
+        if data['status'] == 'finished':
+            print('Downloaded {} in {}'.format(data['_total_bytes_str'], data['_elapsed_str'])) 
+            
